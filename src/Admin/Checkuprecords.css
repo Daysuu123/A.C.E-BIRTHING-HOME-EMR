@@ -1,0 +1,20 @@
+.curec-shell { background: #1f1f1f; min-height: 100vh; display: grid; grid-template-rows: auto auto 1fr auto; }
+.breadcrumbs { color: #cbd5e1; font-size: 12px; padding: 8px 12px 0; }
+.gold-line { background: #caa22a; height: 28px; display: flex; align-items: center; padding-left: 12px; }
+.back { background: transparent; border: none; font-size: 18px; color: #000; cursor: pointer; }
+
+.curec-content { background: #fff; margin: 0 12px; padding: 18px 20px 24px; }
+.title { margin: 0 0 6px; font-size: 24px; }
+.subtitle { color: #6b7280; font-size: 12px; margin-bottom: 8px; }
+.search { width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 8px 10px; font-size: 12px; }
+
+.table-wrap { border: 1px solid #e5e7eb; border-radius: 4px; margin-top: 10px; }
+.table-head, .table-row { display: grid; grid-template-columns: 40px 1.6fr 1fr 1fr 1.4fr 1fr 1.2fr; gap: 8px; align-items: center; }
+.table-head { background: #f9fafb; font-size: 12px; font-weight: 700; padding: 8px 10px; border-bottom: 1px solid #e5e7eb; }
+.table-row { padding: 8px 10px; border-bottom: 1px solid #f3f4f6; font-size: 12px; }
+.table-row:last-child { border-bottom: 0; }
+
+.curec-footer { background: #6b7280; color: #fff; padding: 10px 12px; display: grid; grid-template-columns: 56px 1fr; align-items: center; }
+.footer-mark { width: 40px; height: 40px; border-radius: 50%; background: #caa22a; border: 2px solid #2b2b2b; }
+.mission { text-align: center; font-size: 11px; line-height: 1.2; }
+
