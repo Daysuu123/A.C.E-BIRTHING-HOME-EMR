@@ -1,13 +1,13 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Loginpage from "./Admin/loginpage";
-import Admindashboard from "./Admin/Admindashboard";
-import Checkuprecords from "./Admin/Checkuprecords";
-import Createrecords from "./Admin/Createrecords";
-import Manageaccs from "./Admin/Manageaccs";
-import Patientrecords from "./Admin/Patientrecords";
-import Patientregister from "./Admin/Patientregister";
-import Staffregister from "./Admin/Staffregister";
+import Loginpage from "./AdminSide/loginpage";
+import Admindashboard from "./AdminSide/Admindashboard";
+import Checkuprecords from "./AdminSide/Checkuprecords";
+import Createrecords from "./AdminSide/Createrecords";
+import Manageaccs from "./AdminSide/Manageaccs";
+import Patientrecords from "./AdminSide/Patientrecords";
+import Patientregister from "./AdminSide/Patientregister";
+import Staffregister from "./AdminSide/Staffregister";
 
 function App() {
   return (
