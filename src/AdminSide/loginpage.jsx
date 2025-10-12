@@ -1,7 +1,16 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./loginpage.css";
 
 function LoginPage() {
+  const navigate = useNavigate();
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    // Navigate to admin dashboard after successful login
+    navigate('/admin/dashboard');
+  };
+
   return (
     <div className="login-page">
       <div className="brand-panel">
@@ -23,7 +32,7 @@ function LoginPage() {
       <div className="form-panel">
         <div className="login-card">
           <h2 className="login-title">Login</h2>
-          <form className="login-form" onSubmit={(e) => e.preventDefault()}>
+          <form className="login-form" onSubmit={handleLogin}>
             <label className="sr-only" htmlFor="username">Username</label>
             <input id="username" type="text" placeholder="Username" className="input" />
 
