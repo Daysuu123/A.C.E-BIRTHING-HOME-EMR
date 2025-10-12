@@ -7,7 +7,7 @@ import Createrecords from "./AdminSide/Createrecords";
 import Manageaccs from "./AdminSide/Manageaccs";
 import Patientrecords from "./AdminSide/Patientrecords";
 import Patientregister from "./AdminSide/Patientregister";
-import Staffregister from "./AdminSide/Staffregister";
+
 
 function App() {
   return (
@@ -21,6 +21,7 @@ function App() {
         <Route path="/admin/patient-records" element={<Patientrecords />} />
         <Route path="/admin/patient-register" element={<Patientregister />} />
         <Route path="/admin/staff-register" element={<Staffregister />} />
+
       </Routes>
     </Router>
   );
