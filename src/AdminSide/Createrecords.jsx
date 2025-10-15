@@ -1,11 +1,12 @@
 import React from "react";
 import "./Createrecords.css";
+import { Link } from "react-router-dom";
 
 function Createrecords() {
   return (
     <div className="cr-shell">
       <div className="gold-line">
-        <button className="back" aria-label="Back">←</button>
+        <Link className="back" aria-label="Back" to="/admin/dashboard">←</Link>
       </div>
 
       <section className="cr-content">

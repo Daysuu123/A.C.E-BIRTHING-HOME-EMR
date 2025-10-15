@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Patientregister.css";
+import { Link } from "react-router-dom";
 
 function Patientregister() {
   const [show, setShow] = useState(false);
@@ -8,7 +9,7 @@ function Patientregister() {
     <div className="preg-shell">
       <div className="preg-head">
         <div className="gold-line">
-          <button className="back" aria-label="Back">←</button>
+          <Link className="back" aria-label="Back" to="/admin/dashboard">←</Link>
         </div>
       </div>
 
