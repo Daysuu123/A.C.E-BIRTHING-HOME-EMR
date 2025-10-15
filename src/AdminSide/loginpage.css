@@ -122,8 +122,19 @@
   padding: 10px 12px;
   font-weight: 600;
   cursor: pointer;
+  width: 100%;
+  margin-bottom: 8px;
 }
 .submit:hover { filter: brightness(0.95); }
+
+.staff-login {
+  background: #007bff;
+  margin-top: 8px;
+}
+.staff-login:hover { 
+  filter: brightness(0.9);
+  background: #0056b3;
+}
 
 @media (max-width: 900px) {
   .login-page { grid-template-columns: 1fr; }

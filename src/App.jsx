@@ -1,4 +1,5 @@
 import React from "react";
+<<<<<<< HEAD
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Loginpage from "./Admin/loginpage";
 import Admindashboard from "./Admin/Admindashboard";
@@ -26,12 +27,24 @@ function ProtectedRoute({ children }) {
   }
   return children;
 }
+=======
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Loginpage from "./AdminSide/loginpage";
+import Admindashboard from "./AdminSide/Admindashboard";
+import Checkuprecords from "./AdminSide/Checkuprecords";
+import Createrecords from "./AdminSide/Createrecords";
+import Manageaccs from "./AdminSide/Manageaccs";
+import Patientrecords from "./AdminSide/Patientrecords";
+import Patientregister from "./AdminSide/Patientregister";
+import Staffregister from "./AdminSide/Staffregister";
+>>>>>>> 3b41a8c41ecd1f40e7a5c60c7f517818ca1bcd1b
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Loginpage />} />
+<<<<<<< HEAD
         <Route
           path="/admin/dashboard"
           element={
@@ -89,6 +102,15 @@ function App() {
           }
         />
         <Route path="*" element={<Navigate to="/" replace />} />
+=======
+        <Route path="/admin/dashboard" element={<Admindashboard />} />
+        <Route path="/admin/checkup-records" element={<Checkuprecords />} />
+        <Route path="/admin/create-records" element={<Createrecords />} />
+        <Route path="/admin/manage-accounts" element={<Manageaccs />} />
+        <Route path="/admin/patient-records" element={<Patientrecords />} />
+        <Route path="/admin/patient-register" element={<Patientregister />} />
+        <Route path="/admin/staff-register" element={<Staffregister />} />
+>>>>>>> 3b41a8c41ecd1f40e7a5c60c7f517818ca1bcd1b
       </Routes>
     </Router>
   );
