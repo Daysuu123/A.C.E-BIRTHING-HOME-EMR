@@ -1,27 +1,36 @@
 import React from "react";
 import "./Admindashboard.css";
+import { Link, useNavigate } from "react-router-dom";
 
 function AdminDashboard() {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem("auth");
+    navigate("/", { replace: true });
+  };
   return (
     <div className="admin-shell">
       <header className="topbar">
         <div className="brand">
-          <div className="brand-mark">{/* replace with <img src=... /> if available */}</div>
+          <div className="brand-mark"></div>
           <span className="brand-name">A.C.E Birthing Home</span>
         </div>
         <div className="topbar-right">
           <span className="welcome">Welcome, Admin</span>
-          <button className="logout">Logout</button>
+          <button className="logout" onClick={handleLogout}>Logout</button>
         </div>
       </header>
 
       <div className="admin-body">
         <aside className="sidebar">
           <nav className="nav">
-            <a className="nav-btn active" href="#">Home</a>
-            <a className="nav-btn" href="#">Patient</a>
-            <a className="nav-btn" href="#">Accounts</a>
-            <a className="nav-btn" href="#">Records</a>
+            <Link className="nav-btn active" to="/admin/dashboard">Home</Link>
+            <Link className="nav-btn" to="/admin/patient-records">Patient</Link>
+            <Link className="nav-btn" to="/admin/manage-accounts">Accounts</Link>
+            <Link className="nav-btn" to="/admin/checkup-records">Records</Link>
+            <Link className="nav-btn" to="/admin/create-records">Create Records</Link>
+            <Link className="nav-btn" to="/admin/patient-register">Patient Register</Link>
+            <Link className="nav-btn" to="/admin/staff-register">Staff Register</Link>
           </nav>
         </aside>
 

@@ -1,5 +1,6 @@
 import React from "react";
 import "./Patientrecords.css";
+import { Link } from "react-router-dom";
 
 const samplePatients = [
   { id: "E-10001", name: "Amie Eppie", photo: "https://i.pravatar.cc/120?img=5" },
@@ -16,7 +17,7 @@ function Patientrecords() {
       <div className="records-header">
         <div className="breadcrumbs">List of Patient Records (Admin)</div>
         <div className="gold-line">
-          <button className="back" aria-label="Back">←</button>
+          <Link className="back" aria-label="Back" to="/admin/dashboard">←</Link>
         </div>
       </div>
 

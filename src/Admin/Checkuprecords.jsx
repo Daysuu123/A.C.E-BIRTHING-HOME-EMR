@@ -1,5 +1,6 @@
 import React from "react";
 import "./Checkuprecords.css";
+import { Link } from "react-router-dom";
 
 const rows = [
   { idx: 1, name: "Eppie, Amie P.", type: "Prenatal", date: "09/18/2025", staff: "Dr. Selby Love", notes: "High Bp Detected", outcome: "Continue Monitoring" }
@@ -10,7 +11,7 @@ function Checkuprecords() {
     <div className="curec-shell">
       <div className="breadcrumbs">Check-up Records (Admin)</div>
       <div className="gold-line">
-        <button className="back" aria-label="Back">←</button>
+        <Link className="back" aria-label="Back" to="/admin/dashboard">←</Link>
       </div>
 
       <section className="curec-content">

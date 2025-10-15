@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Staffregister.css";
+import { Link } from "react-router-dom";
 
 function Staffregister() {
   const [show, setShow] = useState(false);
@@ -7,7 +8,7 @@ function Staffregister() {
   return (
     <div className="sreg-shell">
       <div className="gold-line">
-        <button className="back" aria-label="Back">←</button>
+        <Link className="back" aria-label="Back" to="/admin/dashboard">←</Link>
       </div>
 
       <section className="sreg-content">

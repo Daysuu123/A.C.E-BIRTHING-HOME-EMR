@@ -1,5 +1,6 @@
 import React from "react";
 import "./Manageaccs.css";
+import { Link } from "react-router-dom";
 
 const patientRows = [
   { email: "amieeppie10@gmail.com", name: "Amie Pangilinan Eppie", date: "08/27/2025" }
@@ -12,7 +13,7 @@ function Manageaccs() {
   return (
     <div className="maccs-shell">
       <div className="gold-line">
-        <button className="back" aria-label="Back">←</button>
+        <Link className="back" aria-label="Back" to="/admin/dashboard">←</Link>
       </div>
 
       <section className="maccs-content">
