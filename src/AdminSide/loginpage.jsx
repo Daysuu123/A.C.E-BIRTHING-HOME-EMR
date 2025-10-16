@@ -10,17 +10,21 @@ function LoginPage() {
   const navigate = useNavigate();
 
   const devBypass = (email, password, reason) => {
-    if (password === "12345678") {
-      if (email === "admin@example.com") {
-        localStorage.setItem("auth", JSON.stringify({ role: "admin", email }));
-        navigate("/admin/dashboard", { replace: true });
-        return true;
-      }
-      if (email === "staff@example.com") {
-        localStorage.setItem("auth", JSON.stringify({ role: "staff", email }));
-        navigate("/staff/landing", { replace: true });
-        return true;
-      }
+    // Test credentials for existing database data
+    if (password === "Dace@09077041896" && email === "Dace") {
+      localStorage.setItem("auth", JSON.stringify({ role: "admin", email, name: "Dace" }));
+      navigate("/admin/dashboard", { replace: true });
+      return true;
+    }
+    if (password === "hashed_docpass1" && email === "1") {
+      localStorage.setItem("auth", JSON.stringify({ role: "staff", email, name: "Roberto Dela Cruz" }));
+      navigate("/staff/landing", { replace: true });
+      return true;
+    }
+    if (password === "hashed_password1" && email === "maria.santos@example.com") {
+      localStorage.setItem("auth", JSON.stringify({ role: "patient", email, name: "Maria Santos" }));
+      navigate("/user/landing", { replace: true });
+      return true;
     }
     setMessageType("error");
     setMessage(reason || "Login failed.");
@@ -53,11 +57,23 @@ function LoginPage() {
       if (result && (result.success || response.ok)) {
         setMessageType("success");
         setMessage(result.message || "Login successful!");
-        // Determine role from backend if provided; fallback by email
-        const role = (result.user && result.user.role) || (username === "admin@example.com" ? "admin" : username === "staff@example.com" ? "staff" : "admin");
-        localStorage.setItem("auth", JSON.stringify({ role, email: username }));
+        
+        // Use role from backend response
+        const role = result.user?.role || 'admin';
+        const userData = {
+          role,
+          email: result.user?.email || username,
+          name: result.user?.name || username,
+          id: result.user?.id
+        };
+        
+        localStorage.setItem("auth", JSON.stringify(userData));
+        
+        // Navigate based on role
         if (role === "staff") {
           navigate("/staff/landing", { replace: true });
+        } else if (role === "patient") {
+          navigate("/user/landing", { replace: true });
         } else {
           navigate("/admin/dashboard", { replace: true });
         }

@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class StaffAccount extends Authenticatable
+{
+    use Notifiable;
+
+    protected $table = 'staffs_account';
+    protected $primaryKey = 'staff_id';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    protected $fillable = [
+        'staff_id',
+        'password',
+        'staffs_firs',
+        'staffs_sur',
+        'staffs_mi',
+        'position'
+    ];
+
+    protected $hidden = [
+        'password',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+        ];
+    }
+}

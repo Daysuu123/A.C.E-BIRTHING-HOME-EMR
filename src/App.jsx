@@ -20,6 +20,7 @@ import StaffCreateRecords from "./StaffSide/StaffCreateRecords";
 import StaffManageRecords from "./StaffSide/StaffManageRecords";
 import StaffAddPatient from "./StaffSide/StaffAddPatient";
 import StaffManageAccounts from "./StaffSide/StaffManageAccounts";
+import UserLanding from "./PatientSide/UserLanding";
 
 function isAdminAuthenticated() {
   try {
@@ -52,6 +53,24 @@ function isStaffAuthenticated() {
 
 function StaffProtectedRoute({ children }) {
   if (!isStaffAuthenticated()) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+}
+
+function isPatientAuthenticated() {
+  try {
+    const raw = localStorage.getItem("auth");
+    if (!raw) return false;
+    const auth = JSON.parse(raw);
+    return auth && auth.role === "patient";
+  } catch (_) {
+    return false;
+  }
+}
+
+function PatientProtectedRoute({ children }) {
+  if (!isPatientAuthenticated()) {
     return <Navigate to="/" replace />;
   }
   return children;
@@ -227,6 +246,16 @@ function App() {
             <StaffProtectedRoute>
               <StaffManageAccounts />
             </StaffProtectedRoute>
+          }
+        />
+
+        {/* Patient Routes */}
+        <Route
+          path="/user/landing"
+          element={
+            <PatientProtectedRoute>
+              <UserLanding />
+            </PatientProtectedRoute>
           }
         />
       </Routes>
