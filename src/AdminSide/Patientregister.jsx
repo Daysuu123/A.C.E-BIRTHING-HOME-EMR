@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import "./Patientregister.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Patientregister() {
   const [show, setShow] = useState(false);
+  const navigate = useNavigate();
+
+  const handleNext = () => {
+    navigate('/admin/add-patient-info');
+  };
 
   return (
     <div className="preg-shell">
@@ -55,7 +60,7 @@ function Patientregister() {
           </div>
 
           <div className="actions">
-            <button type="button" className="next">Next</button>
+            <button type="button" className="next" onClick={handleNext}>Next</button>
           </div>
         </form>
       </section>
