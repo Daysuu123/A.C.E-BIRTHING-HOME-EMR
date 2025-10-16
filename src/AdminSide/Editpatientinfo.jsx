@@ -1,23 +1,23 @@
-import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useMemo, useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import phLocations from "./phLocations";
 import PhoneInput from "../components/PhoneInput";
 import "./Addpatientinfo.css";
 
 function Editpatientinfo() {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [showConfirm, setShowConfirm] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     lastName: "",
     firstName: "",
     middleName: "",
     dob: "",
     address: "",
-    pob: "",
     province: "",
-    city: "",
     nationality: "",
-    religion: "",
     contact: "",
     emergencyContact: "",
     fatherName: "",
@@ -49,22 +49,69 @@ function Editpatientinfo() {
     return String(Math.max(0, age));
   }, [form.dob]);
 
+  useEffect(() => {
+    fetchPatientData();
+  }, [id]);
+
+  async function fetchPatientData() {
+    if (!id) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/patients/${id}/info`);
+      const data = await response.json();
+      
+      if (data.success && data.patient) {
+        const patient = data.patient;
+        setForm({
+          lastName: patient.last_name || "",
+          firstName: patient.first_name || "",
+          middleName: patient.middle_ini || "",
+          dob: patient.bday || "",
+          address: patient.address || "",
+          province: patient.province || "",
+          nationality: patient.nationality || "",
+          contact: patient.contact || "",
+          emergencyContact: patient.emergency || "",
+          fatherName: patient.fathers_name || "",
+          fatherContact: patient.fathers_con || "",
+          fatherOccupation: patient.fathers_ocu || "",
+          fatherAddress: patient.fathers_add || "",
+          motherName: patient.mother_name || "",
+          motherContact: patient.mother_con || "",
+          motherOccupation: patient.mother_ocu || "",
+          motherAddress: patient.mother_add || "",
+          spouseName: patient.spouse_name || "",
+          spouseContact: patient.spouse_contact || "",
+          spouseOccupation: patient.spouse_ocu || "",
+        });
+      } else {
+        setSubmitError("Failed to load patient data");
+      }
+    } catch (error) {
+      console.error('Error fetching patient data:', error);
+      setSubmitError("Network error. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   function setField(name, value) {
     const nextForm = { ...form, [name]: value };
     setForm(nextForm);
     setTouched((prev) => ({ ...prev, [name]: true }));
     validate(name, value);
     const requiredOk = [
-      nextForm.lastName,nextForm.firstName,nextForm.middleName,nextForm.dob,nextForm.address,nextForm.pob,nextForm.nationality,nextForm.religion,nextForm.contact,nextForm.emergencyContact,
-      nextForm.province,nextForm.city,
+      nextForm.lastName,nextForm.firstName,nextForm.middleName,nextForm.dob,nextForm.address,nextForm.province,nextForm.nationality,nextForm.contact,nextForm.emergencyContact,
       nextForm.fatherName,nextForm.fatherContact,nextForm.fatherOccupation,nextForm.fatherAddress,nextForm.motherName,nextForm.motherContact,nextForm.motherOccupation,nextForm.motherAddress
     ].every(v => String(v||"").trim());
     const phonesOk = [nextForm.contact, nextForm.emergencyContact, nextForm.fatherContact, nextForm.motherContact]
       .every(v => String(v||"").replace(/\D/g, "").length === 11);
     const namesOk = [nextForm.lastName,nextForm.firstName,nextForm.middleName,nextForm.fatherName,nextForm.motherName]
       .every(v => nameRegex.test((v||"")));
-    const maritalOk = String(nextForm.marital||"").trim().length > 0;
-    if (requiredOk && phonesOk && namesOk && maritalOk) {
+    if (requiredOk && phonesOk && namesOk) {
       setSubmitError("");
     }
   }
@@ -86,17 +133,18 @@ function Editpatientinfo() {
         next[field] = value && !nameRegex.test(value) ? "Letters and spaces only." : "";
         break;
       case "address":
-      case "pob":
       case "nationality":
-      case "religion":
       case "fatherOccupation":
       case "fatherAddress":
       case "motherOccupation":
       case "motherAddress":
         next[field] = req(value);
-        if (["nationality","religion","fatherOccupation","motherOccupation"].includes(field) && value) {
+        if (["nationality","fatherOccupation","motherOccupation"].includes(field) && value) {
           next[field] = nameRegex.test(value) ? "" : "Letters and spaces only.";
         }
+        break;
+      case "spouseOccupation":
+        next[field] = value && !nameRegex.test(value) ? "Letters and spaces only." : "";
         break;
       case "contact":
       case "emergencyContact":
@@ -130,6 +178,101 @@ function Editpatientinfo() {
     return !!touched[name] || !!v;
   };
 
+
+  async function handleSave() {
+    // validate required fields before submission
+    [
+      'lastName','firstName','middleName','dob','address','province','nationality','contact','emergencyContact',
+      'fatherName','fatherContact','fatherOccupation','fatherAddress','motherName','motherContact','motherOccupation','motherAddress'
+    ].forEach((f)=>validate(f, form[f]));
+    
+    const requiredOk = [
+      form.lastName,form.firstName,form.middleName,form.dob,form.address,form.province,form.nationality,form.contact,form.emergencyContact,
+      form.fatherName,form.fatherContact,form.fatherOccupation,form.fatherAddress,form.motherName,form.motherContact,form.motherOccupation,form.motherAddress
+    ].every(v => String(v||"").trim());
+    
+    const phonesOk = [form.contact, form.emergencyContact, form.fatherContact, form.motherContact]
+      .every(v => String(v||"").replace(/\D/g, "").length === 11);
+    
+    const namesOk = [form.lastName,form.firstName,form.middleName,form.fatherName,form.motherName].every(v => nameRegex.test((v||"")));
+    
+    if (!requiredOk || !phonesOk || !namesOk) {
+      setSubmitError("Please complete all required fields and fix validation errors.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError("");
+
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/patients/${id}/info`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          lastName: form.lastName,
+          firstName: form.firstName,
+          middleName: form.middleName,
+          dob: form.dob,
+          address: form.address,
+          province: form.province,
+          nationality: form.nationality,
+          contact: form.contact,
+          emergencyContact: form.emergencyContact,
+          fatherName: form.fatherName,
+          fatherContact: form.fatherContact,
+          fatherOccupation: form.fatherOccupation,
+          fatherAddress: form.fatherAddress,
+          motherName: form.motherName,
+          motherContact: form.motherContact,
+          motherOccupation: form.motherOccupation,
+          motherAddress: form.motherAddress,
+          spouseName: form.spouseName || "",
+          spouseContact: form.spouseContact || "",
+          spouseOccupation: form.spouseOccupation || ""
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        const role = getRole();
+        const dest = role === 'staff' ? '/staff/manage-patient' : '/admin/patient-records';
+        navigate(dest, { replace: true });
+      } else {
+        setSubmitError(data.message || "Failed to update patient information");
+      }
+    } catch (error) {
+      console.error('Update error:', error);
+      setSubmitError("Network error. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="addpat-shell">
+        <div className="gold-line">
+          <button
+            className="back"
+            aria-label="Back"
+            onClick={() => navigate(-1)}
+          >
+            ←
+          </button>
+        </div>
+        <section className="addpat-content">
+          <h1 className="title">Edit Patient Personal Information</h1>
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <div>Loading patient data...</div>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="addpat-shell">
       <div className="gold-line">
@@ -144,6 +287,7 @@ function Editpatientinfo() {
 
       <section className="addpat-content">
         <h1 className="title">Edit Patient Personal Information</h1>
+        
 
         <form className="addpat-form">
           <div className="form-section">
@@ -194,40 +338,20 @@ function Editpatientinfo() {
                 <input type="text" required name="address" value={form.address} onChange={(e)=>setField("address", e.target.value)} />
                 <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.address && shouldShow('address')? 'visible':'hidden'}}>{errors.address || 'placeholder'}</div>
               </label>
-              <label className="field">
-                <span>Place of Birth:</span>
-                <input type="text" required name="pob" value={form.pob} onChange={(e)=>setField("pob", e.target.value)} />
-                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.pob && shouldShow('pob')? 'visible':'hidden'}}>{errors.pob || 'placeholder'}</div>
-              </label>
             </div>
 
             <div className="row">
               <label className="field">
                 <span>Province:</span>
-                <select value={form.province || ''} onChange={(e)=>{ const val = e.target.value; setForm((prev)=>({ ...prev, province: val, city: '' })); setTouched((prev)=>({ ...prev, province: true })); validate('province', val); }}>
+                <select value={form.province || ''} onChange={(e)=>{ const val = e.target.value; setForm((prev)=>({ ...prev, province: val })); setTouched((prev)=>({ ...prev, province: true })); validate('province', val); }}>
                   <option value="" disabled>Select Province</option>
                   {phLocations.provinces.map((p)=> (<option key={p} value={p}>{p}</option>))}
                 </select>
               </label>
               <label className="field">
-                <span>Town/City:</span>
-                <select value={form.city || ''} onChange={(e)=>setField('city', e.target.value)} disabled={!form.province}>
-                  <option value="" disabled>{form.province ? 'Select Town/City' : 'Select Province first'}</option>
-                  {(phLocations.citiesByProvince[form.province] || []).map((c)=> (<option key={c} value={c}>{c}</option>))}
-                </select>
-              </label>
-            </div>
-
-            <div className="row">
-              <label className="field">
                 <span>Nationality:</span>
                 <input type="text" required name="nationality" value={form.nationality} onChange={(e)=>setField("nationality", e.target.value)} pattern="[A-Za-z ]+" />
                 <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.nationality && shouldShow('nationality')? 'visible':'hidden'}}>{errors.nationality || 'placeholder'}</div>
-              </label>
-              <label className="field">
-                <span>Religion:</span>
-                <input type="text" required name="religion" value={form.religion} onChange={(e)=>setField("religion", e.target.value)} pattern="[A-Za-z ]+" />
-                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.religion && shouldShow('religion')? 'visible':'hidden'}}>{errors.religion || 'placeholder'}</div>
               </label>
             </div>
 
@@ -330,29 +454,10 @@ function Editpatientinfo() {
             <button
               type="button"
               className="register"
-              onClick={() => {
-                [
-                  'lastName','firstName','middleName','dob','address','pob','nationality','religion','contact','emergencyContact',
-                  'fatherName','fatherContact','fatherOccupation','fatherAddress','motherName','motherContact','motherOccupation','motherAddress'
-                ].forEach((f)=>validate(f, form[f]));
-                const requiredOk = [
-                  form.lastName,form.firstName,form.middleName,form.dob,form.address,form.pob,form.nationality,form.religion,form.contact,form.emergencyContact,
-                  form.province,form.city,
-                  form.fatherName,form.fatherContact,form.fatherOccupation,form.fatherAddress,form.motherName,form.motherContact,form.motherOccupation,form.motherAddress
-                ].every(v => String(v||"").trim());
-                const phonesOk = [form.contact, form.emergencyContact, form.fatherContact, form.motherContact]
-                  .every(v => String(v||"").replace(/\D/g, "").length === 11);
-                const namesOk = [form.lastName,form.firstName,form.middleName,form.fatherName,form.motherName]
-                  .every(v => nameRegex.test((v||"")));
-                const ok = requiredOk && phonesOk && namesOk && String(form.marital||"").trim();
-                if (ok) {
-                  setShowConfirm(true);
-                } else {
-                  setSubmitError("Please complete all required fields and fix validation errors.");
-                }
-              }}
+              onClick={handleSave}
+              disabled={isSubmitting}
             >
-              Save
+              {isSubmitting ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>
@@ -368,36 +473,6 @@ function Editpatientinfo() {
           EVERY WOMAN
         </div>
       </footer>
-
-      {showConfirm ? (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50
-        }}>
-          <div style={{ background: '#fff', borderRadius: 8, padding: 20, width: 360, boxShadow: '0 10px 20px rgba(0,0,0,0.2)' }}>
-            <h3 style={{ marginTop: 0, marginBottom: 8 }}>Save Edit?</h3>
-            <p style={{ marginTop: 0, color: '#374151', fontSize: 14 }}>Do you want to save the changes to this patient's information?</p>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 14 }}>
-              <button
-                onClick={() => setShowConfirm(false)}
-                style={{ background: '#e5e7eb', border: '1px solid #d1d5db', borderRadius: 6, padding: '8px 14px', cursor: 'pointer' }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  const role = getRole();
-                  const dest = role === 'staff' ? '/staff/manage-patient' : '/admin/patient-records';
-                  navigate(dest, { replace: true });
-                }}
-                style={{ background: '#111827', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 14px', cursor: 'pointer' }}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

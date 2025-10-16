@@ -60,11 +60,8 @@ class PatientController extends Controller
             'middleName' => 'required|string|max:255',
             'dob' => 'required|date',
             'address' => 'required|string|max:255',
-            'pob' => 'required|string|max:255',
             'province' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
             'nationality' => 'required|string|max:255',
-            'religion' => 'required|string|max:255',
             'contact' => 'required|string|max:20',
             'emergencyContact' => 'required|string|max:20',
             'fatherName' => 'required|string|max:255',
@@ -75,7 +72,6 @@ class PatientController extends Controller
             'motherContact' => 'required|string|max:20',
             'motherOccupation' => 'required|string|max:255',
             'motherAddress' => 'required|string|max:255',
-            'marital' => 'required|string|max:50',
             'spouseName' => 'nullable|string|max:255',
             'spouseContact' => 'nullable|string|max:20',
             'spouseOccupation' => 'nullable|string|max:255'
@@ -94,9 +90,7 @@ class PatientController extends Controller
                 'bday' => $request->dob,
                 'address' => $request->address,
                 'province' => $request->province,
-                'city' => $request->city,
                 'nationality' => $request->nationality,
-                'religion' => $request->religion,
                 'contact' => $request->contact,
                 'emergency' => $request->emergencyContact,
                 'fathers_name' => $request->fatherName,
@@ -109,9 +103,7 @@ class PatientController extends Controller
                 'mother_add' => $request->motherAddress,
                 'spouse_name' => $request->spouseName,
                 'spouse_contact' => $request->spouseContact,
-                'spouse_ocu' => $request->spouseOccupation,
-                'marital_status' => $request->marital,
-                'place_of_birth' => $request->pob
+                'spouse_ocu' => $request->spouseOccupation
             ]);
 
             return response()->json([
@@ -131,19 +123,8 @@ class PatientController extends Controller
     {
         try {
             $patients = DB::table('patient_acc')
-                ->leftJoin('patient_info', 'patient_acc.patient_id', '=', 'patient_info.patient_id')
-                ->select(
-                    'patient_acc.patient_id',
-                    'patient_acc.last_name',
-                    'patient_acc.first_name',
-                    'patient_acc.middle_ini',
-                    'patient_acc.email',
-                    'patient_acc.date_created',
-                    'patient_info.bday',
-                    'patient_info.contact',
-                    'patient_info.address'
-                )
-                ->orderBy('patient_acc.date_created', 'desc')
+                ->select('patient_id', 'last_name', 'first_name', 'middle_ini', 'email', 'date_created')
+                ->orderBy('date_created', 'desc')
                 ->get();
 
             return response()->json([
@@ -192,11 +173,8 @@ class PatientController extends Controller
             'middleName' => 'required|string|max:255',
             'dob' => 'required|date',
             'address' => 'required|string|max:255',
-            'pob' => 'required|string|max:255',
             'province' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
             'nationality' => 'required|string|max:255',
-            'religion' => 'required|string|max:255',
             'contact' => 'required|string|max:20',
             'emergencyContact' => 'required|string|max:20',
             'fatherName' => 'required|string|max:255',
@@ -207,7 +185,6 @@ class PatientController extends Controller
             'motherContact' => 'required|string|max:20',
             'motherOccupation' => 'required|string|max:255',
             'motherAddress' => 'required|string|max:255',
-            'marital' => 'required|string|max:50',
             'spouseName' => 'nullable|string|max:255',
             'spouseContact' => 'nullable|string|max:20',
             'spouseOccupation' => 'nullable|string|max:255'
@@ -223,9 +200,7 @@ class PatientController extends Controller
                     'bday' => $request->dob,
                     'address' => $request->address,
                     'province' => $request->province,
-                    'city' => $request->city,
                     'nationality' => $request->nationality,
-                    'religion' => $request->religion,
                     'contact' => $request->contact,
                     'emergency' => $request->emergencyContact,
                     'fathers_name' => $request->fatherName,
@@ -238,9 +213,7 @@ class PatientController extends Controller
                     'mother_add' => $request->motherAddress,
                     'spouse_name' => $request->spouseName,
                     'spouse_contact' => $request->spouseContact,
-                    'spouse_ocu' => $request->spouseOccupation,
-                    'marital_status' => $request->marital,
-                    'place_of_birth' => $request->pob
+                    'spouse_ocu' => $request->spouseOccupation
                 ]);
 
             return response()->json([

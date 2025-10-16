@@ -57,8 +57,6 @@ function Manageaccs() {
     }
   }
 
-  const datePlaceholder = useMemo(() => new Date().toLocaleDateString("en-US"), []);
-
   const openModal = (type, key) => {
     setModalType(type);
     setEditingKey(key);

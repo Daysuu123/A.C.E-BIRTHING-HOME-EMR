@@ -142,7 +142,7 @@ function App() {
           }
         />
         <Route
-          path="/admin/patient-records/edit"
+          path="/admin/patient-records/edit/:id"
           element={
             <ProtectedRoute>
               <Editpatientinfo />

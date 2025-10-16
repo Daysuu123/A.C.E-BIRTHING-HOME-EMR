@@ -14,6 +14,7 @@ class StaffAccount extends Authenticatable
     protected $primaryKey = 'staff_id';
     public $incrementing = false;
     protected $keyType = 'string';
+    public $timestamps = false;
 
     protected $fillable = [
         'staff_id',

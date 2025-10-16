@@ -7,6 +7,11 @@ use App\Http\Controllers\PatientController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
+// Test route
+Route::get('/test', function() {
+    return response()->json(['message' => 'API is working']);
+});
+
 // Patient routes
 Route::post('/patients/register-account', [PatientController::class, 'registerAccount']);
 Route::post('/patients/register-info', [PatientController::class, 'registerInfo']);

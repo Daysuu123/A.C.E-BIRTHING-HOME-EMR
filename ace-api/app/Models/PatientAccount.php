@@ -14,6 +14,7 @@ class PatientAccount extends Authenticatable
     protected $primaryKey = 'patient_id';
     public $incrementing = false;
     protected $keyType = 'string';
+    public $timestamps = false;
 
     protected $fillable = [
         'patient_id',

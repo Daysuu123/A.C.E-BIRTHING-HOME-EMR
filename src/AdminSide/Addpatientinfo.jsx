@@ -222,12 +222,12 @@ function Addpatientinfo() {
   async function handleRegister() {
     // validate required fields before submission
     [
-      'lastName','firstName','middleName','dob','address','pob','nationality','religion','contact','emergencyContact',
+      'lastName','firstName','middleName','dob','address','province','nationality','contact','emergencyContact',
       'fatherName','fatherContact','fatherOccupation','fatherAddress','motherName','motherContact','motherOccupation','motherAddress'
     ].forEach((f)=>validate(f, form[f]));
     
     const requiredOk = [
-      form.lastName,form.firstName,form.middleName,form.dob,form.address,form.pob,form.nationality,form.religion,form.contact,form.emergencyContact,
+      form.lastName,form.firstName,form.middleName,form.dob,form.address,form.province,form.nationality,form.contact,form.emergencyContact,
       form.fatherName,form.fatherContact,form.fatherOccupation,form.fatherAddress,form.motherName,form.motherContact,form.motherOccupation,form.motherAddress
     ].every(v => String(v||"").trim());
     
@@ -263,11 +263,8 @@ function Addpatientinfo() {
           middleName: form.middleName,
           dob: form.dob,
           address: form.address,
-          pob: form.pob,
           province: form.province,
-          city: form.city,
           nationality: form.nationality,
-          religion: form.religion,
           contact: form.contact,
           emergencyContact: form.emergencyContact,
           fatherName: form.fatherName,
@@ -278,7 +275,6 @@ function Addpatientinfo() {
           motherContact: form.motherContact,
           motherOccupation: form.motherOccupation,
           motherAddress: form.motherAddress,
-          marital: form.marital,
           spouseName: form.spouseName || "",
           spouseContact: form.spouseContact || "",
           spouseOccupation: form.spouseOccupation || ""

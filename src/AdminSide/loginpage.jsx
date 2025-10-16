@@ -7,6 +7,7 @@ function LoginPage() {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("info"); // 'success' | 'error' | 'info'
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const devBypass = (email, password, reason) => {
@@ -122,11 +123,15 @@ function LoginPage() {
             <input id="username" type="text" placeholder="Username" className="input" />
 
             <label className="sr-only" htmlFor="password">Password</label>
-            <input id="password" type="password" placeholder="Password" className="input" />
+            <input id="password" type={showPassword ? "text" : "password"} placeholder="Password" className="input" />
 
             <div className="form-row">
               <label className="remember">
-                <input type="checkbox" /> Remember me
+                <input 
+                  type="checkbox" 
+                  checked={showPassword}
+                  onChange={(e) => setShowPassword(e.target.checked)}
+                /> Show Password
               </label>
               <a href="#" className="forgot">Forgot Password?</a>
             </div>
