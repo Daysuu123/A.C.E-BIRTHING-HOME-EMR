@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./loginpage.css";
-<<<<<<< Updated upstream
-=======
 // backend handled via dev proxy at /api/loginpage.php
->>>>>>> Stashed changes
 
 function LoginPage() {
   const [message, setMessage] = useState("");
@@ -98,11 +95,7 @@ function LoginPage() {
 
       <div className="form-panel">
         <div className="login-card">
-<<<<<<< Updated upstream
           <h2 className="login-title">Login</h2>
-=======
-        <h2 className="login-title">Login</h2>
->>>>>>> Stashed changes
           {message ? (
             <div className={`notice ${messageType}`}>
               {message}
