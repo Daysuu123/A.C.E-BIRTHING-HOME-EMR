@@ -1,15 +1,8 @@
-<<<<<<< HEAD:src/Admin/loginpage.jsx
 import React, { useState } from "react";
-=======
-import React from "react";
 import { useNavigate } from "react-router-dom";
->>>>>>> 3b41a8c41ecd1f40e7a5c60c7f517818ca1bcd1b:src/AdminSide/loginpage.jsx
 import "./loginpage.css";
-// backend handled via dev proxy at /api/loginpage.php
-import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
-<<<<<<< HEAD:src/Admin/loginpage.jsx
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("info"); // 'success' | 'error' | 'info'
   const [submitting, setSubmitting] = useState(false);
@@ -68,14 +61,6 @@ function LoginPage() {
     } finally {
       setSubmitting(false);
     }
-=======
-  const navigate = useNavigate();
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    // Navigate to admin dashboard after successful login
-    navigate('/admin/dashboard');
->>>>>>> 3b41a8c41ecd1f40e7a5c60c7f517818ca1bcd1b:src/AdminSide/loginpage.jsx
   };
 
   return (
@@ -99,14 +84,11 @@ function LoginPage() {
       <div className="form-panel">
         <div className="login-card">
           <h2 className="login-title">Login</h2>
-<<<<<<< HEAD:src/Admin/loginpage.jsx
           {message ? (
             <div className={`notice ${messageType}`}>
               {message}
             </div>
           ) : null}
-=======
->>>>>>> 3b41a8c41ecd1f40e7a5c60c7f517818ca1bcd1b:src/AdminSide/loginpage.jsx
           <form className="login-form" onSubmit={handleLogin}>
             <label className="sr-only" htmlFor="username">Username</label>
             <input id="username" type="text" placeholder="Username" className="input" />
@@ -129,4 +111,3 @@ function LoginPage() {
 }
 
 export default LoginPage;
-
