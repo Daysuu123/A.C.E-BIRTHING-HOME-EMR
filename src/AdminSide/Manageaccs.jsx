@@ -2,7 +2,6 @@ import React, { useMemo, useState } from "react";
 import "./Manageaccs.css";
 import { Link, useNavigate } from "react-router-dom";
 
-<<<<<<< Updated upstream
 const initialPatientRows = [
   { email: "amieeppie10@gmail.com", name: "Amie Pangilinan Eppie", date: "08/27/2025" }
 ];
@@ -55,7 +54,6 @@ function Manageaccs() {
     closeModal();
   };
 
-=======
 const patientRows = [
   { email: "amieeppie10@gmail.com", name: "Amie Pangilinan Eppie", date: "08/27/2025" },
   { email: "candice.galilea@example.com", name: "Candice Galilea", date: "07/14/2025" },
@@ -69,7 +67,6 @@ const staffRows = [
 
 function Manageaccs() {
   const navigate = useNavigate();
->>>>>>> Stashed changes
   return (
     <div className="maccs-shell">
       <div className="gold-line">
@@ -79,7 +76,6 @@ function Manageaccs() {
       <section className="maccs-content">
         <h1 className="title">Manage Accounts</h1>
 
-<<<<<<< Updated upstream
         <div className="tables-grid">
           <div className="table-block">
             <div className="block-title">Patient Accounts</div>
@@ -88,7 +84,6 @@ function Manageaccs() {
                 <div>Full Name</div>
                 <div>Date Created</div>
                 <div>Action</div>
-=======
         <div className="table-block">
           <div className="block-title">Patient Accounts</div>
           <div className="table patient">
@@ -104,7 +99,6 @@ function Manageaccs() {
                 <div className="name">{r.name}</div>
                 <div className="date">{r.date}</div>
                 <div className="action"><button className="edit" onClick={() => navigate('/admin/manage-accounts/patient/edit')}>Edit</button></div>
->>>>>>> Stashed changes
               </div>
               {patientRows.map((r) => (
                 <div className="trow" key={r.email}>
@@ -116,7 +110,6 @@ function Manageaccs() {
             </div>
           </div>
 
-<<<<<<< Updated upstream
           <div className="table-block">
             <div className="block-title">Staff Accounts</div>
             <div className="table cols-4">
@@ -125,7 +118,6 @@ function Manageaccs() {
                 <div>Position</div>
                 <div>Date Created</div>
                 <div>Action</div>
-=======
         <div className="table-block">
           <div className="block-title">Staff Accounts</div>
           <div className="table staff">
@@ -143,7 +135,6 @@ function Manageaccs() {
                 <div className="pos">{r.position}</div>
                 <div className="date">{r.date}</div>
                 <div className="action"><button className="edit" onClick={() => navigate('/admin/manage-accounts/staff/edit')}>Edit</button></div>
->>>>>>> Stashed changes
               </div>
               {staffRows.map((r) => (
                 <div className="trow" key={r.email}>
