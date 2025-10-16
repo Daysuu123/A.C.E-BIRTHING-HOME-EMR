@@ -25,7 +25,7 @@ function isAdminAuthenticated() {
   try {
     const raw = localStorage.getItem("auth");
     if (!raw) return false;
-    const auth = JSON.parse(raw);
+    const auth = JSON.parse(raw); 
     return auth && auth.role === "admin";
   } catch (_) {
     return false;

@@ -5,12 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 function Patientregister() {
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
-<<<<<<< Updated upstream
-
-  const handleNext = () => {
-    navigate('/admin/add-patient-info');
-  };
-=======
   const [form, setForm] = useState({ lastName: "", firstName: "", middleInitial: "", email: "", password: "", confirmPassword: "" });
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
@@ -73,7 +67,6 @@ function Patientregister() {
     if (!ok) setSubmitError("Please complete all required fields and fix validation errors.");
     return ok;
   }
->>>>>>> Stashed changes
 
   return (
     <div className="preg-shell">
@@ -131,9 +124,6 @@ function Patientregister() {
           </div>
 
           <div className="actions">
-<<<<<<< Updated upstream
-            <button type="button" className="next" onClick={handleNext}>Next</button>
-=======
             <button
               type="button"
               className="next"
@@ -146,7 +136,6 @@ function Patientregister() {
               Next
             </button>
             <div style={{color:'#dc2626',fontSize:13,marginTop:8,minHeight:18,visibility:submitError? 'visible':'hidden'}}>{submitError || 'placeholder'}</div>
->>>>>>> Stashed changes
           </div>
         </form>
       </section>
