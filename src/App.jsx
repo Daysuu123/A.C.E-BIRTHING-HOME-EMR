@@ -1,21 +1,14 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-<<<<<<< Updated upstream
 
 // AdminSide pages
-=======
->>>>>>> Stashed changes
 import Loginpage from "./AdminSide/loginpage";
 import Admindashboard from "./AdminSide/Admindashboard";
 import Checkuprecords from "./AdminSide/Checkuprecords";
 import Createrecords from "./AdminSide/Createrecords";
 import Manageaccs from "./AdminSide/Manageaccs";
-import Patientrecords from "./AdminSide/Patientrecords";
+import Patientrecords from "./AdminSide/Patientrecords";  
 import Patientregister from "./AdminSide/Patientregister";
-<<<<<<< Updated upstream
-import Staffregister from "./AdminSide/Staffregister";
-import Addpatientinfo from "./AdminSide/Addpatientinfo";
-=======
 import Addpatientinfo from "./AdminSide/Addpatientinfo";
 import Staffregister from "./AdminSide/Staffregister";
 import Editpatientinfo from "./AdminSide/Editpatientinfo";
@@ -27,7 +20,6 @@ import StaffCreateRecords from "./StaffSide/StaffCreateRecords";
 import StaffManageRecords from "./StaffSide/StaffManageRecords";
 import StaffAddPatient from "./StaffSide/StaffAddPatient";
 import StaffManageAccounts from "./StaffSide/StaffManageAccounts";
->>>>>>> Stashed changes
 
 function isAdminAuthenticated() {
   try {
@@ -46,8 +38,6 @@ function ProtectedRoute({ children }) {
   }
   return children;
 }
-<<<<<<< Updated upstream
-=======
 
 function isStaffAuthenticated() {
   try {
@@ -66,17 +56,16 @@ function StaffProtectedRoute({ children }) {
   }
   return children;
 }
->>>>>>> Stashed changes
+
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Loginpage />} />
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
+
+
         <Route
           path="/admin/dashboard"
           element={
@@ -175,8 +164,7 @@ function App() {
         />
 
         <Route path="*" element={<Navigate to="/" replace />} />
-<<<<<<< Updated upstream
-=======
+
         <Route
           path="/staff/landing"
           element={
@@ -241,7 +229,6 @@ function App() {
             </StaffProtectedRoute>
           }
         />
->>>>>>> Stashed changes
       </Routes>
     </Router>
   );
