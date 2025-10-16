@@ -1,14 +1,16 @@
 import React from "react";
- HEAD
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Loginpage from "./Admin/loginpage";
-import Admindashboard from "./Admin/Admindashboard";
-import Checkuprecords from "./Admin/Checkuprecords";
-import Createrecords from "./Admin/Createrecords";
-import Manageaccs from "./Admin/Manageaccs";
-import Patientrecords from "./Admin/Patientrecords";
-import Patientregister from "./Admin/Patientregister";
-import Staffregister from "./Admin/Staffregister";
+
+// AdminSide pages
+import Loginpage from "./AdminSide/loginpage";
+import Admindashboard from "./AdminSide/Admindashboard";
+import Checkuprecords from "./AdminSide/Checkuprecords";
+import Createrecords from "./AdminSide/Createrecords";
+import Manageaccs from "./AdminSide/Manageaccs";
+import Patientrecords from "./AdminSide/Patientrecords";
+import Patientregister from "./AdminSide/Patientregister";
+import Staffregister from "./AdminSide/Staffregister";
+import Addpatientinfo from "./AdminSide/Addpatientinfo";
 
 function isAdminAuthenticated() {
   try {
@@ -28,22 +30,12 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Loginpage from "./AdminSide/loginpage";
-import Admindashboard from "./AdminSide/Admindashboard";
-import Checkuprecords from "./AdminSide/Checkuprecords";
-import Createrecords from "./AdminSide/Createrecords";
-import Manageaccs from "./AdminSide/Manageaccs";
-import Patientrecords from "./AdminSide/Patientrecords";
-import Patientregister from "./AdminSide/Patientregister";
-import Staffregister from "./AdminSide/Staffregister";
-b41a8c41ecd1f40e7a5c60c7f517818ca1bcd1b
-
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Loginpage />} />
+
         <Route
           path="/admin/dashboard"
           element={
@@ -100,7 +92,15 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
+        <Route
+          path="/admin/add-patient-info"
+          element={
+            <ProtectedRoute>
+              <Addpatientinfo />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
