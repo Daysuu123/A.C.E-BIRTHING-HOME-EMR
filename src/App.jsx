@@ -103,13 +103,13 @@ function App() {
         />
         <Route path="*" element={<Navigate to="/" replace />} />
 =======
-        <Route path="/admin/dashboard" element={<Admindashboard />} />
-        <Route path="/admin/checkup-records" element={<Checkuprecords />} />
-        <Route path="/admin/create-records" element={<Createrecords />} />
-        <Route path="/admin/manage-accounts" element={<Manageaccs />} />
+        <Route path="/admin/dashboard" element={<Admindashageaccs />} />
         <Route path="/admin/patient-records" element={<Patientrecords />} />
         <Route path="/admin/patient-register" element={<Patientregister />} />
-        <Route path="/admin/staff-register" element={<Staffregister />} />
+        <Route path="/admin/staff-register" element={<board />} />
+        <Route path="/admin/checkup-records" element={<Checkuprecords />} />
+        <Route path="/admin/create-records" element={<Createrecords />} />
+        <Route path="/admin/manage-accounts" element={<ManStaffregister />} />
 >>>>>>> 3b41a8c41ecd1f40e7a5c60c7f517818ca1bcd1b
       </Routes>
     </Router>
