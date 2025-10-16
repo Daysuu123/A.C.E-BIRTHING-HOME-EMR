@@ -2,15 +2,10 @@ import React, { useState } from "react";
 import "./Patientregister.css";
 import { Link, useNavigate } from "react-router-dom";
 
-function Patientregister() {
+function Editpatientaccount() {
   const [show, setShow] = useState(false);
+  const [confirm, setConfirm] = useState(false);
   const navigate = useNavigate();
-<<<<<<< Updated upstream
-
-  const handleNext = () => {
-    navigate('/admin/add-patient-info');
-  };
-=======
   const [form, setForm] = useState({ lastName: "", firstName: "", middleInitial: "", email: "", password: "", confirmPassword: "" });
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
@@ -73,18 +68,17 @@ function Patientregister() {
     if (!ok) setSubmitError("Please complete all required fields and fix validation errors.");
     return ok;
   }
->>>>>>> Stashed changes
 
   return (
     <div className="preg-shell">
       <div className="preg-head">
         <div className="gold-line">
-          <Link className="back" aria-label="Back" to="/admin/dashboard">←</Link>
+          <Link className="back" aria-label="Back" to="/admin/manage-accounts">←</Link>
         </div>
       </div>
 
       <section className="preg-content">
-        <h1 className="title">Patient Registration</h1>
+        <h1 className="title">Edit Patient Account</h1>
 
         <form className="form">
           <div className="row">
@@ -131,22 +125,18 @@ function Patientregister() {
           </div>
 
           <div className="actions">
-<<<<<<< Updated upstream
-            <button type="button" className="next" onClick={handleNext}>Next</button>
-=======
             <button
               type="button"
               className="next"
               onClick={() => {
                 if (validateAll()) {
-                  navigate("/admin/patient-register/info");
+                  setConfirm(true);
                 }
               }}
             >
-              Next
+              Save
             </button>
             <div style={{color:'#dc2626',fontSize:13,marginTop:8,minHeight:18,visibility:submitError? 'visible':'hidden'}}>{submitError || 'placeholder'}</div>
->>>>>>> Stashed changes
           </div>
         </form>
       </section>
@@ -161,10 +151,23 @@ function Patientregister() {
           EVERY WOMAN
         </div>
       </footer>
+
+      {confirm ? (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
+          <div style={{ background: '#fff', borderRadius: 8, padding: 20, width: 360, boxShadow: '0 10px 20px rgba(0,0,0,0.2)' }}>
+            <h3 style={{ marginTop: 0, marginBottom: 8 }}>Save Edit?</h3>
+            <p style={{ marginTop: 0, color: '#374151', fontSize: 14 }}>Do you want to save the changes to this patient account?</p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 14 }}>
+              <button onClick={() => setConfirm(false)} style={{ background: '#e5e7eb', border: '1px solid #d1d5db', borderRadius: 6, padding: '8px 14px', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => navigate('/admin/manage-accounts', { replace: true })} style={{ background: '#111827', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 14px', cursor: 'pointer' }}>Save</button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
 
-export default Patientregister;
+export default Editpatientaccount;
 
 

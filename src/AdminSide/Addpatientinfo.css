@@ -2,14 +2,18 @@
 .gold-line { background: #caa22a; height: 28px; display: flex; align-items: center; padding-left: 12px; }
 .back { background: transparent; border: none; font-size: 18px; color: #000; cursor: pointer; }
 
-.addpat-content { background: #fff; margin: 0 12px; padding: 18px 20px 24px; }
+.addpat-content { background: #fff; margin: 0; padding: 18px 20px 24px; overflow: auto; }
 .title { margin: 0 0 12px; font-size: 28px; text-align: center; }
 
-.addpat-form { border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; }
+.addpat-form { border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; position: relative; }
 .form-section { margin-bottom: 16px; }
 .section-title { font-size: 16px; font-weight: 600; margin: 0 0 8px; color: #111827; }
 
 .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 10px; align-items: end; }
+.row .field:nth-child(2) input[readonly] { align-self: end; }
+/* Align the DOB and Age inputs at the top specifically within add patient form */
+.addpat-form .row { align-items: start; }
+.addpat-form .row .field:nth-child(2) input[readonly] { align-self: start; }
 .field { display: grid; gap: 4px; }
 .field span { font-size: 11px; color: #374151; font-weight: 500; }
 .field input, .field select { border: 1px solid #d1d5db; border-radius: 4px; padding: 8px 10px; font-size: 12px; }
@@ -19,7 +23,9 @@
 .radio-options { display: flex; gap: 16px; margin-top: 4px; }
 .radio-options label { display: flex; align-items: center; gap: 4px; font-size: 12px; }
 
-.actions { display: flex; justify-content: center; margin-top: 16px; }
+.addpat-form .actions { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 16px; width: 100%; }
+.addpat-form .submit-error { color: #dc2626; font-size: 13px; min-height: 18px; position: absolute; left: 50%; bottom: 56px; transform: translateX(-50%); text-align: center; width: auto; }
+.addpat-form .register { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); }
 .register { background: #111827; color: #fff; border: none; border-radius: 6px; padding: 10px 24px; font-size: 14px; font-weight: 600; }
 
 .addpat-footer { background: #6b7280; color: #fff; padding: 10px 12px; display: grid; grid-template-columns: 56px 1fr; align-items: center; }

@@ -1,18 +1,17 @@
 import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import phLocations from "./phLocations";
 import PhoneInput from "../components/PhoneInput";
-import { useNavigate } from "react-router-dom";
 import "./Addpatientinfo.css";
 
-function Addpatientinfo() {
+function Editpatientinfo() {
   const navigate = useNavigate();
+  const [showConfirm, setShowConfirm] = useState(false);
   const [form, setForm] = useState({
     lastName: "",
     firstName: "",
     middleName: "",
     dob: "",
-    age: "",
-    marital: "",
     address: "",
     pob: "",
     province: "",
@@ -36,32 +35,8 @@ function Addpatientinfo() {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [submitError, setSubmitError] = useState("");
-
   const nameRegex = /^[A-Za-z ]+$/;
-  const e164Regex = /^\+[1-9]\d{1,14}$/; // E.164 international format
-
-  // Minimal countries dataset for flag dropdown; extend as needed
-  const countries = [
-    { code: 'PH', name: 'Philippines', dial: '+63', flag: '🇵🇭', min: 10, max: 10 },
-    { code: 'US', name: 'United States', dial: '+1', flag: '🇺🇸', min: 10, max: 10 },
-    { code: 'SG', name: 'Singapore', dial: '+65', flag: '🇸🇬', min: 8, max: 8 },
-    { code: 'AE', name: 'United Arab Emirates', dial: '+971', flag: '🇦🇪', min: 9, max: 9 },
-    { code: 'HK', name: 'Hong Kong', dial: '+852', flag: '🇭🇰', min: 8, max: 8 },
-    { code: 'JP', name: 'Japan', dial: '+81', flag: '🇯🇵', min: 10, max: 10 },
-    { code: 'AU', name: 'Australia', dial: '+61', flag: '🇦🇺', min: 9, max: 9 },
-    { code: 'CA', name: 'Canada', dial: '+1', flag: '🇨🇦', min: 10, max: 10 },
-    { code: 'GB', name: 'United Kingdom', dial: '+44', flag: '🇬🇧', min: 10, max: 10 },
-  ];
-  const getCountryByCode = (code) => countries.find(c => c.code === code) || countries[0];
-  const getCountryByDial = (dial) => countries.find(c => dial && String(dial).startsWith(c.dial));
-
-  const [countryByField, setCountryByField] = useState({
-    contact: 'PH',
-    emergencyContact: 'PH',
-    fatherContact: 'PH',
-    motherContact: 'PH',
-    spouseContact: 'PH',
-  });
+  const phone11Digits = (v) => String(v || "").replace(/\D/g, "").length === 11;
 
   const calculatedAge = useMemo(() => {
     if (!form.dob) return "";
@@ -74,38 +49,11 @@ function Addpatientinfo() {
     return String(Math.max(0, age));
   }, [form.dob]);
 
-  function sanitizeIntlPhone(raw) {
-    // keep leading + and digits only; collapse extra +'s
-    let v = String(raw || "");
-    v = v.replace(/[^+\d]/g, "");
-    // keep only first leading +
-    v = v.replace(/\+/g, (m, idx) => (idx === 0 ? "+" : ""));
-    if (v.startsWith("+")) {
-      const digits = v.slice(1).replace(/\D/g, "");
-      return "+" + digits;
-    }
-    // no + yet, keep digits only while typing
-    return v.replace(/\D/g, "");
-  }
-
-  function normalizeToE164(raw) {
-    const digits = String(raw || "").replace(/[^\d]/g, "").replace(/^0+/, "");
-    return digits ? "+" + digits : "";
-  }
-
   function setField(name, value) {
-    // sanitize and strictly cap to 11 digits total for contact numbers
-    if (name === "contact" || name === "emergencyContact" || name === "fatherContact" || name === "motherContact" || name === "spouseContact") {
-      let v = sanitizeIntlPhone(value);
-      const hasPlus = v.startsWith("+");
-      const digits = v.replace(/\D/g, "").slice(0, 11);
-      value = hasPlus ? (digits ? "+" + digits : "") : digits;
-    }
     const nextForm = { ...form, [name]: value };
     setForm(nextForm);
     setTouched((prev) => ({ ...prev, [name]: true }));
     validate(name, value);
-    // clear submit error only when all fields are complete/valid
     const requiredOk = [
       nextForm.lastName,nextForm.firstName,nextForm.middleName,nextForm.dob,nextForm.address,nextForm.pob,nextForm.nationality,nextForm.religion,nextForm.contact,nextForm.emergencyContact,
       nextForm.province,nextForm.city,
@@ -119,34 +67,6 @@ function Addpatientinfo() {
     if (requiredOk && phonesOk && namesOk && maritalOk) {
       setSubmitError("");
     }
-  }
-
-  function finalizePhone(name) {
-    const current = form[name] || "";
-    const hasPlus = String(current).startsWith("+");
-    const digits = String(current).replace(/\D/g, "").slice(0, 11);
-    const normalized = digits ? (hasPlus ? "+" + digits : "+" + digits) : "";
-    setForm((prev) => ({ ...prev, [name]: normalized }));
-    validate(name, normalized);
-  }
-
-  function changeCountry(field, code) {
-    const selected = getCountryByCode(code);
-    setCountryByField((prev) => ({ ...prev, [field]: code }));
-    const dial = selected.dial;
-    // rebase current value to selected dial
-    const current = form[field] || "";
-    let digits = current.replace(/[^\d]/g, "");
-    // remove any leading country code digits (best-effort); we keep only national part by removing first up to 15-dialDigits
-    const other = getCountryByDial(current);
-    if (other) {
-      const oldDialDigits = other.dial.replace('+','');
-      if (digits.startsWith(oldDialDigits)) digits = digits.slice(oldDialDigits.length);
-    }
-    const national = digits.slice(0, selected.max);
-    const next = dial + national;
-    setForm((prev)=>({ ...prev, [field]: next }));
-    validate(field, next);
   }
 
   function validate(field, rawValue) {
@@ -167,22 +87,16 @@ function Addpatientinfo() {
         break;
       case "address":
       case "pob":
-        next[field] = req(value);
-        break;
       case "nationality":
       case "religion":
-        next[field] = req(value) || (nameRegex.test(value) ? "" : "Letters and spaces only.");
-        break;
       case "fatherOccupation":
       case "fatherAddress":
-        next[field] = req(value);
-        break;
       case "motherOccupation":
       case "motherAddress":
         next[field] = req(value);
-        break;
-      case "spouseOccupation":
-        next[field] = value && !nameRegex.test(value) ? "Letters and spaces only." : "";
+        if (["nationality","religion","fatherOccupation","motherOccupation"].includes(field) && value) {
+          next[field] = nameRegex.test(value) ? "" : "Letters and spaces only.";
+        }
         break;
       case "contact":
       case "emergencyContact":
@@ -190,16 +104,10 @@ function Addpatientinfo() {
       case "motherContact":
       case "spouseContact": {
         if (!value) { next[field] = "This field is required."; break; }
-        const digits = String(value || "").replace(/\D/g, "");
-        // require exactly 11 digits total (PH standard), regardless of country selection
-        next[field] = digits.length === 11 ? "" : "Must be 11 Digits.";
+        next[field] = phone11Digits(value) ? "" : "Must be 11 Digits.";
         break;
       }
-        break;
       case "dob":
-        next[field] = req(value);
-        break;
-      case "marital":
         next[field] = req(value);
         break;
       default:
@@ -221,6 +129,7 @@ function Addpatientinfo() {
     const v = String(form[name] || "").trim();
     return !!touched[name] || !!v;
   };
+
   return (
     <div className="addpat-shell">
       <div className="gold-line">
@@ -234,33 +143,32 @@ function Addpatientinfo() {
       </div>
 
       <section className="addpat-content">
-        <h1 className="title">Patient Personal Information</h1>
+        <h1 className="title">Edit Patient Personal Information</h1>
 
         <form className="addpat-form">
-          {/* Personal Details Section */}
           <div className="form-section">
             <div className="row">
               <label className="field">
                 <span>Last Name (Maiden's):</span>
                 <input type="text" required name="lastName" value={form.lastName} onChange={(e)=>setField("lastName", e.target.value)} />
-                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.lastName && shouldShow('lastName')? 'visible':'hidden'}}>{errors.lastName || 'placeholder'}</div>
+                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.lastName? 'visible':'hidden'}}>{errors.lastName || 'placeholder'}</div>
               </label>
               <label className="field">
                 <span>First Name:</span>
                 <input type="text" required name="firstName" value={form.firstName} onChange={(e)=>setField("firstName", e.target.value)} />
-                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.firstName && shouldShow('firstName')? 'visible':'hidden'}}>{errors.firstName || 'placeholder'}</div>
+                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.firstName? 'visible':'hidden'}}>{errors.firstName || 'placeholder'}</div>
               </label>
               <label className="field">
                 <span>Middle Name:</span>
                 <input type="text" required name="middleName" value={form.middleName} onChange={(e)=>setField("middleName", e.target.value)} />
-                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.middleName && shouldShow('middleName')? 'visible':'hidden'}}>{errors.middleName || 'placeholder'}</div>
+                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.middleName? 'visible':'hidden'}}>{errors.middleName || 'placeholder'}</div>
               </label>
             </div>
 
             <div className="row">
               <label className="field">
                 <span>Date of Birth:</span>
-                <input type="date" name="dob" value={form.dob} onChange={(e)=>{ setField("dob", e.target.value); setForm((p)=>({ ...p, age: "" })); }} />
+                <input type="date" name="dob" value={form.dob} onChange={(e)=>setField("dob", e.target.value)} />
                 <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.dob && shouldShow('dob')? 'visible':'hidden'}}>{errors.dob || 'placeholder'}</div>
               </label>
               <label className="field">
@@ -296,47 +204,16 @@ function Addpatientinfo() {
             <div className="row">
               <label className="field">
                 <span>Province:</span>
-                <select
-                  value={form.province}
-                  onChange={(e)=>{
-                    const val = e.target.value;
-                    const next = { ...form, province: val, city: '' };
-                    setForm(next);
-                    setTouched((prev)=>({ ...prev, province: true }));
-                    validate('province', val);
-                    const requiredOk = [
-                      next.lastName,next.firstName,next.middleName,next.dob,next.address,next.pob,next.nationality,next.religion,next.contact,next.emergencyContact,
-                      next.province,next.city,
-                      next.fatherName,next.fatherContact,next.fatherOccupation,next.fatherAddress,next.motherName,next.motherContact,next.motherOccupation,next.motherAddress
-                    ].every(v => String(v||"").trim());
-                    const phonesOk = [next.contact, next.emergencyContact, next.fatherContact, next.motherContact]
-                      .every(v => String(v||"").replace(/\D/g, "").length === 11);
-                    const namesOk = [next.lastName,next.firstName,next.middleName,next.fatherName,next.motherName]
-                      .every(v => nameRegex.test((v||"")));
-                    const maritalOk = String(next.marital||"").trim().length > 0;
-                    if (requiredOk && phonesOk && namesOk && maritalOk) setSubmitError("");
-                  }}
-                >
+                <select value={form.province || ''} onChange={(e)=>{ const val = e.target.value; setForm((prev)=>({ ...prev, province: val, city: '' })); setTouched((prev)=>({ ...prev, province: true })); validate('province', val); }}>
                   <option value="" disabled>Select Province</option>
-                  {phLocations.provinces.map((p)=> (
-                    <option key={p} value={p}>{p}</option>
-                  ))}
+                  {phLocations.provinces.map((p)=> (<option key={p} value={p}>{p}</option>))}
                 </select>
               </label>
               <label className="field">
                 <span>Town/City:</span>
-                <select
-                  value={form.city}
-                  onChange={(e)=>{
-                    const val = e.target.value;
-                    setField('city', val);
-                  }}
-                  disabled={!form.province}
-                >
+                <select value={form.city || ''} onChange={(e)=>setField('city', e.target.value)} disabled={!form.province}>
                   <option value="" disabled>{form.province ? 'Select Town/City' : 'Select Province first'}</option>
-                  {(phLocations.citiesByProvince[form.province] || []).map((c)=> (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
+                  {(phLocations.citiesByProvince[form.province] || []).map((c)=> (<option key={c} value={c}>{c}</option>))}
                 </select>
               </label>
             </div>
@@ -366,11 +243,9 @@ function Addpatientinfo() {
                 <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.emergencyContact && shouldShow('emergencyContact')? 'visible':'hidden'}}>{errors.emergencyContact || 'placeholder'}</div>
               </label>
             </div>
-
-            {/* Removed Social Security# and Philhealth# as requested - inputs and their error messages deleted */}
+            {/* SSS/Philhealth removed */}
           </div>
 
-          {/* Father's Information Section */}
           <div className="form-section">
             <h3 className="section-title">Father's Information</h3>
             <div className="row">
@@ -389,17 +264,16 @@ function Addpatientinfo() {
               <label className="field">
                 <span>Occupation:</span>
                 <input type="text" required name="fatherOccupation" value={form.fatherOccupation} onChange={(e)=>setField("fatherOccupation", e.target.value)} pattern="[A-Za-z ]+" />
-                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.fatherOccupation && shouldShow('fatherOccupation')? 'visible':'hidden'}}>{errors.fatherOccupation || 'placeholder'}</div>
+                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.fatherOccupation? 'visible':'hidden'}}>{errors.fatherOccupation || 'placeholder'}</div>
               </label>
               <label className="field">
                 <span>Father's Address:</span>
                 <input type="text" required name="fatherAddress" value={form.fatherAddress} onChange={(e)=>setField("fatherAddress", e.target.value)} />
-                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.fatherAddress && shouldShow('fatherAddress')? 'visible':'hidden'}}>{errors.fatherAddress || 'placeholder'}</div>
+                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.fatherAddress? 'visible':'hidden'}}>{errors.fatherAddress || 'placeholder'}</div>
               </label>
             </div>
           </div>
 
-          {/* Mother's Information Section */}
           <div className="form-section">
             <h3 className="section-title">Mother's Information</h3>
             <div className="row">
@@ -428,14 +302,13 @@ function Addpatientinfo() {
             </div>
           </div>
 
-          {/* Spouse Information Section */}
           <div className="form-section">
             <h3 className="section-title">Spouse Information</h3>
             <div className="row">
               <label className="field">
                 <span>Spouse:</span>
                 <input type="text" name="spouseName" value={form.spouseName} onChange={(e)=>setField("spouseName", e.target.value)} />
-                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.spouseName && shouldShow('spouseName')? 'visible':'hidden'}}>{errors.spouseName || 'placeholder'}</div>
+                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.spouseName? 'visible':'hidden'}}>{errors.spouseName || 'placeholder'}</div>
               </label>
               <label className="field">
                 <span>Contact:</span>
@@ -447,7 +320,7 @@ function Addpatientinfo() {
               <label className="field">
                 <span>Occupation:</span>
                 <input type="text" name="spouseOccupation" value={form.spouseOccupation} onChange={(e)=>setField("spouseOccupation", e.target.value)} pattern="[A-Za-z ]+" />
-                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.spouseOccupation && shouldShow('spouseOccupation')? 'visible':'hidden'}}>{errors.spouseOccupation || 'placeholder'}</div>
+                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.spouseOccupation? 'visible':'hidden'}}>{errors.spouseOccupation || 'placeholder'}</div>
               </label>
             </div>
           </div>
@@ -458,28 +331,28 @@ function Addpatientinfo() {
               type="button"
               className="register"
               onClick={() => {
-                // validate required fields before navigation
                 [
                   'lastName','firstName','middleName','dob','address','pob','nationality','religion','contact','emergencyContact',
                   'fatherName','fatherContact','fatherOccupation','fatherAddress','motherName','motherContact','motherOccupation','motherAddress'
                 ].forEach((f)=>validate(f, form[f]));
                 const requiredOk = [
                   form.lastName,form.firstName,form.middleName,form.dob,form.address,form.pob,form.nationality,form.religion,form.contact,form.emergencyContact,
+                  form.province,form.city,
                   form.fatherName,form.fatherContact,form.fatherOccupation,form.fatherAddress,form.motherName,form.motherContact,form.motherOccupation,form.motherAddress
                 ].every(v => String(v||"").trim());
                 const phonesOk = [form.contact, form.emergencyContact, form.fatherContact, form.motherContact]
                   .every(v => String(v||"").replace(/\D/g, "").length === 11);
-                const namesOk = [form.lastName,form.firstName,form.middleName,form.fatherName,form.motherName].every(v => nameRegex.test((v||"")));
-                if (requiredOk && phonesOk && namesOk) {
-                  const role = getRole();
-                  const dest = role === 'staff' ? '/staff/landing' : '/admin/patient-records';
-                  navigate(dest, { replace: true });
+                const namesOk = [form.lastName,form.firstName,form.middleName,form.fatherName,form.motherName]
+                  .every(v => nameRegex.test((v||"")));
+                const ok = requiredOk && phonesOk && namesOk && String(form.marital||"").trim();
+                if (ok) {
+                  setShowConfirm(true);
                 } else {
                   setSubmitError("Please complete all required fields and fix validation errors.");
                 }
               }}
             >
-              Register
+              Save
             </button>
           </div>
         </form>
@@ -495,8 +368,40 @@ function Addpatientinfo() {
           EVERY WOMAN
         </div>
       </footer>
+
+      {showConfirm ? (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50
+        }}>
+          <div style={{ background: '#fff', borderRadius: 8, padding: 20, width: 360, boxShadow: '0 10px 20px rgba(0,0,0,0.2)' }}>
+            <h3 style={{ marginTop: 0, marginBottom: 8 }}>Save Edit?</h3>
+            <p style={{ marginTop: 0, color: '#374151', fontSize: 14 }}>Do you want to save the changes to this patient's information?</p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 14 }}>
+              <button
+                onClick={() => setShowConfirm(false)}
+                style={{ background: '#e5e7eb', border: '1px solid #d1d5db', borderRadius: 6, padding: '8px 14px', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  const role = getRole();
+                  const dest = role === 'staff' ? '/staff/manage-patient' : '/admin/patient-records';
+                  navigate(dest, { replace: true });
+                }}
+                style={{ background: '#111827', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 14px', cursor: 'pointer' }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
 
-export default Addpatientinfo;
+export default Editpatientinfo;
+
+

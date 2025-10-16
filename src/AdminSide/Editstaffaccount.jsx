@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import PhoneInput from "../components/PhoneInput";
 import "./Staffregister.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-function Staffregister() {
+function Editstaffaccount() {
   const [show, setShow] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+  const navigate = useNavigate();
   const [form, setForm] = useState({ lastName: "", firstName: "", middleInitial: "", email: "", phone: "", password: "", confirmPassword: "" });
   const [errors, setErrors] = useState({});
   const [showSubmitError, setShowSubmitError] = useState(false);
@@ -65,14 +67,32 @@ function Staffregister() {
     if (allFilled && allValid) {/* nothing extra */}
   }
 
+  function validateAll() {
+    const fields = ["lastName","firstName","middleInitial","email","password","confirmPassword"];
+    fields.forEach((f) => validate(f, form[f]));
+    const allEmpty = fields.every(f => !String(form[f]||"").trim());
+    setShowSubmitError(allEmpty);
+    
+    const allFilled = fields.every(f => String(form[f]||"").trim());
+    const allValid =
+      nameRegex.test(form.lastName||"") &&
+      nameRegex.test(form.firstName||"") &&
+      miRegex.test(form.middleInitial||"") && (String(form.middleInitial||"").length === 1) &&
+      emailRegex.test(form.email||"") &&
+      pwRegex.test(form.password||"") &&
+      form.password === form.confirmPassword;
+      
+    return allFilled && allValid;
+  }
+
   return (
     <div className="sreg-shell">
       <div className="gold-line">
-        <Link className="back" aria-label="Back" to="/admin/dashboard">←</Link>
+        <Link className="back" aria-label="Back" to="/admin/manage-accounts">←</Link>
       </div>
 
       <section className="sreg-content">
-        <h1 className="title">Staff Registration</h1>
+        <h1 className="title">Edit Staff Account</h1>
 
         <form className="form">
           <div className="row">
@@ -141,12 +161,12 @@ function Staffregister() {
               type="button"
               className="next"
               onClick={() => {
-                ["lastName","firstName","middleInitial","email","password","confirmPassword"].forEach((f)=>validate(f, form[f]));
-                const allEmpty = ["lastName","firstName","middleInitial","email","password","confirmPassword"].every(f => !String(form[f]||"").trim());
-                setShowSubmitError(allEmpty);
+                if (validateAll()) {
+                  setConfirm(true);
+                }
               }}
             >
-              Register
+              Save
             </button>
           </div>
         </form>
@@ -162,9 +182,23 @@ function Staffregister() {
           EVERY WOMAN
         </div>
       </footer>
+
+      {confirm ? (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
+          <div style={{ background: '#fff', borderRadius: 8, padding: 20, width: 360, boxShadow: '0 10px 20px rgba(0,0,0,0.2)' }}>
+            <h3 style={{ marginTop: 0, marginBottom: 8 }}>Save Edit?</h3>
+            <p style={{ marginTop: 0, color: '#374151', fontSize: 14 }}>Do you want to save the changes to this staff account?</p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 14 }}>
+              <button onClick={() => setConfirm(false)} style={{ background: '#e5e7eb', border: '1px solid #d1d5db', borderRadius: 6, padding: '8px 14px', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => navigate('/admin/manage-accounts', { replace: true })} style={{ background: '#111827', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 14px', cursor: 'pointer' }}>Save</button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
 
-export default Staffregister;
+export default Editstaffaccount;
+
 

@@ -1,7 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+<<<<<<< Updated upstream
 
 // AdminSide pages
+=======
+>>>>>>> Stashed changes
 import Loginpage from "./AdminSide/loginpage";
 import Admindashboard from "./AdminSide/Admindashboard";
 import Checkuprecords from "./AdminSide/Checkuprecords";
@@ -9,8 +12,22 @@ import Createrecords from "./AdminSide/Createrecords";
 import Manageaccs from "./AdminSide/Manageaccs";
 import Patientrecords from "./AdminSide/Patientrecords";
 import Patientregister from "./AdminSide/Patientregister";
+<<<<<<< Updated upstream
 import Staffregister from "./AdminSide/Staffregister";
 import Addpatientinfo from "./AdminSide/Addpatientinfo";
+=======
+import Addpatientinfo from "./AdminSide/Addpatientinfo";
+import Staffregister from "./AdminSide/Staffregister";
+import Editpatientinfo from "./AdminSide/Editpatientinfo";
+import Editpatientaccount from "./AdminSide/Editpatientaccount";
+import Editstaffaccount from "./AdminSide/Editstaffaccount";
+import Stafflanding from "./StaffSide/Stafflanding";
+import StaffManagePatient from "./StaffSide/StaffManagePatient";
+import StaffCreateRecords from "./StaffSide/StaffCreateRecords";
+import StaffManageRecords from "./StaffSide/StaffManageRecords";
+import StaffAddPatient from "./StaffSide/StaffAddPatient";
+import StaffManageAccounts from "./StaffSide/StaffManageAccounts";
+>>>>>>> Stashed changes
 
 function isAdminAuthenticated() {
   try {
@@ -29,13 +46,37 @@ function ProtectedRoute({ children }) {
   }
   return children;
 }
+<<<<<<< Updated upstream
+=======
+
+function isStaffAuthenticated() {
+  try {
+    const raw = localStorage.getItem("auth");
+    if (!raw) return false;
+    const auth = JSON.parse(raw);
+    return auth && auth.role === "staff";
+  } catch (_) {
+    return false;
+  }
+}
+
+function StaffProtectedRoute({ children }) {
+  if (!isStaffAuthenticated()) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+}
+>>>>>>> Stashed changes
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Loginpage />} />
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
         <Route
           path="/admin/dashboard"
           element={
@@ -69,6 +110,22 @@ function App() {
           }
         />
         <Route
+          path="/admin/manage-accounts/patient/edit"
+          element={
+            <ProtectedRoute>
+              <Editpatientaccount />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-accounts/staff/edit"
+          element={
+            <ProtectedRoute>
+              <Editstaffaccount />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/admin/patient-records"
           element={
             <ProtectedRoute>
@@ -77,10 +134,26 @@ function App() {
           }
         />
         <Route
+          path="/admin/patient-records/edit"
+          element={
+            <ProtectedRoute>
+              <Editpatientinfo />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/admin/patient-register"
           element={
             <ProtectedRoute>
               <Patientregister />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/patient-register/info"
+          element={
+            <ProtectedRoute>
+              <Addpatientinfo />
             </ProtectedRoute>
           }
         />
@@ -102,6 +175,73 @@ function App() {
         />
 
         <Route path="*" element={<Navigate to="/" replace />} />
+<<<<<<< Updated upstream
+=======
+        <Route
+          path="/staff/landing"
+          element={
+            <StaffProtectedRoute>
+              <Stafflanding />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/manage-patient"
+          element={
+            <StaffProtectedRoute>
+              <StaffManagePatient />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/patient-records/edit"
+          element={
+            <StaffProtectedRoute>
+              <Editpatientinfo />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/create-records"
+          element={
+            <StaffProtectedRoute>
+              <StaffCreateRecords />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/manage-records"
+          element={
+            <StaffProtectedRoute>
+              <StaffManageRecords />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/add-patient"
+          element={
+            <StaffProtectedRoute>
+              <StaffAddPatient />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/add-patient-info"
+          element={
+            <StaffProtectedRoute>
+              <Addpatientinfo />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/manage-accounts"
+          element={
+            <StaffProtectedRoute>
+              <StaffManageAccounts />
+            </StaffProtectedRoute>
+          }
+        />
+>>>>>>> Stashed changes
       </Routes>
     </Router>
   );

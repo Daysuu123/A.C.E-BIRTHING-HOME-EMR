@@ -105,17 +105,7 @@ function PatientProfilePage() {
               <div className="field"></div>
             </div>
 
-            <div className="row">
-              <label className="field">
-                <span>Social Security #:</span>
-                <input type="text" />
-              </label>
-              <label className="field">
-                <span>PhilHealth #:</span>
-                <input type="text" />
-              </label>
-              <div className="field"></div>
-            </div>
+            
           </div>
 
           {/* Father's Information Section */}

@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./loginpage.css";
+<<<<<<< Updated upstream
+=======
+// backend handled via dev proxy at /api/loginpage.php
+>>>>>>> Stashed changes
 
 function LoginPage() {
   const [message, setMessage] = useState("");
@@ -9,10 +13,17 @@ function LoginPage() {
   const navigate = useNavigate();
 
   const devBypass = (email, password, reason) => {
-    if (email === "admin@example.com" && password === "12345678") {
-      localStorage.setItem("auth", JSON.stringify({ role: "admin", email }));
-      navigate("/admin/dashboard", { replace: true });
-      return true;
+    if (password === "12345678") {
+      if (email === "admin@example.com") {
+        localStorage.setItem("auth", JSON.stringify({ role: "admin", email }));
+        navigate("/admin/dashboard", { replace: true });
+        return true;
+      }
+      if (email === "staff@example.com") {
+        localStorage.setItem("auth", JSON.stringify({ role: "staff", email }));
+        navigate("/staff/landing", { replace: true });
+        return true;
+      }
     }
     setMessageType("error");
     setMessage(reason || "Login failed.");
@@ -45,10 +56,14 @@ function LoginPage() {
       if (result && (result.success || response.ok)) {
         setMessageType("success");
         setMessage(result.message || "Login successful!");
-        // store simple auth flag for route guard
-        localStorage.setItem("auth", JSON.stringify({ role: "admin", email: username }));
-        // navigate to dashboard
-        navigate("/admin/dashboard", { replace: true });
+        // Determine role from backend if provided; fallback by email
+        const role = (result.user && result.user.role) || (username === "admin@example.com" ? "admin" : username === "staff@example.com" ? "staff" : "admin");
+        localStorage.setItem("auth", JSON.stringify({ role, email: username }));
+        if (role === "staff") {
+          navigate("/staff/landing", { replace: true });
+        } else {
+          navigate("/admin/dashboard", { replace: true });
+        }
       } else {
         // If backend rejects, still allow dev bypass for demo creds
         if (!devBypass(username, password, (result && result.message) || "Login failed.")) {
@@ -83,7 +98,11 @@ function LoginPage() {
 
       <div className="form-panel">
         <div className="login-card">
+<<<<<<< Updated upstream
           <h2 className="login-title">Login</h2>
+=======
+        <h2 className="login-title">Login</h2>
+>>>>>>> Stashed changes
           {message ? (
             <div className={`notice ${messageType}`}>
               {message}

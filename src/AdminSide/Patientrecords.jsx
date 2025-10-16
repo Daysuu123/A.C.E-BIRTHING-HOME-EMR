@@ -1,6 +1,6 @@
 import React from "react";
 import "./Patientrecords.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const samplePatients = [
   { id: "E-10001", name: "Amie Eppie", photo: "https://i.pravatar.cc/120?img=5" },
@@ -12,10 +12,10 @@ const samplePatients = [
 ];
 
 function Patientrecords() {
+  const navigate = useNavigate();
   return (
     <div className="records-shell">
       <div className="records-header">
-        <div className="breadcrumbs">List of Patient Records (Admin)</div>
         <div className="gold-line">
           <Link className="back" aria-label="Back" to="/admin/dashboard">←</Link>
         </div>
@@ -30,7 +30,7 @@ function Patientrecords() {
           {samplePatients.map((p) => (
             <article key={p.name} className="card">
               <div className="card-actions">
-                <button title="Edit">✎</button>
+                <button title="Edit" onClick={() => navigate('/admin/patient-records/edit')}>✎</button>
                 <button title="Open">⤢</button>
               </div>
               <img className="avatar" src={p.photo} alt={p.name} />

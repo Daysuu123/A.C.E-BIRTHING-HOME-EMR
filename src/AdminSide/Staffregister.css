@@ -2,7 +2,7 @@
 .gold-line { background: #caa22a; height: 28px; display: flex; align-items: center; padding-left: 12px; }
 .back { background: transparent; border: none; font-size: 18px; color: #000; cursor: pointer; }
 
-.sreg-content { background: #fff; margin: 0 12px; padding: 18px 20px 24px; }
+.sreg-content { background: #fff; margin: 0; padding: 18px 20px 24px; }
 .title { margin: 0 0 12px; font-size: 28px; }
 
 .form { border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; }

@@ -1,18 +1,19 @@
-.records-shell { background: #1f1f1f; min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; }
+.records-shell, .records-page { background: transparent; min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; }
 
-.records-header { color: #cbd5e1; font-size: 12px; padding: 8px 12px 0; }
-.gold-line { background: #caa22a; height: 28px; display: flex; align-items: center; padding-left: 12px; }
+.gold-line { background: #caa22a; height: 50px; display: flex; align-items: center; padding-left: 12px; position: sticky; top: 0; z-index: 20; box-shadow: 0 1px 0 rgba(0,0,0,0.15); }
 .back { background: transparent; border: none; font-size: 18px; color: #000; cursor: pointer; }
 
-.records-content { background: #ffffff; margin: 0 12px; padding: 18px 20px 24px; }
+.records-content { background: #ffffff; margin: 0; padding: 18px 20px 24px; }
 .records-title { text-align: center; margin: 0 0 12px; font-size: 32px; }
 
 .search {
-  width: 100%;
+  width: 458px;
   border-radius: 10px;
   border: 1px solid #d1d5db;
-  padding: 10px 12px;
+  height: 20px;
   font-size: 14px;
+  display: block;
+  margin: 8px 0 16px;
 }
 
 .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px 28px; margin-top: 18px; }

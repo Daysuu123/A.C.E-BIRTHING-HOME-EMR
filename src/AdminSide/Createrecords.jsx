@@ -1,8 +1,24 @@
 import React from "react";
 import "./Createrecords.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Createrecords() {
+  const navigate = useNavigate();
+  
+  // Mock female patient names for dropdown
+  const femalePatients = [
+    "Eppie, Amie P.",
+    "Santos, Maria L.",
+    "Reyes, Sofia G.",
+    "Cruz, Isabella M.",
+    "Garcia, Gabriela T.",
+    "Lim, Jasmine R.",
+    "Tan, Angela D.",
+    "Mendoza, Camille P.",
+    "Fernandez, Diana L.",
+    "Ramos, Victoria S."
+  ];
+  
   return (
     <div className="cr-shell">
       <div className="gold-line">
@@ -15,7 +31,11 @@ function Createrecords() {
         <form className="cr-form">
           <label className="field wide">
             <span>Patient Name:</span>
-            <input type="text" defaultValue="Eppie, Amie P." />
+            <select defaultValue="Eppie, Amie P.">
+              {femalePatients.map((name, index) => (
+                <option key={index} value={name}>{name}</option>
+              ))}
+            </select>
           </label>
 
           <div className="row">
@@ -55,7 +75,13 @@ function Createrecords() {
             </label>
 
             <div className="actions">
-              <button type="button" className="create">Create</button>
+              <button
+                type="button"
+                className="create"
+                onClick={() => navigate("/admin/checkup-records", { replace: true })}
+              >
+                Create
+              </button>
             </div>
           </div>
         </form>

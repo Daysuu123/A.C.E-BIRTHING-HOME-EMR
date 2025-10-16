@@ -2,10 +2,10 @@
 .gold-line { background: #caa22a; height: 28px; display: flex; align-items: center; padding-left: 12px; }
 .back { background: transparent; border: none; font-size: 18px; color: #000; cursor: pointer; }
 
-.preg-content { background: #fff; margin: 0 12px; padding: 18px 20px 24px; }
+.preg-content { background: #fff; margin: 0; padding: 18px 20px 24px; }
 .title { margin: 0 0 12px; font-size: 28px; }
 
-.form { border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; }
+.form { border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; position: relative; min-height: 320px; }
 .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 10px; align-items: end; }
 .field { display: grid; gap: 6px; }
 .field span { font-size: 11px; color: #374151; }
@@ -13,8 +13,10 @@
 .field.wide { grid-column: 1 / -1; }
 .show { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #374151; }
 
-.actions { display: flex; justify-content: center; margin-top: 6px; }
+.actions { display: flex; justify-content: flex-end; margin-top: 6px; }
+.actions .next { position: absolute; right: 16px; bottom: 16px; }
 .next { background: #111827; color: #fff; border: none; border-radius: 8px; padding: 8px 32px; }
+.actions div { position: absolute; left: 12px; bottom: 18px; max-width: 60%; }
 
 .preg-footer { background: #6b7280; color: #fff; padding: 10px 12px; display: grid; grid-template-columns: 56px 1fr; align-items: center; }
 .footer-mark { width: 40px; height: 40px; border-radius: 50%; background: #caa22a; border: 2px solid #2b2b2b; }
