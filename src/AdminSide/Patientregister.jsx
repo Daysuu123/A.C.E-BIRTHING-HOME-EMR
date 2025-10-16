@@ -8,6 +8,7 @@ function Patientregister() {
   const [form, setForm] = useState({ lastName: "", firstName: "", middleInitial: "", email: "", password: "", confirmPassword: "" });
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const pwRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
@@ -52,6 +53,50 @@ function Patientregister() {
     setForm(next);
     validate(name, value, next);
     setSubmitError("");
+  }
+
+  async function handleNext() {
+    if (!validateAll()) return;
+    
+    setIsSubmitting(true);
+    setSubmitError("");
+    
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/patients/register-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          lastName: form.lastName,
+          firstName: form.firstName,
+          middleInitial: form.middleInitial,
+          email: form.email,
+          password: form.password
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Store patient_id in localStorage for the next step
+        localStorage.setItem('tempPatientId', data.patient_id);
+        localStorage.setItem('tempPatientData', JSON.stringify({
+          lastName: form.lastName,
+          firstName: form.firstName,
+          middleInitial: form.middleInitial,
+          email: form.email
+        }));
+        navigate("/admin/patient-register/info");
+      } else {
+        setSubmitError(data.message || "Failed to create patient account");
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setSubmitError("Network error. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   function validateAll() {
@@ -127,13 +172,10 @@ function Patientregister() {
             <button
               type="button"
               className="next"
-              onClick={() => {
-                if (validateAll()) {
-                  navigate("/admin/patient-register/info");
-                }
-              }}
+              onClick={handleNext}
+              disabled={isSubmitting}
             >
-              Next
+              {isSubmitting ? "Creating Account..." : "Next"}
             </button>
             <div style={{color:'#dc2626',fontSize:13,marginTop:8,minHeight:18,visibility:submitError? 'visible':'hidden'}}>{submitError || 'placeholder'}</div>
           </div>

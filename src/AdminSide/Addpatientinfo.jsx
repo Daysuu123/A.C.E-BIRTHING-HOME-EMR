@@ -6,6 +6,7 @@ import "./Addpatientinfo.css";
 
 function Addpatientinfo() {
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     lastName: "",
     firstName: "",
@@ -217,6 +218,93 @@ function Addpatientinfo() {
       return "admin";
     }
   };
+
+  async function handleRegister() {
+    // validate required fields before submission
+    [
+      'lastName','firstName','middleName','dob','address','pob','nationality','religion','contact','emergencyContact',
+      'fatherName','fatherContact','fatherOccupation','fatherAddress','motherName','motherContact','motherOccupation','motherAddress'
+    ].forEach((f)=>validate(f, form[f]));
+    
+    const requiredOk = [
+      form.lastName,form.firstName,form.middleName,form.dob,form.address,form.pob,form.nationality,form.religion,form.contact,form.emergencyContact,
+      form.fatherName,form.fatherContact,form.fatherOccupation,form.fatherAddress,form.motherName,form.motherContact,form.motherOccupation,form.motherAddress
+    ].every(v => String(v||"").trim());
+    
+    const phonesOk = [form.contact, form.emergencyContact, form.fatherContact, form.motherContact]
+      .every(v => String(v||"").replace(/\D/g, "").length === 11);
+    
+    const namesOk = [form.lastName,form.firstName,form.middleName,form.fatherName,form.motherName].every(v => nameRegex.test((v||"")));
+    
+    if (!requiredOk || !phonesOk || !namesOk) {
+      setSubmitError("Please complete all required fields and fix validation errors.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError("");
+
+    try {
+      const patientId = localStorage.getItem('tempPatientId');
+      if (!patientId) {
+        setSubmitError("Patient account not found. Please start registration again.");
+        return;
+      }
+
+      const response = await fetch('http://127.0.0.1:8000/api/patients/register-info', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          patient_id: parseInt(patientId),
+          lastName: form.lastName,
+          firstName: form.firstName,
+          middleName: form.middleName,
+          dob: form.dob,
+          address: form.address,
+          pob: form.pob,
+          province: form.province,
+          city: form.city,
+          nationality: form.nationality,
+          religion: form.religion,
+          contact: form.contact,
+          emergencyContact: form.emergencyContact,
+          fatherName: form.fatherName,
+          fatherContact: form.fatherContact,
+          fatherOccupation: form.fatherOccupation,
+          fatherAddress: form.fatherAddress,
+          motherName: form.motherName,
+          motherContact: form.motherContact,
+          motherOccupation: form.motherOccupation,
+          motherAddress: form.motherAddress,
+          marital: form.marital,
+          spouseName: form.spouseName || "",
+          spouseContact: form.spouseContact || "",
+          spouseOccupation: form.spouseOccupation || ""
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Clear temporary data
+        localStorage.removeItem('tempPatientId');
+        localStorage.removeItem('tempPatientData');
+        
+        const role = getRole();
+        const dest = role === 'staff' ? '/staff/landing' : '/admin/patient-records';
+        navigate(dest, { replace: true });
+      } else {
+        setSubmitError(data.message || "Failed to save patient information");
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setSubmitError("Network error. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
   const shouldShow = (name) => {
     const v = String(form[name] || "").trim();
     return !!touched[name] || !!v;
@@ -457,29 +545,10 @@ function Addpatientinfo() {
             <button
               type="button"
               className="register"
-              onClick={() => {
-                // validate required fields before navigation
-                [
-                  'lastName','firstName','middleName','dob','address','pob','nationality','religion','contact','emergencyContact',
-                  'fatherName','fatherContact','fatherOccupation','fatherAddress','motherName','motherContact','motherOccupation','motherAddress'
-                ].forEach((f)=>validate(f, form[f]));
-                const requiredOk = [
-                  form.lastName,form.firstName,form.middleName,form.dob,form.address,form.pob,form.nationality,form.religion,form.contact,form.emergencyContact,
-                  form.fatherName,form.fatherContact,form.fatherOccupation,form.fatherAddress,form.motherName,form.motherContact,form.motherOccupation,form.motherAddress
-                ].every(v => String(v||"").trim());
-                const phonesOk = [form.contact, form.emergencyContact, form.fatherContact, form.motherContact]
-                  .every(v => String(v||"").replace(/\D/g, "").length === 11);
-                const namesOk = [form.lastName,form.firstName,form.middleName,form.fatherName,form.motherName].every(v => nameRegex.test((v||"")));
-                if (requiredOk && phonesOk && namesOk) {
-                  const role = getRole();
-                  const dest = role === 'staff' ? '/staff/landing' : '/admin/patient-records';
-                  navigate(dest, { replace: true });
-                } else {
-                  setSubmitError("Please complete all required fields and fix validation errors.");
-                }
-              }}
+              onClick={handleRegister}
+              disabled={isSubmitting}
             >
-              Register
+              {isSubmitting ? "Saving..." : "Register"}
             </button>
           </div>
         </form>
