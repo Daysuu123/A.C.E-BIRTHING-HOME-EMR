@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import "../AdminSide/Patientregister.css";
+import "./Patientregister.css";
 import { Link, useNavigate } from "react-router-dom";
 
-function StaffAddPatient() {
+function Editpatientaccount() {
   const [show, setShow] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+  const navigate = useNavigate();
   const [form, setForm] = useState({ lastName: "", firstName: "", middleInitial: "", email: "", password: "", confirmPassword: "" });
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const pwRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
   const nameRegex = /^[A-Za-z]+$/;
@@ -26,6 +29,7 @@ function StaffAddPatient() {
     }
     if (field === "password") {
       newErrors.password = pwRegex.test(v) ? "" : "At least 8 chars, 1 uppercase, 1 number, 1 special.";
+      // keep confirm match up to date (only if both have values)
       if (currentForm.confirmPassword) {
         newErrors.confirmPassword = v && currentForm.confirmPassword
           ? (currentForm.confirmPassword === v ? "" : "Passwords do not match.")
@@ -33,6 +37,7 @@ function StaffAddPatient() {
       }
     }
     if (field === "confirmPassword") {
+      // show mismatch only when both fields are non-empty
       if (!v || !currentForm.password) {
         newErrors.confirmPassword = "";
       } else {
@@ -49,30 +54,31 @@ function StaffAddPatient() {
     validate(name, value, next);
     setSubmitError("");
   }
-  
+
   function validateAll() {
     const fields = ["lastName","firstName","middleInitial","email","password","confirmPassword"];
+    const nextErrors = { ...errors };
     fields.forEach((f) => validate(f, form[f], form));
+    // after validate calls, errors state will update async; compute simple pass now
     const anyEmpty = fields.some((f) => !String(form[f] || "").trim());
     const emailOk = emailRegex.test((form.email || "").trim());
     const pwOk = pwRegex.test(form.password || "");
-    const matchOk = !!form.password && !!form.confirmPassword && form.password === form.confirmPassword;
-    const namesOk = /^[A-Za-z]+$/.test(form.lastName || "") && /^[A-Za-z]+$/.test(form.firstName || "") && /^[A-Za-z]$/.test(form.middleInitial || "");
-    const ok = !anyEmpty && emailOk && pwOk && matchOk && namesOk;
+    const matchOk = form.password === form.confirmPassword && !!form.confirmPassword;
+    const ok = !anyEmpty && emailOk && pwOk && matchOk;
     if (!ok) setSubmitError("Please complete all required fields and fix validation errors.");
     return ok;
   }
-  const navigate = useNavigate();
+
   return (
     <div className="preg-shell">
       <div className="preg-head">
         <div className="gold-line">
-          <Link className="back" aria-label="Back" to="/staff/landing">←</Link>
+          <Link className="back" aria-label="Back" to="/admin/manage-accounts">←</Link>
         </div>
       </div>
 
       <section className="preg-content">
-        <h1 className="title">Patient Registration</h1>
+        <h1 className="title">Edit Patient Account</h1>
 
         <form className="form">
           <div className="row">
@@ -104,7 +110,7 @@ function StaffAddPatient() {
           <div className="row">
             <label className="field">
               <span>Password:</span>
-              <input name="password" type={show ? "text" : "password"} required value={form.password} onChange={onChange} pattern="(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}" />
+              <input name="password" type={show ? "text" : "password"} required value={form.password} onChange={onChange} pattern="(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}" />
               <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.password? 'visible':'hidden'}}>{errors.password || 'placeholder'}</div>
             </label>
             <label className="field">
@@ -124,11 +130,11 @@ function StaffAddPatient() {
               className="next"
               onClick={() => {
                 if (validateAll()) {
-                  navigate('/staff/add-patient-info');
+                  setConfirm(true);
                 }
               }}
             >
-              Next
+              Save
             </button>
             <div style={{color:'#dc2626',fontSize:13,marginTop:8,minHeight:18,visibility:submitError? 'visible':'hidden'}}>{submitError || 'placeholder'}</div>
           </div>
@@ -145,9 +151,23 @@ function StaffAddPatient() {
           EVERY WOMAN
         </div>
       </footer>
+
+      {confirm ? (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
+          <div style={{ background: '#fff', borderRadius: 8, padding: 20, width: 360, boxShadow: '0 10px 20px rgba(0,0,0,0.2)' }}>
+            <h3 style={{ marginTop: 0, marginBottom: 8 }}>Save Edit?</h3>
+            <p style={{ marginTop: 0, color: '#374151', fontSize: 14 }}>Do you want to save the changes to this patient account?</p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 14 }}>
+              <button onClick={() => setConfirm(false)} style={{ background: '#e5e7eb', border: '1px solid #d1d5db', borderRadius: 6, padding: '8px 14px', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => navigate('/admin/manage-accounts', { replace: true })} style={{ background: '#111827', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 14px', cursor: 'pointer' }}>Save</button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
 
-export default StaffAddPatient;
+export default Editpatientaccount;
+
 

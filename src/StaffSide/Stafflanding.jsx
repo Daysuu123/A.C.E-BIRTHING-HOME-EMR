@@ -1,104 +1,85 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import "./Stafflanding.css";
+import { Link, useNavigate } from "react-router-dom";
+import "../AdminSide/Admindashboard.css";
 
 function StaffLanding() {
   const navigate = useNavigate();
-
-  const handleNavigation = (path) => {
-    navigate(path);
-  };
-
   const handleLogout = () => {
-    // Navigate back to login page
-    navigate('/');
+    localStorage.removeItem("auth");
+    navigate("/", { replace: true });
   };
-
   return (
-    <div className="staff-shell">
-      <header className="staff-header">
-        <div className="header-top">
-          <span className="page-title">Staff Landing Page</span>
+    <div className="admin-shell">
+      <header className="topbar">
+        <div className="brand">
+          <div className="brand-mark"></div>
+          <span className="brand-name">A.C.E Birthing Home</span>
         </div>
-        <div className="header-main">
-          <div className="brand-section">
-            <div className="brand-logo">
-              <div className="logo-circle">
-                <div className="logo-icon">👤❤️</div>
-              </div>
-              <span className="brand-text">A.C.E BIRTHING HOME</span>
-            </div>
-            <h1 className="brand-name">A.C.E Birthing Home</h1>
-          </div>
-          <div className="header-right">
-            <span className="welcome-text">Welcome, Staff</span>
-            <button className="logout-btn" onClick={handleLogout}>Logout</button>
-          </div>
+        <div className="topbar-right">
+          <span className="welcome">Welcome, Staff</span>
+          <button className="logout" onClick={handleLogout}>Logout</button>
         </div>
-        <div className="header-divider"></div>
       </header>
 
-      <div className="staff-body">
-        <aside className="staff-sidebar">
-          <nav className="staff-nav">
-            <button 
-              className="nav-btn active" 
-              onClick={() => handleNavigation('/staff/dashboard')}
-            >
-              Home
-            </button>
-            <button 
-              className="nav-btn" 
-              onClick={() => handleNavigation('/staff/manage-patient')}
-            >
-              Manage Patient
-            </button>
-            <button 
-              className="nav-btn" 
-              onClick={() => handleNavigation('/staff/add-patient')}
-            >
-              Add Patient
-            </button>
-            <button 
-              className="nav-btn" 
-              onClick={() => handleNavigation('/staff/create-records')}
-            >
-              Create Records
-            </button>
-            <button 
-              className="nav-btn" 
-              onClick={() => handleNavigation('/staff/manage-records')}
-            >
-              Manage Records
-            </button>
+      <div className="admin-body">
+        <aside className="sidebar">
+          <nav className="nav">
+            <Link className="nav-btn active" to="/staff/landing">Home</Link>
+            <Link className="nav-btn" to="/staff/manage-patient">Patient</Link>
+            <Link className="nav-btn" to="/staff/create-records">Create Records</Link>
+            <Link className="nav-btn" to="/staff/manage-records">Records</Link>
+            <Link className="nav-btn" to="/staff/add-patient">Patient Register</Link>
           </nav>
         </aside>
 
-        <main className="staff-content">
-          <div className="content-illustration">
-            <div className="mother-baby-illustration">
-              <div className="mother-figure">
-                <div className="mother-head">👩</div>
-                <div className="mother-body">🤱</div>
+        <main className="content">
+          <h1 className="dash-title">Welcome</h1>
+          <div className="subtitle">Caring for mothers and newborns</div>
+
+          <section className="chart-card" style={{display: 'grid', gap: 12}}>
+            <blockquote style={{
+              margin: 0,
+              padding: '16px 18px',
+              borderLeft: '4px solid #caa22a',
+              background: '#fffef6',
+              fontStyle: 'italic'
+            }}>
+              "Birth is not only about making babies. Birth is about making mothers — strong, competent, capable mothers who trust themselves and know their inner strength." — Barbara Katz Rothman
+            </blockquote>
+
+            <div style={{display:'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12}}>
+              <div style={{background:'#f9fafb', border:'1px solid #e5e7eb', borderRadius:6, padding:16}}>
+                Compassion, respect, and dignity for every mother.
               </div>
-              <div className="baby-figure">
-                <div className="baby-head">👶</div>
-                <div className="baby-bow">🎀</div>
+              <div style={{background:'#f9fafb', border:'1px solid #e5e7eb', borderRadius:6, padding:16}}>
+                Safe beginnings for little ones, supported by your care.
+              </div>
+              <div style={{background:'#f9fafb', border:'1px solid #e5e7eb', borderRadius:6, padding:16}}>
+                Together, we make families feel seen, heard, and held.
               </div>
             </div>
-          </div>
-          <div className="mission-text">
-            TO PROVIDE EXCEPTIONAL
-            <br />
-            MIDWIFERY CARE TO EACH AND
-            <br />
-            EVERY WOMAN
-          </div>
+
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:12}}>
+              <div style={{background:'#fff', border:'1px solid #e5e7eb', borderRadius:6, padding:16}}>
+                "To be pregnant is to be vitally alive, thoroughly woman, and undoubtedly inhabited." — Anne Buchanan
+              </div>
+              <div style={{background:'#fff', border:'1px solid #e5e7eb', borderRadius:6, padding:16}}>
+                "A baby is something you carry inside you for nine months, in your arms for three years, and in your heart till the day you die." — Mary Mason
+              </div>
+            </div>
+          </section>
         </main>
       </div>
 
-      <footer className="staff-footer">
-        <div className="footer-bar"></div>
+      <footer className="footer">
+        <div className="footer-mark" />
+        <div className="mission">
+          TO PROVIDE EXCEPTIONAL
+          <br />
+          MIDWIFERY CARE TO EACH AND
+          <br />
+          EVERY WOMAN
+        </div>
       </footer>
     </div>
   );

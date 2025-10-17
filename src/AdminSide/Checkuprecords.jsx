@@ -9,7 +9,6 @@ const rows = [
 function Checkuprecords() {
   return (
     <div className="curec-shell">
-      <div className="breadcrumbs">Check-up Records (Admin)</div>
       <div className="gold-line">
         <Link className="back" aria-label="Back" to="/admin/dashboard">←</Link>
       </div>

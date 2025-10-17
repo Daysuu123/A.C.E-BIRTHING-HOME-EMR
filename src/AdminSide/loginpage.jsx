@@ -1,17 +1,30 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./loginpage.css";
+// backend handled via dev proxy at /api/loginpage.php
 
 function LoginPage() {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("info"); // 'success' | 'error' | 'info'
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const devBypass = (email, password, reason) => {
-    if (email === "admin@example.com" && password === "12345678") {
-      localStorage.setItem("auth", JSON.stringify({ role: "admin", email }));
+    // Test credentials for existing database data
+    if (password === "Dace@09077041896" && email === "Dace") {
+      localStorage.setItem("auth", JSON.stringify({ role: "admin", email, name: "Dace" }));
       navigate("/admin/dashboard", { replace: true });
+      return true;
+    }
+    if (password === "hashed_docpass1" && email === "1") {
+      localStorage.setItem("auth", JSON.stringify({ role: "staff", email, name: "Roberto Dela Cruz" }));
+      navigate("/staff/landing", { replace: true });
+      return true;
+    }
+    if (password === "hashed_password1" && email === "maria.santos@example.com") {
+      localStorage.setItem("auth", JSON.stringify({ role: "patient", email, name: "Maria Santos" }));
+      navigate("/user/landing", { replace: true });
       return true;
     }
     setMessageType("error");
@@ -45,10 +58,26 @@ function LoginPage() {
       if (result && (result.success || response.ok)) {
         setMessageType("success");
         setMessage(result.message || "Login successful!");
-        // store simple auth flag for route guard
-        localStorage.setItem("auth", JSON.stringify({ role: "admin", email: username }));
-        // navigate to dashboard
-        navigate("/admin/dashboard", { replace: true });
+        
+        // Use role from backend response
+        const role = result.user?.role || 'admin';
+        const userData = {
+          role,
+          email: result.user?.email || username,
+          name: result.user?.name || username,
+          id: result.user?.id
+        };
+        
+        localStorage.setItem("auth", JSON.stringify(userData));
+        
+        // Navigate based on role
+        if (role === "staff") {
+          navigate("/staff/landing", { replace: true });
+        } else if (role === "patient") {
+          navigate("/user/landing", { replace: true });
+        } else {
+          navigate("/admin/dashboard", { replace: true });
+        }
       } else {
         // If backend rejects, still allow dev bypass for demo creds
         if (!devBypass(username, password, (result && result.message) || "Login failed.")) {
@@ -94,11 +123,15 @@ function LoginPage() {
             <input id="username" type="text" placeholder="Username" className="input" />
 
             <label className="sr-only" htmlFor="password">Password</label>
-            <input id="password" type="password" placeholder="Password" className="input" />
+            <input id="password" type={showPassword ? "text" : "password"} placeholder="Password" className="input" />
 
             <div className="form-row">
               <label className="remember">
-                <input type="checkbox" /> Remember me
+                <input 
+                  type="checkbox" 
+                  checked={showPassword}
+                  onChange={(e) => setShowPassword(e.target.checked)}
+                /> Show Password
               </label>
               <a href="#" className="forgot">Forgot Password?</a>
             </div>

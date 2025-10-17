@@ -8,7 +8,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Test connection by fetching from a table (replace 'your_table' with an actual table name)
 export async function testConnection() {
-  const { error } = await supabase.from('TATAILIO').select().limit(1)
+  const { error } = await supabase.from('A.C.E Birthing Home Database').select().limit(1)
   if (error) {
     console.error('Supabase connection failed:', error.message)
     return false

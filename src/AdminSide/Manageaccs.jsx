@@ -1,17 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import "./Manageaccs.css";
-import { Link } from "react-router-dom";
-
-const initialPatientRows = [
-  { email: "amieeppie10@gmail.com", name: "Amie Pangilinan Eppie", date: "08/27/2025" }
-];
-const initialStaffRows = [
-  { email: "obienjanelle@gmail.com", name: "Obien, Janelle C.", position: "OB-GYN", date: "01/10/2025" }
-];
+import { Link, useNavigate } from "react-router-dom";
 
 function Manageaccs() {
-  const [patientRows, setPatientRows] = useState(initialPatientRows);
-  const [staffRows, setStaffRows] = useState(initialStaffRows);
+  const [patientRows, setPatientRows] = useState([]);
+  const [staffRows, setStaffRows] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState(null); // 'patient' | 'staff'
@@ -19,6 +14,48 @@ function Manageaccs() {
   const [editingKey, setEditingKey] = useState(null);
 
   const datePlaceholder = useMemo(() => new Date().toLocaleDateString("en-US"), []);
+
+  useEffect(() => {
+    fetchPatients();
+    fetchStaff();
+  }, []);
+
+  async function fetchPatients() {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/patients');
+      const data = await response.json();
+      
+      if (data.success) {
+        const formattedPatients = data.patients.map(patient => ({
+          id: patient.patient_id,
+          email: patient.email,
+          name: `${patient.first_name} ${patient.last_name}`,
+          date: new Date(patient.date_created).toLocaleDateString("en-US"),
+          contact: patient.contact || "N/A",
+          address: patient.address || "N/A"
+        }));
+        setPatientRows(formattedPatients);
+      }
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+    }
+  }
+
+  async function fetchStaff() {
+    try {
+      // For now, using static data. You can create a staff API endpoint later
+      const initialStaffRows = [
+        { email: "obienjanelle@gmail.com", name: "Obien, Janelle C.", position: "OB-GYN", date: "01/10/2025" },
+        { email: "la.anne@example.com", name: "Anne, L.", position: "Midwife", date: "02/05/2025" },
+        { email: "l.cruz@example.com", name: "Cruz, L.", position: "Pediatrician", date: "03/22/2025" }
+      ];
+      setStaffRows(initialStaffRows);
+    } catch (error) {
+      console.error('Error fetching staff:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const openModal = (type, key) => {
     setModalType(type);
@@ -72,13 +109,29 @@ function Manageaccs() {
                 <div>Date Created</div>
                 <div>Action</div>
               </div>
-              {patientRows.map((r) => (
-                <div className="trow" key={r.email}>
-                  <div className="name">{r.name}</div>
-                  <div className="date">{r.date}</div>
-                  <div className="action"><button className="edit" onClick={() => openModal("patient", r.email)}>View</button></div>
+              {isLoading ? (
+                <div className="trow">
+                  <div className="name">Loading...</div>
+                  <div className="date">-</div>
+                  <div className="action">-</div>
                 </div>
-              ))}
+              ) : patientRows.length === 0 ? (
+                <div className="trow">
+                  <div className="name">No patients found</div>
+                  <div className="date">-</div>
+                  <div className="action">-</div>
+                </div>
+              ) : (
+                patientRows.map((r) => (
+                  <div className="trow" key={r.id}>
+                    <div className="name">{r.name}</div>
+                    <div className="date">{r.date}</div>
+                    <div className="action">
+                      <button className="edit" onClick={() => openModal("patient", r.id)}>View</button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -96,7 +149,9 @@ function Manageaccs() {
                   <div className="name">{r.name}</div>
                   <div className="pos">{r.position}</div>
                   <div className="date">{r.date}</div>
-                  <div className="action"><button className="edit" onClick={() => openModal("staff", r.email)}>View</button></div>
+                  <div className="action">
+                    <button className="edit" onClick={() => openModal("staff", r.email)}>View</button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -150,5 +205,3 @@ function Manageaccs() {
 }
 
 export default Manageaccs;
-
-

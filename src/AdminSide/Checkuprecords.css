@@ -1,9 +1,9 @@
-.curec-shell { background: #1f1f1f; min-height: 100vh; display: grid; grid-template-rows: auto auto 1fr auto; }
+.curec-shell { background: #1f1f1f; min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; }
 .breadcrumbs { color: #cbd5e1; font-size: 12px; padding: 8px 12px 0; }
 .gold-line { background: #caa22a; height: 28px; display: flex; align-items: center; padding-left: 12px; }
 .back { background: transparent; border: none; font-size: 18px; color: #000; cursor: pointer; }
 
-.curec-content { background: #fff; margin: 0 12px; padding: 18px 20px 24px; }
+.curec-content { background: #fff; margin: 0; padding: 18px 20px 24px; }
 .title { margin: 0 0 6px; font-size: 24px; }
 .subtitle { color: #6b7280; font-size: 12px; margin-bottom: 8px; }
 .search { width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 8px 10px; font-size: 12px; }

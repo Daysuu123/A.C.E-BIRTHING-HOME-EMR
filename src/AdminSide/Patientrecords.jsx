@@ -1,21 +1,47 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./Patientrecords.css";
-import { Link } from "react-router-dom";
-
-const samplePatients = [
-  { id: "E-10001", name: "Amie Eppie", photo: "https://i.pravatar.cc/120?img=5" },
-  { id: "C-10001", name: "Dorothea Cari", photo: "https://i.pravatar.cc/120?img=10" },
-  { id: "C-10003", name: "Kaylie Celia", photo: "https://i.pravatar.cc/120?img=32" },
-  { id: "E-10003", name: "Annalise Elisabeth", photo: "https://i.pravatar.cc/120?img=20" },
-  { id: "G-10001", name: "Candice Galilea", photo: "https://i.pravatar.cc/120?img=13" },
-  { id: "E-10001", name: "Venetia Vivian", photo: "https://i.pravatar.cc/120?img=47" }
-];
+import { Link, useNavigate } from "react-router-dom";
 
 function Patientrecords() {
+  const navigate = useNavigate();
+  const [patients, setPatients] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  async function fetchPatients() {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/patients');
+      const data = await response.json();
+      
+      if (data.success) {
+        const formattedPatients = data.patients.map(patient => ({
+          id: patient.patient_id,
+          name: `${patient.first_name} ${patient.last_name}`,
+          email: patient.email,
+          contact: patient.contact || "N/A",
+          address: patient.address || "N/A",
+          photo: `https://i.pravatar.cc/120?img=${patient.patient_id}`
+        }));
+        setPatients(formattedPatients);
+      }
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const filteredPatients = patients.filter(patient =>
+    patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.id.toString().includes(searchTerm)
+  );
   return (
     <div className="records-shell">
       <div className="records-header">
-        <div className="breadcrumbs">List of Patient Records (Admin)</div>
         <div className="gold-line">
           <Link className="back" aria-label="Back" to="/admin/dashboard">←</Link>
         </div>
@@ -24,26 +50,47 @@ function Patientrecords() {
       <section className="records-content">
         <h1 className="records-title">Patient Records</h1>
 
-        <input className="search" placeholder="Search: Patient ID or Patient Name" />
+        <input 
+          className="search" 
+          placeholder="Search: Patient ID or Patient Name" 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
         <div className="cards-grid">
-          {samplePatients.map((p) => (
-            <article key={p.name} className="card">
-              <div className="card-actions">
-                <button title="Edit">✎</button>
-                <button title="Open">⤢</button>
-              </div>
-              <img className="avatar" src={p.photo} alt={p.name} />
+          {isLoading ? (
+            <div className="card">
               <div className="meta">
-                <div className="line">Patient ID: {p.id}</div>
-                <div className="line">Patient Name: {p.name}</div>
+                <div className="line">Loading patients...</div>
               </div>
-              <div className="card-quick">
-                <button title="Share">🔗</button>
-                <button title="Download">⬇</button>
+            </div>
+          ) : filteredPatients.length === 0 ? (
+            <div className="card">
+              <div className="meta">
+                <div className="line">No patients found</div>
               </div>
-            </article>
-          ))}
+            </div>
+          ) : (
+            filteredPatients.map((p) => (
+              <article key={p.id} className="card">
+                <div className="card-actions">
+                  <button title="Edit" onClick={() => navigate(`/admin/patient-records/edit/${p.id}`)}>✎</button>
+                  <button title="View Details" onClick={() => navigate(`/admin/patient-records/view/${p.id}`)}>⤢</button>
+                </div>
+                <img className="avatar" src={p.photo} alt={p.name} />
+                <div className="meta">
+                  <div className="line">Patient ID: {p.id}</div>
+                  <div className="line">Patient Name: {p.name}</div>
+                  <div className="line">Email: {p.email}</div>
+                  <div className="line">Contact: {p.contact}</div>
+                </div>
+                <div className="card-quick">
+                  <button title="Share">🔗</button>
+                  <button title="Download">⬇</button>
+                </div>
+              </article>
+            ))
+          )}
         </div>
       </section>
 
