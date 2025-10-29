@@ -1,16 +1,29 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Createrecords.css";
 import { useNavigate } from "react-router-dom";
 import AdminLayout from "../components/AdminLayout";
 
 function Createrecords() {
   const navigate = useNavigate();
+  const [staffs, setStaffs] = useState([]);
   const nameRef = useRef();
   const typeRef = useRef();
   const dateRef = useRef();
   const staffRef = useRef();
   const notesRef = useRef();
   const outcomeRef = useRef();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/staffs');
+        const data = await res.json();
+        if (data && data.success) {
+          setStaffs((data.staff || []).map(s => ({ id: s.staff_id, name: `${s.staffs_sur}, ${s.staffs_firs}` })));
+        }
+      } catch (_) {}
+    })();
+  }, []);
   
   // Mock female patient names for dropdown
   const femalePatients = [
@@ -55,10 +68,11 @@ function Createrecords() {
 
           <label className="field">
             <span>Attending Staff</span>
-            <select defaultValue="Dr. Selby Loren" ref={staffRef}>
-              <option>Dr. Selby Loren</option>
-              <option>Midwife L. Anne</option>
-              <option>Dr. L. Cruz</option>
+            <select defaultValue="" ref={staffRef}>
+              <option value="" disabled>Select Staff</option>
+              {staffs.map(s => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
             </select>
           </label>
         </div>
@@ -78,23 +92,30 @@ function Createrecords() {
             <button
               type="button"
               className="create"
-              onClick={() => {
-                const rec = {
-                  name: nameRef.current?.value || '',
-                  type: typeRef.current?.value || '',
-                  date: (()=>{try{const d=dateRef.current?.value; if(!d) return ''; const dt=new Date(d); return dt.toLocaleDateString('en-US');}catch(_){return ''}})(),
-                  staff: staffRef.current?.value || '',
+              onClick={async () => {
+                const payload = {
+                  patient_name: nameRef.current?.value || '',
+                  record_type: typeRef.current?.value || '',
+                  date: dateRef.current?.value || '',
+                  attending_staff: staffRef.current?.value ? Number(staffRef.current.value) : undefined,
                   notes: notesRef.current?.value || '',
                   outcome: outcomeRef.current?.value || ''
                 };
                 try {
-                  const raw = localStorage.getItem('checkup_records');
-                  const arr = raw ? JSON.parse(raw) : [];
-                  const next = Array.isArray(arr) ? arr : [];
-                  next.push(rec);
-                  localStorage.setItem('checkup_records', JSON.stringify(next));
-                } catch(_) {}
-                navigate("/admin/checkup-records", { replace: true });
+                  const res = await fetch('/api/records', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                  });
+                  const data = await res.json();
+                  if (data && data.success) {
+                    navigate("/admin/checkup-records", { replace: true });
+                  } else {
+                    alert(data?.message || 'Failed to create record');
+                  }
+                } catch(_) {
+                  alert('Network error creating record');
+                }
               }}
             >
               Create

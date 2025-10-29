@@ -3,12 +3,23 @@ import "./Checkuprecords.css";
 import AdminLayout from "../components/AdminLayout";
 import CreateRecordsModal from "../components/CreateRecordsModal";
 
-function readRecords() {
+async function fetchRecords() {
   try {
-    const raw = localStorage.getItem('checkup_records');
-    const arr = raw ? JSON.parse(raw) : [];
-    return Array.isArray(arr) ? arr : [];
-  } catch (_) { return []; }
+    const res = await fetch('/api/records');
+    const data = await res.json();
+    if (data && data.success) {
+      return (data.records || []).map((r, i) => ({
+        idx: i + 1,
+        name: r.patient_name,
+        type: r.record_type,
+        date: r.date ? new Date(r.date).toLocaleDateString('en-US') : '-',
+        staff: r.attending_staff_name || String(r.attending_staff || ''),
+        notes: r.notes,
+        outcome: r.outcome
+      }));
+    }
+  } catch (_) {}
+  return [];
 }
 
 function Checkuprecords() {
@@ -16,12 +27,10 @@ function Checkuprecords() {
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
-    const base = [
-      { idx: 1, name: "Eppie, Amie P.", type: "Prenatal", date: "09/18/2025", staff: "Dr. Selby Love", notes: "High Bp Detected", outcome: "Continue Monitoring" }
-    ];
-    const saved = readRecords();
-    const merged = [...base, ...saved.map((r, i) => ({ idx: 2 + i, ...r }))];
-    setRows(merged);
+    (async () => {
+      const list = await fetchRecords();
+      setRows(list);
+    })();
   }, [showCreateModal]);
 
   return (

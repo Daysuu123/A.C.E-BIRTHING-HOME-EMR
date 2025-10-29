@@ -73,6 +73,40 @@ class StaffController extends Controller
             ], 500);
         }
     }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'firstName' => 'required|string|max:255',
+            'lastName' => 'required|string|max:255',
+            'middleInitial' => 'required|string|max:1',
+            'position' => 'required|string|max:255',
+        ]);
+
+        try {
+            DB::table('staffs_account')
+                ->where('staff_id', $id)
+                ->update([
+                    'staffs_firs' => $request->firstName,
+                    'staffs_sur' => $request->lastName,
+                    'staffs_mi' => $request->middleInitial,
+                    'position' => $request->position,
+                ]);
+            return response()->json(['success' => true, 'message' => 'Staff updated']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to update staff: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            DB::table('staffs_account')->where('staff_id', $id)->delete();
+            return response()->json(['success' => true, 'message' => 'Staff deleted']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to delete staff: ' . $e->getMessage()], 500);
+        }
+    }
 }
 
 
