@@ -135,7 +135,7 @@ function LoginPage() {
               </label>
               <a href="#" className="forgot">Forgot Password?</a>
             </div>
-            <button type="submit" className="submit hover:bg-blue-600 transition-colors duration-200" disabled={submitting}>{submitting ? "Logging in..." : "Login"}</button>
+            <button type="submit" className="submit" disabled={submitting}>{submitting ? "Logging in..." : "Login"}</button>
           </form>
         </div>
       </div>

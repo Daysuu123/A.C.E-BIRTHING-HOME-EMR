@@ -171,3 +171,4 @@ function PatientRegisterModal({ isOpen, onClose }) {
 }
 
 export default PatientRegisterModal;
+

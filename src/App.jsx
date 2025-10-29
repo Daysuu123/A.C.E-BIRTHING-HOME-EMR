@@ -83,6 +83,65 @@ function App() {
       <Routes>
         <Route path="/" element={<Loginpage />} />
 
+        {/* Staff routes */}
+        <Route
+          path="/staff/landing"
+          element={
+            <StaffProtectedRoute>
+              <Stafflanding />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/manage-patient"
+          element={
+            <StaffProtectedRoute>
+              <StaffManagePatient />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/create-records"
+          element={
+            <StaffProtectedRoute>
+              <StaffCreateRecords />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/manage-records"
+          element={
+            <StaffProtectedRoute>
+              <StaffManageRecords />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/add-patient"
+          element={
+            <StaffProtectedRoute>
+              <StaffAddPatient />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/manage-accounts"
+          element={
+            <StaffProtectedRoute>
+              <StaffManageAccounts />
+            </StaffProtectedRoute>
+          }
+        />
+
+        {/* Patient routes */}
+        <Route
+          path="/user/landing"
+          element={
+            <PatientProtectedRoute>
+              <UserLanding />
+            </PatientProtectedRoute>
+          }
+        />
 
 
         <Route
