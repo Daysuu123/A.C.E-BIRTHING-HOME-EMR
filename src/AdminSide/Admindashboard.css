@@ -1,3 +1,4 @@
+.root, html, body, #root { height: 100%; overflow: auto; }
 .admin-shell {
   display: grid;
   grid-template-rows: 64px 1fr 80px;
@@ -14,25 +15,28 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
 .brand { display: flex; align-items: center; gap: 12px; }
-.brand-mark {
-  width: 40px; height: 40px; border-radius: 50%;
-  background: #eee; border: 2px solid #2b2b2b;
-}
+.brand-mark { width: 40px; height: 40px; border-radius: 50%; background: #000000; border: 2px solid #2b2b2b; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; }
+.brand-mark img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .brand-name { color: #fff; font-weight: 700; font-size: 20px; text-shadow: 0 1px 0 rgba(0,0,0,0.3); }
 
 .topbar-right { display: flex; align-items: center; gap: 12px; }
+.menu-toggle { display: none; background: #1f2937; color: #fff; border: none; border-radius: 6px; padding: 6px 10px; }
 .welcome { color: #fff; font-weight: 600; }
 .logout {
   background: #1f2937; color: #fff; border: none; border-radius: 6px;
   padding: 8px 12px; cursor: pointer;
 }
 
-.admin-body { display: grid; grid-template-columns: 220px 1fr; }
+.admin-body { display: grid; grid-template-columns: 220px 1fr; align-items: stretch; }
+.sidebar-wrap { display: contents; }
+.sidebar-inner { height: 100%; }
 
 .sidebar {
   background: #e5c35b;
   border-right: none;
   padding: 14px;
+  height: calc(100vh - 64px - 80px); /* fill between header and footer */
+  box-sizing: border-box; /* include padding in height calc */
 }
 .nav { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
 .nav-btn {
@@ -51,7 +55,17 @@
 .content {
   background: #ffffff;
   padding: 18px 24px;
+  height: calc(100vh - 64px - 80px); /* exact fit so footer aligns without default scrollbar */
+  box-sizing: border-box; /* include padding in height */
+  overflow: auto; /* scroll only inner content when needed */
 }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.toolbar .search { flex: 1 1 400px; max-width: 420px; margin: 0; }
+.action-btn { background: #111827; color: #fff; border: none; border-radius: 8px; padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 500; white-space: nowrap; flex: 0 0 auto; }
+
+/* Validation spacing - generic */
+.field input, .field select, .field textarea { margin-bottom: 4px; }
+.field .error, .field .help, .field .hint, .field > div { min-height: 16px; }
 .dash-title { margin: 0; font-size: 28px; }
 .subtitle { color: #374151; margin-bottom: 8px; font-weight: 600; }
 
@@ -78,9 +92,8 @@
   display: grid; grid-template-columns: 56px 1fr; align-items: center;
   background: #4b5563; color: #fff; padding: 8px 16px;
 }
-.footer-mark {
-  width: 40px; height: 40px; border-radius: 50%; background: #caa22a; border: 2px solid #2b2b2b;
-}
+.footer-mark { width: 40px; height: 40px; border-radius: 50%; background: #000000; border: 2px solid #2b2b2b; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; }
+.footer-mark img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .mission { text-align: center; font-size: 11px; line-height: 1.2; }
 
 @media (max-width: 1000px) {
@@ -88,7 +101,13 @@
 }
 
 @media (max-width: 720px) {
+  .menu-toggle { display: inline-block; }
   .admin-body { grid-template-columns: 1fr; }
-  .sidebar { order: 2; }
+  .sidebar-wrap { position: fixed; inset: 0; display: none; background: rgba(0,0,0,0.35); z-index: 40; }
+  .sidebar-wrap.open { display: block; }
+  .sidebar-inner { position: absolute; left: 0; top: 0; bottom: 0; width: 260px; background: #e5c35b; padding: 14px; }
+  /* Collapse brand */
+  .brand-mark { display: none; }
+  .brand-name { display: none; }
 }
 

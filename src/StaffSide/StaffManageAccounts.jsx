@@ -1,6 +1,6 @@
 import React from "react";
 import "../AdminSide/Manageaccs.css";
-import { Link } from "react-router-dom";
+import StaffLayout from "../components/StaffLayout";
 
 const patientRows = [
   { email: "amieeppie10@gmail.com", name: "Amie Pangilinan Eppie", date: "08/27/2025" },
@@ -15,68 +15,49 @@ const staffRows = [
 
 function StaffManageAccounts() {
   return (
-    <div className="maccs-shell">
-      <div className="gold-line">
-        <Link className="back" aria-label="Back" to="/staff/landing">←</Link>
+    <StaffLayout title="Manage Accounts">
+      <div className="table-block">
+        <div className="block-title">Patient Accounts</div>
+        <div className="table patient">
+          <div className="thead">
+            <div>Email</div>
+            <div>Full Name</div>
+            <div>Date Created</div>
+            <div>Action</div>
+          </div>
+          {patientRows.map((r) => (
+            <div className="trow" key={r.email}>
+              <div className="email">{r.email}</div>
+              <div className="name">{r.name}</div>
+              <div className="date">{r.date}</div>
+              <div className="action"><button className="edit">Edit</button></div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <section className="maccs-content">
-        <h1 className="title">Manage Accounts</h1>
-
-        <div className="table-block">
-          <div className="block-title">Patient Accounts</div>
-          <div className="table patient">
-            <div className="thead">
-              <div>Email</div>
-              <div>Full Name</div>
-              <div>Date Created</div>
-              <div>Action</div>
-            </div>
-            {patientRows.map((r) => (
-              <div className="trow" key={r.email}>
-                <div className="email">{r.email}</div>
-                <div className="name">{r.name}</div>
-                <div className="date">{r.date}</div>
-                <div className="action"><button className="edit">Edit</button></div>
-              </div>
-            ))}
+      <div className="table-block">
+        <div className="block-title">Staff Accounts</div>
+        <div className="table staff">
+          <div className="thead">
+            <div>Email</div>
+            <div>Full Name</div>
+            <div>Postion</div>
+            <div>Date Created</div>
+            <div>Action</div>
           </div>
-        </div>
-
-        <div className="table-block">
-          <div className="block-title">Staff Accounts</div>
-          <div className="table staff">
-            <div className="thead">
-              <div>Email</div>
-              <div>Full Name</div>
-              <div>Postion</div>
-              <div>Date Created</div>
-              <div>Action</div>
+          {staffRows.map((r) => (
+            <div className="trow" key={r.email}>
+              <div className="email">{r.email}</div>
+              <div className="name">{r.name}</div>
+              <div className="pos">{r.position}</div>
+              <div className="date">{r.date}</div>
+              <div className="action"><button className="edit">Edit</button></div>
             </div>
-            {staffRows.map((r) => (
-              <div className="trow" key={r.email}>
-                <div className="email">{r.email}</div>
-                <div className="name">{r.name}</div>
-                <div className="pos">{r.position}</div>
-                <div className="date">{r.date}</div>
-                <div className="action"><button className="edit">Edit</button></div>
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
-      </section>
-
-      <footer className="maccs-footer">
-        <div className="footer-mark" />
-        <div className="mission">
-          TO PROVIDE EXCEPTIONAL
-          <br />
-          MIDWIFERY CARE TO EACH AND
-          <br />
-          EVERY WOMAN
-        </div>
-      </footer>
-    </div>
+      </div>
+    </StaffLayout>
   );
 }
 

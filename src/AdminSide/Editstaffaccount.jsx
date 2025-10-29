@@ -7,7 +7,7 @@ function Editstaffaccount() {
   const [show, setShow] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const navigate = useNavigate();
-  const [form, setForm] = useState({ lastName: "", firstName: "", middleInitial: "", email: "", phone: "", password: "", confirmPassword: "" });
+  const [form, setForm] = useState({ lastName: "", firstName: "", middleInitial: "", email: "", phone: "", position: "", password: "", confirmPassword: "" });
   const [errors, setErrors] = useState({});
   const [showSubmitError, setShowSubmitError] = useState(false);
 
@@ -120,12 +120,13 @@ function Editstaffaccount() {
               <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.email? 'visible':'hidden'}}>{errors.email || 'placeholder'}</div>
             </label>
             <label className="field">
-              <span>Role:</span>
-              <select defaultValue="Midwife">
-                <option>Midwife</option>
-                <option>Doctor</option>
-                <option>Admin</option>
-                <option>Nurse</option>
+              <span>Position:</span>
+              <select name="position" value={form.position || ""} onChange={onChange}>
+                <option value="">{form.position ? form.position : "Select Position"}</option>
+                <option value="Midwife">Midwife</option>
+                <option value="Doctor">Doctor</option>
+                <option value="Admin">Admin</option>
+                <option value="Nurse">Nurse</option>
               </select>
               <div style={{marginTop:4,minHeight:16}} />
             </label>

@@ -1,6 +1,7 @@
 import React from "react";
 import "./Createrecords.css";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import AdminLayout from "../components/AdminLayout";
 
 function Createrecords() {
   const navigate = useNavigate();
@@ -20,84 +21,65 @@ function Createrecords() {
   ];
   
   return (
-    <div className="cr-shell">
-      <div className="gold-line">
-        <Link className="back" aria-label="Back" to="/admin/dashboard">←</Link>
-      </div>
+    <AdminLayout title="Create Check-up and Deliver Records">
+      <form className="cr-form">
+        <label className="field wide">
+          <span>Patient Name:</span>
+          <select defaultValue="Eppie, Amie P.">
+            {femalePatients.map((name, index) => (
+              <option key={index} value={name}>{name}</option>
+            ))}
+          </select>
+        </label>
 
-      <section className="cr-content">
-        <h1 className="title">Create Check-up and Deliver Records</h1>
-
-        <form className="cr-form">
-          <label className="field wide">
-            <span>Patient Name:</span>
-            <select defaultValue="Eppie, Amie P.">
-              {femalePatients.map((name, index) => (
-                <option key={index} value={name}>{name}</option>
-              ))}
+        <div className="row">
+          <label className="field">
+            <span>Record Type:</span>
+            <select defaultValue="Prenatal">
+              <option>Prenatal</option>
+              <option>Postnatal</option>
+              <option>Delivery</option>
             </select>
           </label>
 
-          <div className="row">
-            <label className="field">
-              <span>Record Type:</span>
-              <select defaultValue="Prenatal">
-                <option>Prenatal</option>
-                <option>Postnatal</option>
-                <option>Delivery</option>
-              </select>
-            </label>
-
-            <label className="field">
-              <span>Date:</span>
-              <input type="date" defaultValue="2025-09-18" />
-            </label>
-
-            <label className="field">
-              <span>Attending Staff</span>
-              <select defaultValue="Dr. Selby Loren">
-                <option>Dr. Selby Loren</option>
-                <option>Midwife L. Anne</option>
-                <option>Dr. L. Cruz</option>
-              </select>
-            </label>
-          </div>
-
-          <label className="field wide">
-            <span>Notes</span>
-            <input type="text" defaultValue="High Bp detected" />
+          <label className="field">
+            <span>Date:</span>
+            <input type="date" defaultValue="2025-09-18" />
           </label>
 
-          <div className="row">
-            <label className="field wide">
-              <span>Outcome</span>
-              <textarea rows={3} defaultValue="Continue Monitoring" />
-            </label>
-
-            <div className="actions">
-              <button
-                type="button"
-                className="create"
-                onClick={() => navigate("/admin/checkup-records", { replace: true })}
-              >
-                Create
-              </button>
-            </div>
-          </div>
-        </form>
-      </section>
-
-      <footer className="cr-footer">
-        <div className="footer-mark" />
-        <div className="mission">
-          TO PROVIDE EXCEPTIONAL
-          <br />
-          MIDWIFERY CARE TO EACH AND
-          <br />
-          EVERY WOMAN
+          <label className="field">
+            <span>Attending Staff</span>
+            <select defaultValue="Dr. Selby Loren">
+              <option>Dr. Selby Loren</option>
+              <option>Midwife L. Anne</option>
+              <option>Dr. L. Cruz</option>
+            </select>
+          </label>
         </div>
-      </footer>
-    </div>
+
+        <label className="field wide">
+          <span>Notes</span>
+          <input type="text" defaultValue="High Bp detected" />
+        </label>
+
+        <div className="row">
+          <label className="field wide">
+            <span>Outcome</span>
+            <textarea rows={3} defaultValue="Continue Monitoring" />
+          </label>
+
+          <div className="actions">
+            <button
+              type="button"
+              className="create"
+              onClick={() => navigate("/admin/checkup-records", { replace: true })}
+            >
+              Create
+            </button>
+          </div>
+        </div>
+      </form>
+    </AdminLayout>
   );
 }
 

@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import "./Manageaccs.css";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import AdminLayout from "../components/AdminLayout";
 
 function Manageaccs() {
   const [patientRows, setPatientRows] = useState([]);
@@ -57,15 +58,22 @@ function Manageaccs() {
     }
   }
 
+  const toInputDate = (mmddyyyy) => {
+    // Converts "MM/DD/YYYY" to "YYYY-MM-DD" for input[type=date]
+    if (!mmddyyyy || !/\d{2}\/\d{2}\/\d{4}/.test(mmddyyyy)) return "";
+    const [mm, dd, yyyy] = mmddyyyy.split('/');
+    return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
+  };
+
   const openModal = (type, key) => {
     setModalType(type);
     setEditingKey(key);
     if (type === "patient") {
       const row = patientRows.find(r => r.email === key);
-      setFormData({ name: row?.name || "", date: row?.date || "" });
+      setFormData({ name: row?.name || "", date: toInputDate(row?.date), position: "" });
     } else {
       const row = staffRows.find(r => r.email === key);
-      setFormData({ name: row?.name || "", position: row?.position || "", date: row?.date || "" });
+      setFormData({ name: row?.name || "", position: row?.position || "", date: toInputDate(row?.date) });
     }
     setIsModalOpen(true);
   };
@@ -92,72 +100,64 @@ function Manageaccs() {
   };
 
   return (
-    <div className="maccs-shell">
-      <div className="gold-line">
-        <Link className="back" aria-label="Back" to="/admin/dashboard">←</Link>
-      </div>
-
-      <section className="maccs-content">
-        <h1 className="title">Manage Accounts</h1>
-
-        <div className="tables-grid">
-          <div className="table-block">
-            <div className="block-title">Patient Accounts</div>
-            <div className="table cols-3">
-              <div className="thead">
-                <div>Full Name</div>
-                <div>Date Created</div>
-                <div>Action</div>
-              </div>
-              {isLoading ? (
-                <div className="trow">
-                  <div className="name">Loading...</div>
-                  <div className="date">-</div>
-                  <div className="action">-</div>
-                </div>
-              ) : patientRows.length === 0 ? (
-                <div className="trow">
-                  <div className="name">No patients found</div>
-                  <div className="date">-</div>
-                  <div className="action">-</div>
-                </div>
-              ) : (
-                patientRows.map((r) => (
-                  <div className="trow" key={r.id}>
-                    <div className="name">{r.name}</div>
-                    <div className="date">{r.date}</div>
-                    <div className="action">
-                      <button className="edit" onClick={() => openModal("patient", r.id)}>View</button>
-                    </div>
-                  </div>
-                ))
-              )}
+    <AdminLayout title="Manage Accounts">
+      <div className="tables-grid">
+        <div className="table-block">
+          <div className="block-title">Patient Accounts</div>
+          <div className="table cols-3">
+            <div className="thead">
+              <div>Full Name</div>
+              <div>Date Created</div>
+              <div>Action</div>
             </div>
-          </div>
-
-          <div className="table-block">
-            <div className="block-title">Staff Accounts</div>
-            <div className="table cols-4">
-              <div className="thead">
-                <div>Full Name</div>
-                <div>Position</div>
-                <div>Date Created</div>
-                <div>Action</div>
+            {isLoading ? (
+              <div className="trow">
+                <div className="name">Loading...</div>
+                <div className="date">-</div>
+                <div className="action">-</div>
               </div>
-              {staffRows.map((r) => (
-                <div className="trow" key={r.email}>
+            ) : patientRows.length === 0 ? (
+              <div className="trow">
+                <div className="name">No patients found</div>
+                <div className="date">-</div>
+                <div className="action">-</div>
+              </div>
+            ) : (
+              patientRows.map((r) => (
+                <div className="trow" key={r.id}>
                   <div className="name">{r.name}</div>
-                  <div className="pos">{r.position}</div>
                   <div className="date">{r.date}</div>
                   <div className="action">
-                    <button className="edit" onClick={() => openModal("staff", r.email)}>View</button>
+                    <button className="edit" onClick={() => openModal("patient", r.id)}>View</button>
                   </div>
                 </div>
-              ))}
-            </div>
+              ))
+            )}
           </div>
         </div>
-      </section>
+
+        <div className="table-block">
+          <div className="block-title">Staff Accounts</div>
+          <div className="table cols-4">
+            <div className="thead">
+              <div>Full Name</div>
+              <div>Position</div>
+              <div>Date Created</div>
+              <div>Action</div>
+            </div>
+            {staffRows.map((r) => (
+              <div className="trow" key={r.email}>
+                <div className="name">{r.name}</div>
+                <div className="pos">{r.position}</div>
+                <div className="date">{r.date}</div>
+                <div className="action">
+                  <button className="edit" onClick={() => openModal("staff", r.email)}>View</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {isModalOpen ? (
         <div className="modal-backdrop" role="dialog" aria-modal="true">
@@ -174,12 +174,18 @@ function Manageaccs() {
               {modalType === "staff" ? (
                 <label className="field">
                   <span>Position</span>
-                  <input name="position" type="text" value={formData.position} onChange={onChange} required />
+                  <select name="position" value={formData.position} onChange={onChange} required>
+                    <option value="">Select Position</option>
+                    <option value="Midwife">Midwife</option>
+                    <option value="Doctor">Doctor</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Nurse">Nurse</option>
+                  </select>
                 </label>
               ) : null}
               <label className="field">
                 <span>Date Created</span>
-                <input name="date" type="text" value={formData.date} onChange={onChange} placeholder={datePlaceholder} />
+                <input name="date" type="date" value={formData.date || ''} onChange={onChange} placeholder={datePlaceholder} />
               </label>
               <div className="modal-actions">
                 <button type="button" className="btn ghost" onClick={closeModal}>Cancel</button>
@@ -189,18 +195,7 @@ function Manageaccs() {
           </div>
         </div>
       ) : null}
-
-      <footer className="maccs-footer">
-        <div className="footer-mark" />
-        <div className="mission">
-          TO PROVIDE EXCEPTIONAL
-          <br />
-          MIDWIFERY CARE TO EACH AND
-          <br />
-          EVERY WOMAN
-        </div>
-      </footer>
-    </div>
+    </AdminLayout>
   );
 }
 

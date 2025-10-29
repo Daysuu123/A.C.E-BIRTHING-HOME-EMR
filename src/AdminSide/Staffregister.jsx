@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import PhoneInput from "../components/PhoneInput";
 import "./Staffregister.css";
-import { Link } from "react-router-dom";
+import AdminLayout from "../components/AdminLayout";
 
 function Staffregister() {
   const [show, setShow] = useState(false);
-  const [form, setForm] = useState({ lastName: "", firstName: "", middleInitial: "", email: "", phone: "", password: "", confirmPassword: "" });
+  const [form, setForm] = useState({ lastName: "", firstName: "", middleInitial: "", email: "", phone: "", position: "", password: "", confirmPassword: "" });
   const [errors, setErrors] = useState({});
   const [showSubmitError, setShowSubmitError] = useState(false);
 
@@ -66,103 +66,85 @@ function Staffregister() {
   }
 
   return (
-    <div className="sreg-shell">
-      <div className="gold-line">
-        <Link className="back" aria-label="Back" to="/admin/dashboard">←</Link>
-      </div>
-
-      <section className="sreg-content">
-        <h1 className="title">Staff Registration</h1>
-
-        <form className="form">
-          <div className="row">
-            <label className="field">
-              <span>Last Name:</span>
-              <input name="lastName" type="text" placeholder="Last Name" value={form.lastName} onChange={onChange} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.lastName? 'visible':'hidden'}}>{errors.lastName || 'placeholder'}</div>
-            </label>
-            <label className="field">
-              <span>First Name:</span>
-              <input name="firstName" type="text" placeholder="First Name" value={form.firstName} onChange={onChange} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.firstName? 'visible':'hidden'}}>{errors.firstName || 'placeholder'}</div>
-            </label>
-            <label className="field">
-              <span>Middle Initial:</span>
-              <input name="middleInitial" type="text" placeholder="M.I." maxLength={1} value={form.middleInitial} onChange={onChange} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.middleInitial? 'visible':'hidden'}}>{errors.middleInitial || 'placeholder'}</div>
-            </label>
-          </div>
-
-          <div className="row">
-            <label className="field">
-              <span>Email:</span>
-              <input name="email" type="email" placeholder="email@example.com" value={form.email} onChange={onChange} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.email? 'visible':'hidden'}}>{errors.email || 'placeholder'}</div>
-            </label>
-            <label className="field">
-              <span>Role:</span>
-              <select defaultValue="Midwife">
-                <option>Midwife</option>
-                <option>Doctor</option>
-                <option>Admin</option>
-                <option>Nurse</option>
-              </select>
-              <div style={{marginTop:4,minHeight:16}} />
-            </label>
-            <label className="field">
-              <span>Phone:</span>
-              <PhoneInput value={form.phone} onChange={(v)=>setForm((prev)=>({ ...prev, phone: v }))} />
-              <div style={{marginTop:4,minHeight:16}} />
-            </label>
-          </div>
-
-          <div className="row">
-            <label className="field">
-              <span>Password:</span>
-              <input name="password" type={show ? "text" : "password"} placeholder="Password" value={form.password} onChange={onChange} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.password? 'visible':'hidden'}}>{errors.password || 'placeholder'}</div>
-            </label>
-            <label className="field">
-              <span>Confirm Password:</span>
-              <input name="confirmPassword" type={show ? "text" : "password"} placeholder="Confirm Password" value={form.confirmPassword} onChange={onChange} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.confirmPassword? 'visible':'hidden'}}>{errors.confirmPassword || 'placeholder'}</div>
-            </label>
-            <label className="show">
-              <input type="checkbox" onChange={(e) => setShow(e.target.checked)} />
-              Show Password
-            </label>
-          </div>
-
-          <div className="actions">
-            {showSubmitError ? (
-              <div style={{color:'#dc2626',fontSize:13,marginBottom:8}}>Please complete all required fields and fix validation errors.</div>
-            ) : null}
-            <button
-              type="button"
-              className="next"
-              onClick={() => {
-                ["lastName","firstName","middleInitial","email","password","confirmPassword"].forEach((f)=>validate(f, form[f]));
-                const allEmpty = ["lastName","firstName","middleInitial","email","password","confirmPassword"].every(f => !String(form[f]||"").trim());
-                setShowSubmitError(allEmpty);
-              }}
-            >
-              Register
-            </button>
-          </div>
-        </form>
-      </section>
-
-      <footer className="sreg-footer">
-        <div className="footer-mark" />
-        <div className="mission">
-          TO PROVIDE EXCEPTIONAL
-          <br />
-          MIDWIFERY CARE TO EACH AND
-          <br />
-          EVERY WOMAN
+    <AdminLayout title="Staff Registration">
+      <form className="form">
+        <div className="row">
+          <label className="field">
+            <span>Last Name:</span>
+            <input name="lastName" type="text" placeholder="Last Name" value={form.lastName} onChange={onChange} />
+            <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.lastName? 'visible':'hidden'}}>{errors.lastName || 'placeholder'}</div>
+          </label>
+          <label className="field">
+            <span>First Name:</span>
+            <input name="firstName" type="text" placeholder="First Name" value={form.firstName} onChange={onChange} />
+            <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.firstName? 'visible':'hidden'}}>{errors.firstName || 'placeholder'}</div>
+          </label>
+          <label className="field">
+            <span>Middle Initial:</span>
+            <input name="middleInitial" type="text" placeholder="M.I." maxLength={1} value={form.middleInitial} onChange={onChange} />
+            <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.middleInitial? 'visible':'hidden'}}>{errors.middleInitial || 'placeholder'}</div>
+          </label>
         </div>
-      </footer>
-    </div>
+
+        <div className="row">
+          <label className="field">
+            <span>Email:</span>
+            <input name="email" type="email" placeholder="email@example.com" value={form.email} onChange={onChange} />
+            <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.email? 'visible':'hidden'}}>{errors.email || 'placeholder'}</div>
+          </label>
+          <label className="field">
+            <span>Position:</span>
+            <select name="position" value={form.position} onChange={onChange}>
+              <option value="">Select Position</option>
+              <option value="Midwife">Midwife</option>
+              <option value="Doctor">Doctor</option>
+              <option value="Admin">Admin</option>
+              <option value="Nurse">Nurse</option>
+            </select>
+            <div style={{marginTop:4,minHeight:16}} />
+          </label>
+          <label className="field">
+            <span>Phone:</span>
+            <PhoneInput value={form.phone} onChange={(v)=>setForm((prev)=>({ ...prev, phone: v }))} />
+            <div style={{marginTop:4,minHeight:16}} />
+          </label>
+        </div>
+
+        <div className="row">
+          <label className="field">
+            <span>Password:</span>
+            <input name="password" type={show ? "text" : "password"} placeholder="Password" value={form.password} onChange={onChange} />
+            <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.password? 'visible':'hidden'}}>{errors.password || 'placeholder'}</div>
+          </label>
+          <label className="field">
+            <span>Confirm Password:</span>
+            <input name="confirmPassword" type={show ? "text" : "password"} placeholder="Confirm Password" value={form.confirmPassword} onChange={onChange} />
+            <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.confirmPassword? 'visible':'hidden'}}>{errors.confirmPassword || 'placeholder'}</div>
+          </label>
+          <label className="show">
+            <input type="checkbox" onChange={(e) => setShow(e.target.checked)} />
+            Show Password
+          </label>
+        </div>
+
+        <div className="actions">
+          {showSubmitError ? (
+            <div style={{color:'#dc2626',fontSize:13,marginBottom:8}}>Please complete all required fields and fix validation errors.</div>
+          ) : null}
+          <button
+            type="button"
+            className="next"
+            onClick={() => {
+              ["lastName","firstName","middleInitial","email","password","confirmPassword"].forEach((f)=>validate(f, form[f]));
+              const allEmpty = ["lastName","firstName","middleInitial","email","password","confirmPassword"].every(f => !String(form[f]||"").trim());
+              setShowSubmitError(allEmpty);
+            }}
+          >
+            Register
+          </button>
+        </div>
+      </form>
+    </AdminLayout>
   );
 }
 

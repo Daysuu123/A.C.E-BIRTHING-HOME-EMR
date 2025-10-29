@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../AdminSide/Patientregister.css";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import StaffLayout from "../components/StaffLayout";
 
 function StaffAddPatient() {
   const [show, setShow] = useState(false);
@@ -64,88 +65,67 @@ function StaffAddPatient() {
   }
   const navigate = useNavigate();
   return (
-    <div className="preg-shell">
-      <div className="preg-head">
-        <div className="gold-line">
-          <Link className="back" aria-label="Back" to="/staff/landing">←</Link>
+    <StaffLayout title="Patient Registration">
+      <form className="form">
+        <div className="row">
+          <label className="field">
+            <span>Last Name:</span>
+            <input name="lastName" type="text" required value={form.lastName} onChange={onChange} pattern="[A-Za-z]+" />
+            <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.lastName? 'visible':'hidden'}}>{errors.lastName || 'placeholder'}</div>
+          </label>
+          <label className="field">
+            <span>First Name:</span>
+            <input name="firstName" type="text" required value={form.firstName} onChange={onChange} pattern="[A-Za-z]+" />
+            <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.firstName? 'visible':'hidden'}}>{errors.firstName || 'placeholder'}</div>
+          </label>
+          <label className="field">
+            <span>Middle Initial:</span>
+            <input name="middleInitial" type="text" required value={form.middleInitial} onChange={onChange} maxLength={1} pattern="[A-Za-z]" />
+            <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.middleInitial? 'visible':'hidden'}}>{errors.middleInitial || 'placeholder'}</div>
+          </label>
         </div>
-      </div>
 
-      <section className="preg-content">
-        <h1 className="title">Patient Registration</h1>
-
-        <form className="form">
-          <div className="row">
-            <label className="field">
-              <span>Last Name:</span>
-              <input name="lastName" type="text" required value={form.lastName} onChange={onChange} pattern="[A-Za-z]+" />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.lastName? 'visible':'hidden'}}>{errors.lastName || 'placeholder'}</div>
-            </label>
-            <label className="field">
-              <span>First Name:</span>
-              <input name="firstName" type="text" required value={form.firstName} onChange={onChange} pattern="[A-Za-z]+" />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.firstName? 'visible':'hidden'}}>{errors.firstName || 'placeholder'}</div>
-            </label>
-            <label className="field">
-              <span>Middle Initial:</span>
-              <input name="middleInitial" type="text" required value={form.middleInitial} onChange={onChange} maxLength={1} pattern="[A-Za-z]" />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.middleInitial? 'visible':'hidden'}}>{errors.middleInitial || 'placeholder'}</div>
-            </label>
-          </div>
-
-          <div className="row">
-            <label className="field wide">
-              <span>Email:</span>
-              <input name="email" type="email" required value={form.email} onChange={onChange} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.email? 'visible':'hidden'}}>{errors.email || 'placeholder'}</div>
-            </label>
-          </div>
-
-          <div className="row">
-            <label className="field">
-              <span>Password:</span>
-              <input name="password" type={show ? "text" : "password"} required value={form.password} onChange={onChange} pattern="(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}" />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.password? 'visible':'hidden'}}>{errors.password || 'placeholder'}</div>
-            </label>
-            <label className="field">
-              <span>Confirm Password:</span>
-              <input name="confirmPassword" type={show ? "text" : "password"} required minLength={8} value={form.confirmPassword} onChange={onChange} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.confirmPassword? 'visible':'hidden'}}>{errors.confirmPassword || 'placeholder'}</div>
-            </label>
-            <label className="show">
-              <input type="checkbox" onChange={(e) => setShow(e.target.checked)} />
-              Show Password
-            </label>
-          </div>
-
-          <div className="actions">
-            <button
-              type="button"
-              className="next"
-              onClick={() => {
-                if (validateAll()) {
-                  navigate('/staff/add-patient-info');
-                }
-              }}
-            >
-              Next
-            </button>
-            <div style={{color:'#dc2626',fontSize:13,marginTop:8,minHeight:18,visibility:submitError? 'visible':'hidden'}}>{submitError || 'placeholder'}</div>
-          </div>
-        </form>
-      </section>
-
-      <footer className="preg-footer">
-        <div className="footer-mark" />
-        <div className="mission">
-          TO PROVIDE EXCEPTIONAL
-          <br />
-          MIDWIFERY CARE TO EACH AND
-          <br />
-          EVERY WOMAN
+        <div className="row">
+          <label className="field wide">
+            <span>Email:</span>
+            <input name="email" type="email" required value={form.email} onChange={onChange} />
+            <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.email? 'visible':'hidden'}}>{errors.email || 'placeholder'}</div>
+          </label>
         </div>
-      </footer>
-    </div>
+
+        <div className="row">
+          <label className="field">
+            <span>Password:</span>
+            <input name="password" type={show ? "text" : "password"} required value={form.password} onChange={onChange} pattern="(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}" />
+            <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.password? 'visible':'hidden'}}>{errors.password || 'placeholder'}</div>
+          </label>
+          <label className="field">
+            <span>Confirm Password:</span>
+            <input name="confirmPassword" type={show ? "text" : "password"} required minLength={8} value={form.confirmPassword} onChange={onChange} />
+            <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.confirmPassword? 'visible':'hidden'}}>{errors.confirmPassword || 'placeholder'}</div>
+          </label>
+          <label className="show">
+            <input type="checkbox" onChange={(e) => setShow(e.target.checked)} />
+            Show Password
+          </label>
+        </div>
+
+        <div className="actions">
+          <button
+            type="button"
+            className="next"
+            onClick={() => {
+              if (validateAll()) {
+                navigate('/staff/add-patient-info');
+              }
+            }}
+          >
+            Next
+          </button>
+          <div style={{color:'#dc2626',fontSize:13,marginTop:8,minHeight:18,visibility:submitError? 'visible':'hidden'}}>{submitError || 'placeholder'}</div>
+        </div>
+      </form>
+    </StaffLayout>
   );
 }
 

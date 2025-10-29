@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import "../AdminSide/Patientrecords.css";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import StaffLayout from "../components/StaffLayout";
+import StaffPatientRegisterModal from "../components/StaffPatientRegisterModal";
 
 const samplePatients = [
   { id: "E-10001", name: "Amie Eppie", photo: "https://i.pravatar.cc/120?img=5" },
@@ -13,49 +15,49 @@ const samplePatients = [
 
 function StaffManagePatient() {
   const navigate = useNavigate();
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+
   return (
-    <div className="records-shell">
-      <div className="records-header">
-        <div className="gold-line">
-          <Link className="back" aria-label="Back" to="/staff/landing">←</Link>
-        </div>
+    <StaffLayout title="Patient Records">
+      <div className="toolbar">
+        <input 
+          className="search" 
+          placeholder="Search: Patient ID or Patient Name" 
+          style={{ flex: 1, maxWidth: '400px' }}
+        />
+        <button 
+          className="action-btn"
+          onClick={() => setShowRegisterModal(true)}
+        >
+          Register a Patient
+        </button>
       </div>
 
-      <section className="records-content">
-        <h1 className="records-title">Patient Records</h1>
-        <input className="search" placeholder="Search: Patient ID or Patient Name" />
-        <div className="cards-grid">
-          {samplePatients.map((p) => (
-            <article key={p.name} className="card">
-              <div className="card-actions">
-                <button title="Edit" onClick={() => navigate('/staff/patient-records/edit')}>✎</button>
-                <button title="Open">⤢</button>
-              </div>
-              <img className="avatar" src={p.photo} alt={p.name} />
-              <div className="meta">
-                <div className="line">Patient ID: {p.id}</div>
-                <div className="line">Patient Name: {p.name}</div>
-              </div>
-              <div className="card-quick">
-                <button title="Share">🔗</button>
-                <button title="Download">⬇</button>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+      <div className="cards-grid">
+        {samplePatients.map((p) => (
+          <article key={p.name} className="card">
+            <div className="card-actions">
+              <button title="Edit" onClick={() => navigate('/staff/patient-records/edit')}>✎</button>
+              <button title="Open">⤢</button>
+            </div>
+            <img className="avatar" src={p.photo} alt={p.name} />
+            <div className="meta">
+              <div className="line">Patient ID: {p.id}</div>
+              <div className="line">Patient Name: {p.name}</div>
+            </div>
+            <div className="card-quick">
+              <button title="Share">🔗</button>
+              <button title="Download">⬇</button>
+            </div>
+          </article>
+        ))}
+      </div>
 
-      <footer className="records-footer">
-        <div className="footer-mark" />
-        <div className="mission">
-          TO PROVIDE EXCEPTIONAL
-          <br />
-          MIDWIFERY CARE TO EACH AND
-          <br />
-          EVERY WOMAN
-        </div>
-      </footer>
-    </div>
+      <StaffPatientRegisterModal 
+        isOpen={showRegisterModal} 
+        onClose={() => setShowRegisterModal(false)} 
+      />
+    </StaffLayout>
   );
 }
 
