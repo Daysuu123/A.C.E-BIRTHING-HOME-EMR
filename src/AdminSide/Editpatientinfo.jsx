@@ -61,7 +61,7 @@ function Editpatientinfo() {
     }
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/patients/${id}/info`);
+      const response = await fetch(`/api/patients/${id}/info`);
       const data = await response.json();
       
       if (data.success && data.patient) {
@@ -206,7 +206,7 @@ function Editpatientinfo() {
     setSubmitError("");
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/patients/${id}/info`, {
+      const response = await fetch(`/api/patients/${id}/info`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

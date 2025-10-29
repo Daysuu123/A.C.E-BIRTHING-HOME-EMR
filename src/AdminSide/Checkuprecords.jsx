@@ -1,14 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Checkuprecords.css";
 import AdminLayout from "../components/AdminLayout";
 import CreateRecordsModal from "../components/CreateRecordsModal";
 
-const rows = [
-  { idx: 1, name: "Eppie, Amie P.", type: "Prenatal", date: "09/18/2025", staff: "Dr. Selby Love", notes: "High Bp Detected", outcome: "Continue Monitoring" }
-];
+function readRecords() {
+  try {
+    const raw = localStorage.getItem('checkup_records');
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch (_) { return []; }
+}
 
 function Checkuprecords() {
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [rows, setRows] = useState([]);
+
+  useEffect(() => {
+    const base = [
+      { idx: 1, name: "Eppie, Amie P.", type: "Prenatal", date: "09/18/2025", staff: "Dr. Selby Love", notes: "High Bp Detected", outcome: "Continue Monitoring" }
+    ];
+    const saved = readRecords();
+    const merged = [...base, ...saved.map((r, i) => ({ idx: 2 + i, ...r }))];
+    setRows(merged);
+  }, [showCreateModal]);
 
   return (
     <AdminLayout title="Check-up and Deliver Records">

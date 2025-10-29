@@ -23,7 +23,7 @@ function Manageaccs() {
 
   async function fetchPatients() {
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/patients');
+      const response = await fetch('/api/patients');
       const data = await response.json();
       
       if (data.success) {
@@ -44,13 +44,19 @@ function Manageaccs() {
 
   async function fetchStaff() {
     try {
-      // For now, using static data. You can create a staff API endpoint later
-      const initialStaffRows = [
-        { email: "obienjanelle@gmail.com", name: "Obien, Janelle C.", position: "OB-GYN", date: "01/10/2025" },
-        { email: "la.anne@example.com", name: "Anne, L.", position: "Midwife", date: "02/05/2025" },
-        { email: "l.cruz@example.com", name: "Cruz, L.", position: "Pediatrician", date: "03/22/2025" }
-      ];
-      setStaffRows(initialStaffRows);
+      const response = await fetch('/api/staffs');
+      const data = await response.json();
+      if (data.success) {
+        const formatted = (data.staff || []).map(s => ({
+          id: s.staff_id,
+          name: `${s.staffs_sur}, ${s.staffs_firs}`,
+          position: s.position || 'N/A',
+          date: s.date_created ? new Date(s.date_created).toLocaleDateString('en-US') : '-'
+        }));
+        setStaffRows(formatted);
+      } else {
+        console.error('Error fetching staff:', data.message);
+      }
     } catch (error) {
       console.error('Error fetching staff:', error);
     } finally {
@@ -69,10 +75,10 @@ function Manageaccs() {
     setModalType(type);
     setEditingKey(key);
     if (type === "patient") {
-      const row = patientRows.find(r => r.email === key);
+      const row = patientRows.find(r => r.id === key);
       setFormData({ name: row?.name || "", date: toInputDate(row?.date), position: "" });
     } else {
-      const row = staffRows.find(r => r.email === key);
+      const row = staffRows.find(r => r.id === key);
       setFormData({ name: row?.name || "", position: row?.position || "", date: toInputDate(row?.date) });
     }
     setIsModalOpen(true);
@@ -92,9 +98,9 @@ function Manageaccs() {
   const onSave = (e) => {
     e.preventDefault();
     if (modalType === "patient") {
-      setPatientRows(prev => prev.map(r => r.email === editingKey ? { ...r, name: formData.name, date: formData.date || r.date } : r));
+      setPatientRows(prev => prev.map(r => r.id === editingKey ? { ...r, name: formData.name, date: formData.date || r.date } : r));
     } else if (modalType === "staff") {
-      setStaffRows(prev => prev.map(r => r.email === editingKey ? { ...r, name: formData.name, position: formData.position, date: formData.date || r.date } : r));
+      setStaffRows(prev => prev.map(r => r.id === editingKey ? { ...r, name: formData.name, position: formData.position, date: formData.date || r.date } : r));
     }
     closeModal();
   };
@@ -146,12 +152,12 @@ function Manageaccs() {
               <div>Action</div>
             </div>
             {staffRows.map((r) => (
-              <div className="trow" key={r.email}>
+              <div className="trow" key={r.id}>
                 <div className="name">{r.name}</div>
                 <div className="pos">{r.position}</div>
                 <div className="date">{r.date}</div>
                 <div className="action">
-                  <button className="edit" onClick={() => openModal("staff", r.email)}>View</button>
+                  <button className="edit" onClick={() => openModal("staff", r.id)}>View</button>
                 </div>
               </div>
             ))}

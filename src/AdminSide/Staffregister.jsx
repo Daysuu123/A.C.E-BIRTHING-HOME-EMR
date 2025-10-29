@@ -134,10 +134,35 @@ function Staffregister() {
           <button
             type="button"
             className="next"
-            onClick={() => {
+            onClick={async () => {
               ["lastName","firstName","middleInitial","email","password","confirmPassword"].forEach((f)=>validate(f, form[f]));
-              const allEmpty = ["lastName","firstName","middleInitial","email","password","confirmPassword"].every(f => !String(form[f]||"").trim());
-              setShowSubmitError(allEmpty);
+              const required = ["lastName","firstName","middleInitial","password","confirmPassword","position"];
+              const anyEmpty = required.some(f => !String(form[f]||"").trim());
+              if (anyEmpty || form.password !== form.confirmPassword) {
+                setShowSubmitError(true);
+                return;
+              }
+              try {
+                const res = await fetch('/api/staffs/register', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    lastName: form.lastName,
+                    firstName: form.firstName,
+                    middleInitial: form.middleInitial,
+                    position: form.position,
+                    password: form.password
+                  })
+                });
+                const data = await res.json();
+                if (data && data.success) {
+                  alert('Staff account created');
+                } else {
+                  alert(data?.message || 'Failed to create staff');
+                }
+              } catch (e) {
+                alert('Network error creating staff');
+              }
             }}
           >
             Register

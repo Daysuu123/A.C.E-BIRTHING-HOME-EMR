@@ -251,7 +251,7 @@ function Addpatientinfo() {
         return;
       }
 
-      const response = await fetch('http://127.0.0.1:8000/api/patients/register-info', {
+      const response = await fetch('/api/patients/register-info', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

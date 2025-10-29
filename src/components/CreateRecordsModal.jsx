@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useRef } from "react";
 import "../AdminSide/Createrecords.css";
 import { useNavigate } from "react-router-dom";
 
 function CreateRecordsModal({ isOpen, onClose }) {
   const navigate = useNavigate();
+  const nameRef = useRef();
+  const typeRef = useRef();
+  const dateRef = useRef();
+  const staffRef = useRef();
+  const notesRef = useRef();
+  const outcomeRef = useRef();
   
   // Mock female patient names for dropdown
   const femalePatients = [
@@ -33,7 +39,7 @@ function CreateRecordsModal({ isOpen, onClose }) {
           <form className="cr-form">
             <label className="field wide">
               <span>Patient Name:</span>
-              <select defaultValue="Eppie, Amie P.">
+              <select defaultValue="Eppie, Amie P." ref={nameRef}>
                 {femalePatients.map((name, index) => (
                   <option key={index} value={name}>{name}</option>
                 ))}
@@ -43,7 +49,7 @@ function CreateRecordsModal({ isOpen, onClose }) {
             <div className="row">
               <label className="field">
                 <span>Record Type:</span>
-                <select defaultValue="Prenatal">
+                <select defaultValue="Prenatal" ref={typeRef}>
                   <option>Prenatal</option>
                   <option>Postnatal</option>
                   <option>Delivery</option>
@@ -52,12 +58,12 @@ function CreateRecordsModal({ isOpen, onClose }) {
 
               <label className="field">
                 <span>Date:</span>
-                <input type="date" defaultValue="2025-09-18" />
+                <input type="date" defaultValue="2025-09-18" ref={dateRef} />
               </label>
 
               <label className="field">
                 <span>Attending Staff</span>
-                <select defaultValue="Dr. Selby Loren">
+                <select defaultValue="Dr. Selby Loren" ref={staffRef}>
                   <option>Dr. Selby Loren</option>
                   <option>Midwife L. Anne</option>
                   <option>Dr. L. Cruz</option>
@@ -67,13 +73,13 @@ function CreateRecordsModal({ isOpen, onClose }) {
 
             <label className="field wide">
               <span>Notes</span>
-              <input type="text" defaultValue="High Bp detected" />
+              <input type="text" defaultValue="High Bp detected" ref={notesRef} />
             </label>
 
             <div className="row">
               <label className="field wide">
                 <span>Outcome</span>
-                <textarea rows={3} defaultValue="Continue Monitoring" />
+                <textarea rows={3} defaultValue="Continue Monitoring" ref={outcomeRef} />
               </label>
 
               <div className="actions">
@@ -81,6 +87,21 @@ function CreateRecordsModal({ isOpen, onClose }) {
                   type="button"
                   className="create"
                   onClick={() => {
+                    const rec = {
+                      name: nameRef.current?.value || '',
+                      type: typeRef.current?.value || '',
+                      date: (()=>{try{const d=dateRef.current?.value; if(!d) return ''; const dt=new Date(d); return dt.toLocaleDateString('en-US');}catch(_){return ''}})(),
+                      staff: staffRef.current?.value || '',
+                      notes: notesRef.current?.value || '',
+                      outcome: outcomeRef.current?.value || ''
+                    };
+                    try {
+                      const raw = localStorage.getItem('checkup_records');
+                      const arr = raw ? JSON.parse(raw) : [];
+                      const next = Array.isArray(arr) ? arr : [];
+                      next.push(rec);
+                      localStorage.setItem('checkup_records', JSON.stringify(next));
+                    } catch(_) {}
                     onClose();
                     navigate("/admin/checkup-records", { replace: true });
                   }}
