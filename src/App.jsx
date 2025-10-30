@@ -208,6 +208,15 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/admin/patient-records/view/:id" // Use the parameter to catch the patient_id
+          element={
+            <ProtectedRoute>
+              <Addpatientinfo /> {/* Renders the component you requested */}
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/admin/patient-register"
           element={

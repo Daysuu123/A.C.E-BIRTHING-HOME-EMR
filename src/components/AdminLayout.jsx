@@ -21,12 +21,12 @@ function AdminLayout({ children, title = "Dashboard" }) {
             onClick={() => setSidebarOpen(v => !v)}
           >☰</button>
           <div className="brand-mark">
-            <img src="/vite.svg" alt="Clinic Logo" />
+            <img src="/logo.svg" alt="Clinic Logo" />
           </div>
           <span className="brand-name">A.C.E Birthing Home</span>
         </div>
         <div className="topbar-right">
-          <span className="welcome">Welcome, Admin</span>
+          <span className="welcome">Welcome, Dace</span>
           <button className="logout" onClick={handleLogout}>Logout</button>
         </div>
       </header>

@@ -77,14 +77,11 @@ function Patientrecords() {
             <article key={p.id} className="card">
               <div className="card-actions">
                 <button title="Edit" onClick={() => navigate(`/admin/patient-records/edit/${p.id}`)}>✎</button>
-                <button title="View Details" onClick={() => navigate(`/admin/patient-records/view/${p.id}`)}>⤢</button>
               </div>
               <img className="avatar" src={p.photo} alt={p.name} />
               <div className="meta">
                 <div className="line">Patient ID: {p.id}</div>
                 <div className="line">Patient Name: {p.name}</div>
-                <div className="line">Email: {p.email}</div>
-                <div className="line">Contact: {p.contact}</div>
               </div>
               <div className="card-quick">
                 <button title="Share">🔗</button>

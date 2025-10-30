@@ -5,11 +5,11 @@ function AdminSidebar() {
   const location = useLocation();
   
   const navItems = [
-    { path: "/admin/dashboard", label: "Home", icon: "🏠" },
-    { path: "/admin/patient-records", label: "Patient", icon: "👥" },
-    { path: "/admin/manage-accounts", label: "Accounts", icon: "👤" },
-    { path: "/admin/checkup-records", label: "Records", icon: "📋" },
-    { path: "/admin/staff-register", label: "Staff Register", icon: "👨‍⚕️" },
+    { path: "/admin/dashboard", label: "Home", icon: "" },
+    { path: "/admin/patient-records", label: "Patient", icon: "" },
+    { path: "/admin/manage-accounts", label: "Accounts", icon: "" },
+    { path: "/admin/checkup-records", label: "Records", icon: "" },
+    { path: "/admin/staff-register", label: "Staff Register", icon: "" },
   ];
 
   const isActive = (path) => {
