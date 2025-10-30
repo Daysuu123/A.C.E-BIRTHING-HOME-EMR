@@ -151,16 +151,32 @@ function Manageaccs() {
               <div>Date Created</div>
               <div>Action</div>
             </div>
-            {staffRows.map((r) => (
-              <div className="trow" key={r.id}>
-                <div className="name">{r.name}</div>
-                <div className="pos">{r.position}</div>
-                <div className="date">{r.date}</div>
-                <div className="action">
-                  <button className="edit" onClick={() => openModal("staff", r.id)}>View</button>
-                </div>
+            {isLoading ? (
+              <div className="trow">
+                <div className="name">Loading...</div>
+                <div className="pos">-</div>
+                <div className="date">-</div>
+                <div className="action">-</div>
               </div>
-            ))}
+            ) : staffRows.length === 0 ? (
+              <div className="trow">
+                <div className="name">No staff found</div>
+                <div className="pos">-</div>
+                <div className="date">-</div>
+                <div className="action">-</div>
+              </div>
+            ) : (
+              staffRows.map((r) => (
+                <div className="trow" key={r.id}>
+                  <div className="name">{r.name}</div>
+                  <div className="pos">{r.position}</div>
+                  <div className="date">{r.date}</div>
+                  <div className="action">
+                    <button className="edit" onClick={() => openModal("staff", r.id)}>View</button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

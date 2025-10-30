@@ -21,7 +21,7 @@ function AdminLayout({ children, title = "Dashboard" }) {
             onClick={() => setSidebarOpen(v => !v)}
           >☰</button>
           <div className="brand-mark">
-            <img src="/logo.svg" alt="Clinic Logo" />
+            <img src="assets/logo.svg" alt="Clinic Logo" />
           </div>
           <span className="brand-name">A.C.E Birthing Home</span>
         </div>
@@ -46,7 +46,7 @@ function AdminLayout({ children, title = "Dashboard" }) {
 
       <footer className="footer">
         <div className="footer-mark">
-          <img src="/vite.svg" alt="Clinic Logo" />
+          <img src="assets/ACElogo.png" alt="Clinic Logo" />
         </div>
         <div className="mission">
           TO PROVIDE EXCEPTIONAL

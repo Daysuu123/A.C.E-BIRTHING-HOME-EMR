@@ -111,3 +111,43 @@
   .brand-name { display: none; }
 }
 
+/* Apply this to the main container wrapper */
+.dashboard-grid-container {
+    /* Use CSS Grid to define the layout */
+    display: grid;
+    /* Define 2 equal columns for the top row */
+    grid-template-columns: 1fr 1fr;
+    /* Add some gap between the chart cards */
+    gap: 20px;
+    margin-top: 20px; /* Optional: Space below the dashboard title */
+}
+
+/* This targets the full-width chart at the bottom (Bar Graph 1) */
+.bottom-chart-full {
+    /* Make this item span across all columns (both 1 and 2) */
+    grid-column: 1 / span 2;
+}
+
+/* Base styling for the chart cards for visual appeal (adjust as needed) */
+.chart-card {
+    background-color: #ffffff; /* White background */
+    border: 1px solid #e0e0e0; /* Light border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+    /* Ensure charts scale within the card */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.subtitle {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* Optional: Make sure the charts inside fill the space */
+.MuiChartsContainer-root {
+    width: 100% !important;
+}
