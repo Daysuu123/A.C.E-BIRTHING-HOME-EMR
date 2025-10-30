@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon; // added
 
 class StaffController extends Controller
 {
@@ -17,10 +18,17 @@ class StaffController extends Controller
                     'staffs_firs',
                     'staffs_sur',
                     'position',
-                    DB::raw("COALESCE(date_created, '') as date_created")
+                    'date_created' // return raw timestamp to PHP
                 )
                 ->orderBy('staff_id', 'asc')
-                ->get();
+                ->get()
+                ->map(function ($row) {
+                    // format in PHP to avoid SQL type mismatches
+                    $row->date_created = $row->date_created
+                        ? Carbon::parse($row->date_created)->format('m/d/Y')
+                        : null; // or 'N/A' if you prefer a string
+                    return $row;
+                });
 
             return response()->json([
                 'success' => true,
