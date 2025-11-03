@@ -1,5 +1,6 @@
 import React from "react";
 import "./PatientProfilePage.css";
+import logoImg from "../assets/ACElogo.png";
 
 function PatientProfilePage() {
   return (
@@ -182,19 +183,16 @@ function PatientProfilePage() {
       </section>
 
       <footer className="footer">
-        <div className="footer-brand">
-          <div className="footer-logo">
-            A.C.E
-            <span className="footer-sub">Birthing Home</span>
-          </div>
+        <div className="footer-inline">
+          <img src={logoImg} alt="A.C.E Birthing Home" className="footer-image" />
+          <p className="footer-mission">
+            TO PROVIDE EXCEPTIONAL
+            <br />
+            MIDWIFERY CARE TO EACH AND
+            <br />
+            EVERY WOMAN
+          </p>
         </div>
-        <p className="footer-mission">
-          TO PROVIDE EXCEPTIONAL
-          <br />
-          MIDWIFERY CARE TO EACH AND
-          <br />
-          EVERY WOMAN
-        </p>
       </footer>
     </div>
   );

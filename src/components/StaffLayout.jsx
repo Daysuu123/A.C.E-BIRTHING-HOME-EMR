@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StaffSidebar from "./StaffSidebar";
+import logoImg from "../assets/ACElogo.png";
 
 function StaffLayout({ children, title = "Dashboard" }) {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ function StaffLayout({ children, title = "Dashboard" }) {
             onClick={() => setSidebarOpen(v => !v)}
           >☰</button>
           <div className="brand-mark">
-            <img src="/vite.svg" alt="Clinic Logo" />
+            <img src={logoImg} alt="Clinic Logo" />
           </div>
           <span className="brand-name">A.C.E Birthing Home</span>
         </div>
@@ -46,7 +47,7 @@ function StaffLayout({ children, title = "Dashboard" }) {
 
       <footer className="footer">
         <div className="footer-mark">
-          <img src="/vite.svg" alt="Clinic Logo" />
+          <img src={logoImg} alt="Clinic Logo" />
         </div>
         <div className="mission">
           TO PROVIDE EXCEPTIONAL

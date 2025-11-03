@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./loginpage.css";
+import logoImg from "../assets/ACElogo.png";
 // backend handled via dev proxy at /api/loginpage.php
 
 function LoginPage() {
@@ -28,7 +29,7 @@ function LoginPage() {
       return true;
     }
     setMessageType("error");
-    setMessage(reason || "Login failed.");
+    setMessage(reason || "Incorrect username or password.");
     return false;
   };
 
@@ -51,7 +52,7 @@ function LoginPage() {
         result = await response.json();
       } catch (_) {
         // Fallback: allow dev login without backend
-        devBypass(username, password, "Server returned a non-JSON response.");
+        devBypass(username, password, "Incorrect username or password.");
         return;
       }
 
@@ -80,7 +81,8 @@ function LoginPage() {
         }
       } else {
         // If backend rejects, still allow dev bypass for demo creds
-        if (!devBypass(username, password, (result && result.message) || "Login failed.")) {
+        const serverMsg = (result && result.message) || (response.status === 401 ? "Incorrect username or password." : undefined);
+        if (!devBypass(username, password, serverMsg || "Incorrect username or password.")) {
           // message already set by devBypass when it fails
         }
       }
@@ -96,10 +98,7 @@ function LoginPage() {
     <div className="login-page">
       <div className="brand-panel">
         <div className="brand-circle">
-          <div className="brand-logo">
-            A.C.E
-            <span className="brand-sub">Birthing Home</span>
-          </div>
+          <img src={logoImg} alt="A.C.E Birthing Home" className="brand-image" />
         </div>
         <p className="brand-mission">
           TO PROVIDE EXCEPTIONAL

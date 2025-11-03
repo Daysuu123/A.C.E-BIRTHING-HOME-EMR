@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../AdminSide/Patientregister.css";
 import { useNavigate } from "react-router-dom";
+import { postJson } from "../lib/api";
 
 function StaffPatientRegisterModal({ isOpen, onClose }) {
   const [show, setShow] = useState(false);
@@ -68,23 +69,15 @@ function StaffPatientRegisterModal({ isOpen, onClose }) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/patients/register-account', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          lastName: form.lastName,
-          firstName: form.firstName,
-          middleInitial: form.middleInitial,
-          email: form.email,
-          password: form.password
-        })
+      const { data, ok } = await postJson('/patients/register-account', {
+        lastName: form.lastName,
+        firstName: form.firstName,
+        middleInitial: form.middleInitial,
+        email: form.email,
+        password: form.password
       });
 
-      const data = await response.json();
-      
-      if (data.success) {
+      if (data && (data.success || ok)) {
         // Store patient data for the next step
         localStorage.setItem('tempPatientId', data.patient_id);
         localStorage.setItem('tempPatientData', JSON.stringify(data.patient));
@@ -93,10 +86,10 @@ function StaffPatientRegisterModal({ isOpen, onClose }) {
         onClose();
         navigate('/staff/add-patient-info');
       } else {
-        setSubmitError(data.message || 'Failed to create patient account');
+        setSubmitError((data && data.message) || 'Failed to create patient account');
       }
     } catch (error) {
-      setSubmitError('Network error. Please try again.');
+      setSubmitError('Network error. Please ensure the backend is running.');
     } finally {
       setIsSubmitting(false);
     }

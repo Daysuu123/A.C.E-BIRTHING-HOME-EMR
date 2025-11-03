@@ -2,6 +2,8 @@
   display: grid;
   grid-template-columns: 42% 58%;
   min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .brand-panel {
@@ -9,40 +11,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
+  flex-direction: column;
+  gap: 18px;
   padding: 24px;
 }
 
 .brand-circle {
-  width: 240px;
-  height: 240px;
-  border: 2px solid #2b2b2b;
-  border-radius: 50%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  width: auto;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255,255,255,0.05);
 }
 
-.brand-logo {
-  color: #2b2b2b;
-  font-weight: 800;
-  text-align: center;
-}
-.brand-logo .brand-sub {
-  display: block;
-  font-weight: 600;
-}
+.brand-image { width: 70%; height: auto; object-fit: contain; display: block; }
 
 .brand-mission {
   color: #2b2b2b;
-  font-size: 12px;
+  font-size: clamp(12px, 1.8vw, 16px);
+  line-height: 1.35;
   letter-spacing: 0.5px;
   text-align: center;
-  position: absolute;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
+  padding: 0 12px;
+  margin-top: 4px;
 }
 
 .form-panel {
@@ -50,14 +44,19 @@
   align-items: center;
   justify-content: center;
   background: #ffffff;
+  padding: 16px;
+  min-width: 0; /* prevent grid overflow */
 }
 
 .login-card {
-  width: 320px;
+  width: min(92vw, 380px);
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   padding: 24px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  margin: 0 auto; /* its own space; center it */
+  box-sizing: border-box;
+  overflow: hidden; /* avoid inner scrollbar */
 }
 
 .login-title {
@@ -152,7 +151,26 @@
 }
 
 @media (max-width: 900px) {
-  .login-page { grid-template-columns: 1fr; }
-  .brand-panel { min-height: 40vh; }
+  .login-page { grid-template-columns: 1fr; row-gap: 8px; }
+  .brand-panel { min-height: auto; }
+  .brand-image { width: 64%; max-width: 280px; }
+}
+
+@media (max-width: 520px) {
+  .brand-panel { padding: 16px; }
+  .brand-image { width: 58%; max-width: 220px; }
+}
+
+/* Remove scrollbars entirely on the login page view */
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* On small screens, allow the browser to handle a single vertical scrollbar */
+@media (max-width: 900px) {
+  html, body { overflow-y: auto; overflow-x: hidden; height: auto; }
+  .login-page { height: auto; min-height: 100vh; overflow: visible; }
 }
 
