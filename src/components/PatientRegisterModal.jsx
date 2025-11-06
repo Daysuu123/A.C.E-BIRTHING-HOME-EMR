@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../AdminSide/Patientregister.css";
 import { useNavigate } from "react-router-dom";
 
-function PatientRegisterModal({ isOpen, onClose }) {
+function PatientRegisterModal({ isOpen, onClose, onComplete }) {
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
   const [form, setForm] = useState({ lastName: "", firstName: "", middleInitial: "", email: "", password: "", confirmPassword: "" });
@@ -83,10 +83,15 @@ function PatientRegisterModal({ isOpen, onClose }) {
         // Store patient data for the next step
         localStorage.setItem('tempPatientId', data.patient_id);
         localStorage.setItem('tempPatientData', JSON.stringify(data.patient));
-        
-        // Close modal and navigate to patient info page
-        onClose();
-        navigate('/admin/patient-register/info');
+
+        // If parent provided onComplete, let parent handle next step (open info modal)
+        if (typeof onComplete === 'function') {
+          onComplete();
+        } else {
+          // Fallback to previous behavior: close and navigate to info route
+          onClose();
+          navigate('/admin/patient-register/info');
+        }
       } else {
         setSubmitError(data.message || 'Failed to create patient account');
       }

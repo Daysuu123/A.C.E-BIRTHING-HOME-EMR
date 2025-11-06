@@ -33,5 +33,10 @@ Route::post('/records', [RecordsController::class, 'store']);
 Route::put('/records/{id}', [RecordsController::class, 'update']);
 Route::delete('/records/{id}', [RecordsController::class, 'destroy']);
 
+// Dashboard analytics routes
+Route::get('/dashboard/monthly-patients', [PatientController::class, 'getMonthlyPatients']);
+Route::get('/dashboard/monthly-checkups', [RecordsController::class, 'getMonthlyCheckups']);
+Route::get('/dashboard/checkup-types', [RecordsController::class, 'getCheckupTypes']);
+
 
 

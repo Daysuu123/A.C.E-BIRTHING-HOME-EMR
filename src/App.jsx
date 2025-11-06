@@ -10,6 +10,7 @@ import Manageaccs from "./AdminSide/Manageaccs";
 import Patientrecords from "./AdminSide/Patientrecords";  
 import Patientregister from "./AdminSide/Patientregister";
 import Addpatientinfo from "./AdminSide/Addpatientinfo";
+import AddpatientinfoModal from "./AdminSide/AddpatientinfoModal";
 import Staffregister from "./AdminSide/Staffregister";
 import Editpatientinfo from "./AdminSide/Editpatientinfo";
 import Editpatientaccount from "./AdminSide/Editpatientaccount";
@@ -101,7 +102,7 @@ function App() {
           }
         />
         <Route
-          path="/staff/create-records"
+          path="/staff/staff-create-records"
           element={
             <StaffProtectedRoute>
               <StaffCreateRecords />
@@ -229,7 +230,7 @@ function App() {
           path="/admin/patient-register/info"
           element={
             <ProtectedRoute>
-              <Addpatientinfo />
+              <AddpatientinfoModal />
             </ProtectedRoute>
           }
         />

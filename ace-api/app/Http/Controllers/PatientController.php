@@ -227,4 +227,41 @@ class PatientController extends Controller
             ], 500);
         }
     }
+
+    public function getMonthlyPatients()
+    {
+        try {
+            $monthlyPatients = DB::table('patient_acc')
+                ->select(
+                    DB::raw('EXTRACT(MONTH FROM date_created) as month'),
+                    DB::raw('COUNT(*) as count')
+                )
+                ->whereYear('date_created', now()->year)
+                ->groupBy(DB::raw('EXTRACT(MONTH FROM date_created)'))
+                ->orderBy(DB::raw('EXTRACT(MONTH FROM date_created)'))
+                ->get();
+
+            // Format data for chart
+            $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            $formattedData = [];
+            
+            foreach ($months as $index => $month) {
+                $monthData = $monthlyPatients->where('month', $index + 1)->first();
+                $formattedData[] = [
+                    'month' => $month,
+                    'patients' => $monthData ? $monthData->count : 0
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $formattedData
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch monthly patients: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

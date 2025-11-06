@@ -3,6 +3,8 @@ import "./Patientrecords.css";
 import { useNavigate } from "react-router-dom";
 import AdminLayout from "../components/AdminLayout";
 import PatientRegisterModal from "../components/PatientRegisterModal";
+import PatientPersonalInfoModal from "../components/PatientPersonalInfoModal";
+import EditPatientInfoModal from "../components/EditPatientInfoModal";
 
 function Patientrecords() {
   const navigate = useNavigate();
@@ -10,6 +12,9 @@ function Patientrecords() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     fetchPatients();
@@ -76,7 +81,7 @@ function Patientrecords() {
           filteredPatients.map((p) => (
             <article key={p.id} className="card">
               <div className="card-actions">
-                <button title="Edit" onClick={() => navigate(`/admin/patient-records/edit/${p.id}`)}>✎</button>
+                <button title="Edit" onClick={() => { setEditingId(p.id); setShowEditModal(true); }}>✎</button>
               </div>
               <img className="avatar" src={p.photo} alt={p.name} />
               <div className="meta">
@@ -95,6 +100,20 @@ function Patientrecords() {
       <PatientRegisterModal 
         isOpen={showRegisterModal} 
         onClose={() => setShowRegisterModal(false)} 
+        onComplete={() => { setShowRegisterModal(false); setShowInfoModal(true); }}
+      />
+
+      <PatientPersonalInfoModal
+        isOpen={showInfoModal}
+        onClose={() => setShowInfoModal(false)}
+        onSaved={() => { setShowInfoModal(false); fetchPatients(); }}
+      />
+
+      <EditPatientInfoModal
+        isOpen={showEditModal}
+        patientId={editingId}
+        onClose={() => { setShowEditModal(false); setEditingId(null); }}
+        onSaved={() => { setShowEditModal(false); setEditingId(null); fetchPatients(); }}
       />
     </AdminLayout>
   );
