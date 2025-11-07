@@ -37,7 +37,7 @@ const PhoneInput = ({ value, onChange, placeholder, className, ...props }) => {
         onChange={handleInnerChange}
         placeholder={placeholder || "9XXXXXXXXX"}
         className="phone-field"
-        maxLength={10}
+        maxLength={11}
         {...props}
       />
     </div>

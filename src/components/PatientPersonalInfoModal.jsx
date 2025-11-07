@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import "../AdminSide/Patientregister.css";
 import "../AdminSide/Addpatientinfo.css";
 import PhoneInput from "./PhoneInput";
 import phLocations from "../AdminSide/phLocations";
 
-function PatientPersonalInfoModal({ isOpen, onClose, onSaved }) {
+function PatientPersonalInfoModal({ isOpen, onClose, onSaved, syncData }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     lastName: "",
@@ -35,8 +35,63 @@ function PatientPersonalInfoModal({ isOpen, onClose, onSaved }) {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [submitError, setSubmitError] = useState("");
+  const [syncError, setSyncError] = useState(""); // Track synchronization errors
 
   const nameRegex = /^[A-Za-z ]+$/;
+
+  // Synchronize data from registration modal
+  useEffect(() => {
+    if (syncData && isOpen) {
+      try {
+        setSyncError(""); // Clear previous sync errors
+        
+        // Enhanced validation for synchronized data
+        const validationErrors = [];
+        
+        if (!syncData.lastName || !syncData.lastName.trim()) {
+          validationErrors.push("Last Name is missing from registration data");
+        } else if (!nameRegex.test(syncData.lastName.trim())) {
+          validationErrors.push("Last Name contains invalid characters");
+        }
+        
+        if (!syncData.firstName || !syncData.firstName.trim()) {
+          validationErrors.push("First Name is missing from registration data");
+        } else if (!nameRegex.test(syncData.firstName.trim())) {
+          validationErrors.push("First Name contains invalid characters");
+        }
+        
+        if (!syncData.middleName || !syncData.middleName.trim()) {
+          validationErrors.push("Middle Name is missing from registration data");
+        } else if (!nameRegex.test(syncData.middleName.trim())) {
+          validationErrors.push("Middle Name contains invalid characters");
+        }
+
+        if (validationErrors.length > 0) {
+          setSyncError(`Data validation failed: ${validationErrors.join(', ')}`);
+          return;
+        }
+
+        // Populate form fields with synchronized data
+        setForm(prevForm => ({
+          ...prevForm,
+          lastName: syncData.lastName.trim(),
+          firstName: syncData.firstName.trim(),
+          middleName: syncData.middleName.trim()
+        }));
+        
+        // Validate the synchronized fields
+        setTimeout(() => {
+          validate('lastName', syncData.lastName.trim());
+          validate('firstName', syncData.firstName.trim());
+          validate('middleName', syncData.middleName.trim());
+        }, 0);
+        
+      } catch (error) {
+        setSyncError("Failed to synchronize registration data. Please fill in the fields manually.");
+        console.error("Data synchronization error:", error);
+      }
+    }
+  }, [syncData, isOpen]);
 
   const calculatedAge = useMemo(() => {
     if (!form.dob) return "";
@@ -146,41 +201,65 @@ function PatientPersonalInfoModal({ isOpen, onClose, onSaved }) {
 
     setIsSubmitting(true);
     setSubmitError("");
+    setSyncError(""); // Clear any sync errors
     try {
       const patientId = localStorage.getItem("tempPatientId");
       if (!patientId) {
         setSubmitError("Patient account not found. Please start registration again.");
         return;
       }
+
+      // Validate synchronized data consistency
+      if (syncData && syncData.tempPatientId && syncData.tempPatientId !== patientId) {
+        console.warn('Patient ID mismatch detected. Using current form data.');
+      }
+
+      const payload = {
+        patient_id: parseInt(patientId),
+        lastName: form.lastName,
+        firstName: form.firstName,
+        middleName: form.middleName,
+        dob: form.dob,
+        address: form.address,
+        province: form.province,
+        nationality: form.nationality,
+        contact: form.contact,
+        emergencyContact: form.emergencyContact,
+        fatherName: form.fatherName,
+        fatherContact: form.fatherContact,
+        fatherOccupation: form.fatherOccupation,
+        fatherAddress: form.fatherAddress,
+        motherName: form.motherName,
+        motherContact: form.motherContact,
+        motherOccupation: form.motherOccupation,
+        motherAddress: form.motherAddress,
+        spouseName: form.spouseName || "",
+        spouseContact: form.spouseContact || "",
+        spouseOccupation: form.spouseOccupation || ""
+      };
+
+      console.log('Saving patient data:', payload);
+
       const response = await fetch('/api/patients/register-info', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          patient_id: parseInt(patientId),
-          lastName: form.lastName,
-          firstName: form.firstName,
-          middleName: form.middleName,
-          dob: form.dob,
-          address: form.address,
-          province: form.province,
-          nationality: form.nationality,
-          contact: form.contact,
-          emergencyContact: form.emergencyContact,
-          fatherName: form.fatherName,
-          fatherContact: form.fatherContact,
-          fatherOccupation: form.fatherOccupation,
-          fatherAddress: form.fatherAddress,
-          motherName: form.motherName,
-          motherContact: form.motherContact,
-          motherOccupation: form.motherOccupation,
-          motherAddress: form.motherAddress,
-          spouseName: form.spouseName || "",
-          spouseContact: form.spouseContact || "",
-          spouseOccupation: form.spouseOccupation || ""
-        })
+        body: JSON.stringify(payload)
       });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          throw new Error(`Server error: ${response.status} - ${response.statusText}`);
+        }
+        throw new Error(errorData.message || `Server error: ${response.status} - ${response.statusText}`);
+      }
+
       const data = await response.json();
       if (data.success) {
+        console.log('Patient information saved successfully:', data);
         localStorage.removeItem('tempPatientId');
         localStorage.removeItem('tempPatientData');
         if (onSaved) onSaved();
@@ -189,7 +268,16 @@ function PatientPersonalInfoModal({ isOpen, onClose, onSaved }) {
         setSubmitError(data.message || "Failed to save patient information");
       }
     } catch (err) {
-      setSubmitError("Network error. Please try again.");
+      console.error('Save error details:', err);
+      let errorMessage = 'Network error. Please try again.';
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        errorMessage = 'Network error: Unable to connect to the server. Please check your connection.';
+      } else if (err.name === 'SyntaxError') {
+        errorMessage = 'Server error: Invalid response format. Please try again.';
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      setSubmitError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -206,6 +294,20 @@ function PatientPersonalInfoModal({ isOpen, onClose, onSaved }) {
         </div>
         <div className="modal-body">
           <form className="addpat-form">
+            {/* Synchronization error display */}
+            {syncError && (
+              <div style={{
+                backgroundColor: '#fef2f2',
+                border: '1px solid #fecaca',
+                color: '#dc2626',
+                padding: '12px',
+                borderRadius: '6px',
+                marginBottom: '16px',
+                fontSize: '14px'
+              }}>
+                ⚠️ {syncError}
+              </div>
+            )}
             <div className="form-section">
               <div className="row">
                 <label className="field">
@@ -386,7 +488,7 @@ function PatientPersonalInfoModal({ isOpen, onClose, onSaved }) {
               <div className="row">
                 <label className="field">
                   <span>Spouse:</span>
-                  <input type="text" required pattern="[A-Za-z ]+" name="spouseName" value={form.spouseName} onChange={(e)=>setField("spouseName", e.target.value)} />
+                  <input type="text" name="spouseName" value={form.spouseName} onChange={(e)=>setField("spouseName", e.target.value)} />
                     <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.spouseName? 'visible':'hidden'}}>{errors.spouseName || 'placeholder'}</div>
                 </label>
                 <label className="field">
@@ -398,7 +500,7 @@ function PatientPersonalInfoModal({ isOpen, onClose, onSaved }) {
               <div className="row">
                 <label className="field">
                   <span>Occupation:</span>
-                  <input type="text" required pattern="[A-Za-z ]+" name="spouseOccupation" value={form.spouseOccupation} onChange={(e)=>setField("spouseOccupation", e.target.value)} />
+                  <input type="text" name="spouseOccupation" value={form.spouseOccupation} onChange={(e)=>setField("spouseOccupation", e.target.value)} pattern="[A-Za-z ]+" />
                     <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.spouseOccupation? 'visible':'hidden'}}>{errors.spouseOccupation || 'placeholder'}</div>
                 </label>
               </div>

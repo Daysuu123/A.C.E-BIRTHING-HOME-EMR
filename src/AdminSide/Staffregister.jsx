@@ -144,12 +144,16 @@ function Staffregister() {
               try {
                 const res = await fetch('/api/staffs/register', {
                   method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                  },
                   body: JSON.stringify({
                     lastName: form.lastName,
                     firstName: form.firstName,
                     middleInitial: form.middleInitial,
                     position: form.position,
+                    email: form.email,
                     password: form.password
                   })
                 });
