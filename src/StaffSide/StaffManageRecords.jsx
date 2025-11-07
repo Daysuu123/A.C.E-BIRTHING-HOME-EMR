@@ -17,7 +17,7 @@ function StaffManageRecords() {
   const fetchRecords = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/api/records');
+      const response = await fetch('/api/records');
       const data = await response.json();
       
       if (data.success) {
@@ -38,6 +38,7 @@ function StaffManageRecords() {
     // Refresh records after creating a new one
     fetchRecords();
   };
+
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -92,32 +93,32 @@ function StaffManageRecords() {
       </div>
 
       <div className="table-wrap">
-        <div className="table-head">
-          <div>#</div>
-          <div>Name</div>
-          <div>Record Type</div>
-          <div>Date</div>
-          <div>Attending Staff</div>
-          <div>Notes</div>
-          <div>Outcome</div>
+      <div className="table-head">
+        <div>#</div>
+        <div>Name</div>
+        <div>Record Type</div>
+        <div>Date</div>
+        <div>Attending Staff</div>
+        <div>Notes</div>
+        <div>Outcome</div>
+      </div>
+      {records.length === 0 ? (
+        <div className="no-records">
+          <p>No records found. Create your first record!</p>
         </div>
-        {records.length === 0 ? (
-          <div className="no-records">
-            <p>No records found. Create your first record!</p>
+      ) : (
+        records.map((record, index) => (
+          <div className="table-row" key={record.record_id}>
+            <div>{index + 1}.</div>
+            <div>{record.patient_name || 'N/A'}</div>
+            <div>{record.record_type || 'N/A'}</div>
+            <div>{formatDate(record.date)}</div>
+            <div>{record.attending_staff_name || 'N/A'}</div>
+            <div>{record.notes || 'N/A'}</div>
+            <div>{record.outcome || 'N/A'}</div>
           </div>
-        ) : (
-          records.map((record, index) => (
-            <div className="table-row" key={record.record_id}>
-              <div>{index + 1}.</div>
-              <div>{record.patient_name || 'N/A'}</div>
-              <div>{record.record_type || 'N/A'}</div>
-              <div>{formatDate(record.date)}</div>
-              <div>{record.attending_staff_name || 'N/A'}</div>
-              <div>{record.notes || 'N/A'}</div>
-              <div>{record.outcome || 'N/A'}</div>
-            </div>
-          ))
-        )}
+        ))
+      )}
       </div>
 
       <StaffCreateRecordsModal 
