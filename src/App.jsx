@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 
 // AdminSide pages
 import Loginpage from "./AdminSide/loginpage";
+import ForgotPassword from "./AdminSide/ForgotPassword";
+import ChangePassword from "./AdminSide/ChangePassword";
 import Admindashboard from "./AdminSide/Admindashboard";
 import Checkuprecords from "./AdminSide/Checkuprecords";
 import Createrecords from "./AdminSide/Createrecords";
@@ -89,6 +91,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Loginpage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/change-password" element={<ChangePassword />} />
 
         {/* Staff routes */}
         <Route
@@ -241,13 +245,13 @@ function App() {
         />
 
         <Route
-          path="/admin/patient-records/view/:id" // Use the parameter to catch the patient_id
-          element={
-            <ProtectedRoute>
-              <Addpatientinfo /> {/* Renders the component you requested */}
-            </ProtectedRoute>
-          }
-        />
+          path="/admin/patient-records/view/:id" // Use the parameter to catch the patient_id
+          element={
+            <ProtectedRoute>
+              <Addpatientinfo /> {/* Renders the component you requested */}
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/admin/patient-register"
           element={

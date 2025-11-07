@@ -132,7 +132,7 @@ function LoginPage() {
                   onChange={(e) => setShowPassword(e.target.checked)}
                 /> Show Password
               </label>
-              <a href="#" className="forgot">Forgot Password?</a>
+              <a href="/forgot-password" className="forgot">Forgot Password?</a>
             </div>
             <button type="submit" className="submit" disabled={submitting}>{submitting ? "Logging in..." : "Login"}</button>
           </form>
