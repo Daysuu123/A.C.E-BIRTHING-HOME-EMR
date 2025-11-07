@@ -109,7 +109,7 @@ function PatientPersonalInfoModal({ isOpen, onClose, onSaved, syncData }) {
       let v = String(value || "");
       v = v.replace(/[^+\d]/g, "");
       v = v.replace(/\+/g, (m, idx) => (idx === 0 ? "+" : ""));
-      const digits = v.replace(/\D/g, "").slice(0, 11);
+      const digits = v.replace(/\D/g, "").slice(0, 10);
       value = v.startsWith("+") ? (digits ? "+" + digits : "") : digits;
     }
     const next = { ...form, [name]: value };

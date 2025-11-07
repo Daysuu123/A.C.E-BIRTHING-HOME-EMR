@@ -15,6 +15,7 @@ function Patientrecords() {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [syncData, setSyncData] = useState(null); // Store synchronized data from registration
 
   useEffect(() => {
     fetchPatients();
@@ -100,13 +101,48 @@ function Patientrecords() {
       <PatientRegisterModal 
         isOpen={showRegisterModal} 
         onClose={() => setShowRegisterModal(false)} 
-        onComplete={() => { setShowRegisterModal(false); setShowInfoModal(true); }}
+        onComplete={(registrationData) => {
+          try {
+            setShowRegisterModal(false);
+            
+            // Validate registration data before setting sync data
+            if (!registrationData || typeof registrationData !== 'object') {
+              console.error('Invalid registration data received:', registrationData);
+              alert('Registration completed but data synchronization failed. Please fill in the information manually.');
+              setShowInfoModal(true);
+              return;
+            }
+            
+            // Validate required fields
+            if (!registrationData.lastName || !registrationData.firstName || !registrationData.middleName) {
+              console.warn('Incomplete registration data:', registrationData);
+              alert('Registration completed but some information is missing. Please fill in the remaining fields.');
+            }
+            
+            // Store sync data for personal info modal
+            setSyncData(registrationData);
+            
+            // Log successful data capture for debugging
+            console.log('Registration data captured successfully:', {
+              lastName: registrationData.lastName,
+              firstName: registrationData.firstName,
+              middleName: registrationData.middleName
+            });
+            
+            setShowInfoModal(true);
+          } catch (error) {
+            console.error('Error handling registration completion:', error);
+            alert('An error occurred during registration completion. Please fill in the information manually.');
+            setShowInfoModal(true);
+          }
+        }}
       />
 
       <PatientPersonalInfoModal
         isOpen={showInfoModal}
-        onClose={() => setShowInfoModal(false)}
-        onSaved={() => { setShowInfoModal(false); fetchPatients(); }}
+        onClose={() => { setShowInfoModal(false); setSyncData(null); }} // Clear sync data on close
+        onSaved={() => { setShowInfoModal(false); setSyncData(null); fetchPatients(); }} // Clear sync data after save
+        syncData={syncData} // Pass synchronized data from registration
       />
 
       <EditPatientInfoModal

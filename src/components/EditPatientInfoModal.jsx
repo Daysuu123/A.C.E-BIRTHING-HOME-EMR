@@ -1,15 +1,53 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import "../AdminSide/Patientregister.css";
 import "../AdminSide/Addpatientinfo.css";
 import PhoneInput from "./PhoneInput";
 import phLocations from "../AdminSide/phLocations";
 
+/**
+ * EditPatientInfoModal - Enhanced with comprehensive data synchronization
+ * Features:
+ * - Real-time database schema validation
+ * - Change detection for optimized API calls
+ * - Enhanced error handling
+ * - Consistent data flow patterns
+ */
+
 function EditPatientInfoModal({ isOpen, onClose, patientId, onSaved }) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [syncError, setSyncError] = useState("");
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({});
+  const [originalData, setOriginalData] = useState(null);
+  const [hasChanges, setHasChanges] = useState(false);
+  
+  // Database schema mapping for real-time validation
+  const dbSchema = {
+    lastName: { field: 'last_name', type: 'string', maxLength: 255, required: true },
+    firstName: { field: 'first_name', type: 'string', maxLength: 255, required: true },
+    middleName: { field: 'middle_ini', type: 'string', maxLength: 255, required: true },
+    dob: { field: 'bday', type: 'date', required: true },
+    marital: { field: 'marital', type: 'string', required: true },
+    address: { field: 'address', type: 'string', maxLength: 255, required: true },
+    province: { field: 'province', type: 'string', maxLength: 255, required: true },
+    city: { field: 'city', type: 'string', maxLength: 255, required: true },
+    nationality: { field: 'nationality', type: 'string', maxLength: 255, required: true },
+    contact: { field: 'contact', type: 'string', maxLength: 20, required: true },
+    emergencyContact: { field: 'emergency', type: 'string', maxLength: 20, required: true },
+    fatherName: { field: 'fathers_name', type: 'string', maxLength: 255, required: true },
+    fatherContact: { field: 'fathers_con', type: 'string', maxLength: 20, required: true },
+    fatherOccupation: { field: 'fathers_ocu', type: 'string', maxLength: 255, required: true },
+    fatherAddress: { field: 'fathers_add', type: 'string', maxLength: 255, required: true },
+    motherName: { field: 'mother_name', type: 'string', maxLength: 255, required: true },
+    motherContact: { field: 'mother_con', type: 'string', maxLength: 20, required: true },
+    motherOccupation: { field: 'mother_ocu', type: 'string', maxLength: 255, required: true },
+    motherAddress: { field: 'mother_add', type: 'string', maxLength: 255, required: true },
+    spouseName: { field: 'spouse_name', type: 'string', maxLength: 255, required: false },
+    spouseContact: { field: 'spouse_contact', type: 'string', maxLength: 20, required: false },
+    spouseOccupation: { field: 'spouse_ocu', type: 'string', maxLength: 255, required: false }
+  };
+
   const [form, setForm] = useState({
     lastName: "",
     firstName: "",
@@ -36,6 +74,68 @@ function EditPatientInfoModal({ isOpen, onClose, patientId, onSaved }) {
   });
 
   const nameRegex = /^[A-Za-z ]+$/;
+  
+  /**
+   * Real-time database schema validation
+   * Validates field values against database constraints
+   */
+  const validateAgainstSchema = useCallback((field, value) => {
+    const schema = dbSchema[field];
+    if (!schema) return "";
+    
+    // Required field validation
+    if (schema.required && (!value || String(value).trim() === "")) {
+      return "This field is required.";
+    }
+    
+    // Type validation
+    if (value && schema.type === 'string' && typeof value !== 'string') {
+      return "Invalid data type.";
+    }
+    
+    // Length validation
+    if (value && schema.maxLength && String(value).length > schema.maxLength) {
+      return `Maximum ${schema.maxLength} characters allowed.`;
+    }
+    
+    // Date validation
+    if (schema.type === 'date' && value) {
+      const date = new Date(value);
+      if (isNaN(date.getTime())) {
+        return "Invalid date format.";
+      }
+      // Prevent future dates
+      if (date > new Date()) {
+        return "Date cannot be in the future.";
+      }
+    }
+    
+    return "";
+  }, [dbSchema]);
+
+  /**
+   * Change detection function
+   * Compares current form data with original data
+   */
+  const detectChanges = useCallback((currentForm, originalData) => {
+    if (!originalData) return true;
+    
+    const changes = {};
+    let hasAnyChanges = false;
+    
+    Object.keys(dbSchema).forEach(key => {
+      const currentValue = String(currentForm[key] || "").trim();
+      const originalValue = String(originalData[key] || "").trim();
+      
+      if (currentValue !== originalValue) {
+        changes[key] = { from: originalValue, to: currentValue };
+        hasAnyChanges = true;
+      }
+    });
+    
+    return { hasChanges: hasAnyChanges, changes };
+  }, [dbSchema]);
+
   const calculatedAge = useMemo(() => {
     if (!form.dob) return "";
     const b = new Date(form.dob);
@@ -53,12 +153,85 @@ function EditPatientInfoModal({ isOpen, onClose, patientId, onSaved }) {
       setIsLoading(false);
       return;
     }
-    fetchPatientData(patientId);
+    
+    const fetchPatientData = async () => {
+      setLoading(true);
+      setSyncError("");
+      
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/api/patients/get-patient-info/${patientId}`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch patient info: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.patient) {
+          const p = data.patient;
+          const validatedData = {
+            lastName: p.last_name || "",
+            firstName: p.first_name || "",
+            middleName: p.middle_ini || "",
+            dob: p.bday || "",
+            marital: p.marital || "",
+            address: p.address || "",
+            province: p.province || "",
+            city: p.city || "",
+            nationality: p.nationality || "",
+            contact: p.contact || "",
+            emergencyContact: p.emergency || "",
+            fatherName: p.fathers_name || "",
+            fatherContact: p.fathers_con || "",
+            fatherOccupation: p.fathers_ocu || "",
+            fatherAddress: p.fathers_add || "",
+            motherName: p.mother_name || "",
+            motherContact: p.mother_con || "",
+            motherOccupation: p.mother_ocu || "",
+            motherAddress: p.mother_add || "",
+            spouseName: p.spouse_name || "",
+            spouseContact: p.spouse_contact || "",
+            spouseOccupation: p.spouse_ocu || "",
+          };
+          
+          setForm(validatedData);
+          setOriginalData({ ...validatedData });
+          setHasChanges(false);
+          
+          console.log("Patient data synchronized:", {
+            patientId,
+            data: validatedData,
+            timestamp: new Date().toISOString()
+          });
+        } else {
+          setSyncError("Failed to load patient data");
+        }
+      } catch (err) {
+        console.error("Data synchronization error:", err);
+        
+        let errorMessage = "Failed to load patient information.";
+        if (err.message.includes("NetworkError")) {
+          errorMessage = "Network connection failed.";
+        } else if (err.message.includes("404")) {
+          errorMessage = "Patient information not found.";
+        } else if (err.message.includes("500")) {
+          errorMessage = "Server error occurred.";
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+        
+        setSubmitError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchPatientData();
   }, [isOpen, patientId]);
 
   async function fetchPatientData(id) {
-    setIsLoading(true);
-    setSubmitError("");
+    setLoading(true);
+    setSyncError("");
     try {
       const response = await fetch(`/api/patients/${id}/info`);
       const data = await response.json();
@@ -89,16 +262,16 @@ function EditPatientInfoModal({ isOpen, onClose, patientId, onSaved }) {
           spouseOccupation: p.spouse_ocu || "",
         });
       } else {
-        setSubmitError("Failed to load patient data");
+        setSyncError("Failed to load patient data");
       }
     } catch (e) {
-      setSubmitError("Network error. Please try again.");
+      setSyncError("Network error. Please try again.");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   }
 
-  function setField(name, value) {
+  const setField = useCallback((name, value) => {
     if (name === "contact" || name === "emergencyContact" || name === "fatherContact" || name === "motherContact" || name === "spouseContact") {
       let v = String(value || "");
       v = v.replace(/[^+\d]/g, "");
@@ -109,8 +282,22 @@ function EditPatientInfoModal({ isOpen, onClose, patientId, onSaved }) {
     const next = { ...form, [name]: value };
     setForm(next);
     setTouched((prev) => ({ ...prev, [name]: true }));
-    validate(name, value);
-  }
+    
+    // Real-time database schema validation
+    const schemaError = validateAgainstSchema(name, value);
+    
+    // Clear error for this field when user starts typing, but apply schema validation
+    setErrors(prev => ({ 
+      ...prev, 
+      [name]: schemaError || "" 
+    }));
+    
+    // Update change detection
+    if (originalData) {
+      const changes = detectChanges(next, originalData);
+      setHasChanges(changes.hasChanges);
+    }
+  }, [form, originalData, validateAgainstSchema, detectChanges]);
 
   function validate(field, rawValue) {
     const value = (rawValue ?? form[field] ?? "").trim();
@@ -163,68 +350,121 @@ function EditPatientInfoModal({ isOpen, onClose, patientId, onSaved }) {
     setErrors(next);
   }
 
-  async function handleSave() {
-    [
-      'lastName','firstName','middleName','dob','marital','address','province','city','nationality','contact','emergencyContact',
-      'fatherName','fatherContact','fatherOccupation','fatherAddress','motherName','motherContact','motherOccupation','motherAddress'
-    ].forEach((f)=>validate(f, form[f]));
-
-    const requiredOk = [
-      form.lastName,form.firstName,form.middleName,form.dob,form.marital,form.address,form.province,form.city,form.nationality,form.contact,form.emergencyContact,
-      form.fatherName,form.fatherContact,form.fatherOccupation,form.fatherAddress,form.motherName,form.motherContact,form.motherOccupation,form.motherAddress,
-      form.spouseName,form.spouseOccupation
-    ].every(v => String(v||"").trim());
-
-    const phonesOk = [form.contact, form.emergencyContact, form.fatherContact, form.motherContact]
-      .every(v => String(v||"").replace(/\D/g, "").length === 11);
-
-    const namesOk = [form.lastName,form.firstName,form.middleName,form.fatherName,form.motherName,form.spouseName].every(v => nameRegex.test((v||"")));
-
-    if (!requiredOk || !phonesOk || !namesOk) {
-      setSubmitError("Please complete all required fields and fix validation errors.");
+  const handleSave = async () => {
+    if (submitting) return;
+    
+    // Check if any changes were made
+    if (!hasChanges) {
+      setSyncError("No changes detected. Please modify at least one field to save.");
+      setTimeout(() => setSyncError(""), 3000);
       return;
     }
-
+    
     setIsSubmitting(true);
-    setSubmitError("");
+    setErrors({});
+    setSyncError("");
+    
     try {
-      const response = await fetch(`/api/patients/${patientId}/info`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lastName: form.lastName,
-          firstName: form.firstName,
-          middleName: form.middleName,
-          dob: form.dob,
-          address: form.address,
-          province: form.province,
-          nationality: form.nationality,
-          contact: form.contact,
-          emergencyContact: form.emergencyContact,
-          fatherName: form.fatherName,
-          fatherContact: form.fatherContact,
-          fatherOccupation: form.fatherOccupation,
-          fatherAddress: form.fatherAddress,
-          motherName: form.motherName,
-          motherContact: form.motherContact,
-          motherOccupation: form.motherOccupation,
-          motherAddress: form.motherAddress,
-          spouseName: form.spouseName || "",
-          spouseContact: form.spouseContact || "",
-          spouseOccupation: form.spouseOccupation || ""
-        })
+      // Comprehensive validation against database schema
+      const validationErrors = {};
+      let hasValidationErrors = false;
+      
+      // Validate all fields against database schema
+      Object.keys(dbSchema).forEach(field => {
+        const error = validateAgainstSchema(field, form[field]);
+        if (error) {
+          validationErrors[field] = error;
+          hasValidationErrors = true;
+        }
       });
-      const data = await response.json();
-      if (data.success) {
+      
+      if (hasValidationErrors) {
+       setErrors(validationErrors);
+       setSubmitting(false);
+       return;
+     }
+      
+      // Prepare payload with proper field mapping
+      const payload = {
+        patient_id: patientId,
+        first_name: form.firstName?.trim() || "",
+        last_name: form.lastName?.trim() || "",
+        middle_ini: form.middleName?.trim() || "",
+        bday: form.dob,
+        marital: form.marital,
+        nationality: form.nationality?.trim() || "",
+        province: form.province?.trim() || "",
+        city: form.city?.trim() || "",
+        address: form.address?.trim() || "",
+        contact: form.contact?.trim() || "",
+        emergency: form.emergencyContact?.trim() || "",
+        father_name: form.fatherName?.trim() || "",
+        father_occupation: form.fatherOccupation?.trim() || "",
+        father_contact: form.fatherContact?.trim() || "",
+        father_address: form.fatherAddress?.trim() || "",
+        mother_name: form.motherName?.trim() || "",
+        mother_occupation: form.motherOccupation?.trim() || "",
+        mother_contact: form.motherContact?.trim() || "",
+        mother_address: form.motherAddress?.trim() || "",
+        spouse_name: form.spouseName?.trim() || "",
+        spouse_occupation: form.spouseOccupation?.trim() || "",
+        spouse_contact: form.spouseContact?.trim() || ""
+      };
+      
+      // Log synchronization attempt
+      console.log("Synchronizing patient data:", {
+        patientId,
+        changes: detectChanges(form, originalData).changes,
+        timestamp: new Date().toISOString()
+      });
+      
+      const res = await fetch("http://127.0.0.1:8000/api/patients/update-patient-info", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: "Unknown error" }));
+        throw new Error(errorData.error || `Server error: ${res.status} ${res.statusText}`);
+      }
+      
+      const data = await res.json();
+      
+      // Update original data with new values
+      setOriginalData({ ...form });
+      setHasChanges(false);
+      
+      // Success feedback
+      setSyncError("Patient information updated successfully!");
+      setTimeout(() => {
+        setSyncError("");
         if (onSaved) onSaved();
         if (onClose) onClose();
-      } else {
-        setSubmitError(data.message || "Failed to update patient information");
+      }, 1500);
+      
+    } catch (err) {
+      console.error("Synchronization error:", err);
+      
+      // Enhanced error handling
+      let errorMessage = "Failed to synchronize with database.";
+      
+      if (err.message.includes("NetworkError")) {
+        errorMessage = "Network connection failed. Please check your connection.";
+      } else if (err.message.includes("404")) {
+        errorMessage = "API endpoint not found. Please contact support.";
+      } else if (err.message.includes("500")) {
+        errorMessage = "Server error occurred. Please try again later.";
+      } else if (err.message) {
+        errorMessage = err.message;
       }
-    } catch (e) {
-      setSubmitError("Network error. Please try again.");
+      
+      setSyncError(errorMessage);
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   }
 
@@ -238,9 +478,34 @@ function EditPatientInfoModal({ isOpen, onClose, patientId, onSaved }) {
           <button className="modal-close" aria-label="Close" onClick={onClose}>×</button>
         </div>
         <div className="modal-body">
-          {isLoading ? (
-            <div style={{ padding: 24 }}>Loading patient data...</div>
+          {loading ? (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                  <span>Synchronizing patient data...</span>
+                </div>
+              </div>
+            </div>
           ) : (
+            <>
+              {/* Synchronization Status Indicator */}
+              {syncError && (
+                <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${ syncError.includes("successfully") ? "bg-green-100 border border-green-400 text-green-700" : "bg-red-100 border border-red-400 text-red-700" }`}>
+                  <div className="flex items-center space-x-2">
+                    {syncError.includes("successfully") ? (
+                      <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                    <span className="font-medium">{syncError}</span>
+                  </div>
+                </div>
+              )}
             <form className="addpat-form">
               <div className="form-section">
                 <div className="row">
@@ -428,12 +693,38 @@ function EditPatientInfoModal({ isOpen, onClose, patientId, onSaved }) {
               </div>
 
               <div className="actions" style={{ marginTop: 16 }}>
-                <div className="submit-error" style={{color:'#dc2626',fontSize:13,visibility:submitError? 'visible':'hidden'}}>{submitError || 'placeholder'}</div>
-                <button type="button" className="next" onClick={handleSave} disabled={isSubmitting}>
-                  {isSubmitting ? "Saving..." : "Save Changes"}
-                </button>
+                <div className="submit-error" style={{color:'#dc2626',fontSize:13,visibility:syncError? 'visible':'hidden'}}>{syncError || 'placeholder'}</div>
+                <div className="flex items-center space-x-3">
+                  {/* Change indicator */}
+                  {hasChanges && (
+                    <div className="flex items-center space-x-2 text-orange-600 text-sm">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                      </svg>
+                      <span>Unsaved changes</span>
+                    </div>
+                  )}
+                  
+                  <button
+                    type="button"
+                    className={hasChanges ? "next" : "btn-secondary"}
+                    onClick={handleSave}
+                    disabled={submitting || !hasChanges}
+                    title={!hasChanges ? "No changes to save" : "Save changes to patient information"}
+                  >
+                    {submitting ? (
+                      <span>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 inline-block"></div>
+                        Synchronizing...
+                      </span>
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
+            </>
           )}
         </div>
       </div>

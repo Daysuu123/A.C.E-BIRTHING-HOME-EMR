@@ -54,17 +54,19 @@ function PatientRegisterModal({ isOpen, onClose, onComplete }) {
     setSubmitError("");
 
     try {
+      const registrationData = {
+        lastName: form.lastName.trim(),
+        firstName: form.firstName.trim(),
+        middleInitial: form.middleInitial.trim(),
+        email: form.email.trim()
+      };
+
       const response = await fetch('/api/patients/register-account', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          lastName: form.lastName,
-          firstName: form.firstName,
-          middleInitial: form.middleInitial,
-          email: form.email
-        })
+        body: JSON.stringify(registrationData)
       });
 
       const data = await response.json();
@@ -74,9 +76,14 @@ function PatientRegisterModal({ isOpen, onClose, onComplete }) {
         localStorage.setItem('tempPatientId', data.patient_id);
         localStorage.setItem('tempPatientData', JSON.stringify(data.patient));
 
-        // If parent provided onComplete, let parent handle next step (open info modal)
-        if (typeof onComplete === 'function') {
-          onComplete();
+        // Pass registration data to parent component for synchronization
+        if (onComplete) {
+          onComplete({
+            lastName: registrationData.lastName,
+            firstName: registrationData.firstName,
+            middleName: registrationData.middleInitial, // Map middleInitial to middleName
+            patientId: data.patient_id
+          });
         } else {
           // Fallback to previous behavior: close and navigate to info route
           onClose();
