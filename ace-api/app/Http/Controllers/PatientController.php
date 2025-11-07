@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 use App\Models\PatientAccount;
+use App\Mail\PatientEmailVerification;
 
 class PatientController extends Controller
 {
@@ -15,13 +18,18 @@ class PatientController extends Controller
             'lastName' => 'required|string|max:255',
             'firstName' => 'required|string|max:255',
             'middleInitial' => 'required|string|max:1',
-            'email' => 'required|email|unique:patient_acc,email',
-            'password' => 'required|string|min:8'
+            'email' => 'required|email|unique:patient_acc,email'
         ]);
 
         try {
             // Generate patient_id (you can customize this logic)
             $patientId = DB::table('patient_acc')->max('patient_id') + 1;
+
+            // Generate a temporary password for the patient
+            $tempPassword = 'TempPass' . rand(1000, 9999);
+            
+            // Generate email verification token
+            $verificationToken = Str::random(64);
 
             $patient = PatientAccount::create([
                 'patient_id' => $patientId,
@@ -29,9 +37,14 @@ class PatientController extends Controller
                 'first_name' => $request->firstName,
                 'middle_ini' => $request->middleInitial,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => Hash::make($tempPassword),
+                'email_verification_token' => $verificationToken,
+                'is_email_verified' => false,
                 'date_created' => now()
             ]);
+            
+            // Send verification email
+            Mail::to($patient->email)->send(new PatientEmailVerification($patient, $verificationToken));
 
             return response()->json([
                 'success' => true,
@@ -41,7 +54,8 @@ class PatientController extends Controller
                     'id' => $patient->patient_id,
                     'name' => $patient->first_name . ' ' . $patient->last_name,
                     'email' => $patient->email
-                ]
+                ],
+                'temp_password' => $tempPassword // Include temp password in response for admin to share with patient
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -224,6 +238,43 @@ class PatientController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update patient information: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function verifyEmail($token)
+    {
+        try {
+            $patient = PatientAccount::where('email_verification_token', $token)->first();
+
+            if (!$patient) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid verification token'
+                ], 404);
+            }
+
+            if ($patient->is_email_verified) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Email already verified'
+                ]);
+            }
+
+            $patient->update([
+                'is_email_verified' => true,
+                'email_verified_at' => now(),
+                'email_verification_token' => null
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email verified successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to verify email: ' . $e->getMessage()
             ], 500);
         }
     }

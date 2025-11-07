@@ -23,7 +23,10 @@ class PatientAccount extends Authenticatable
         'first_name',
         'last_name',
         'middle_ini',
-        'date_created'
+        'date_created',
+        'email_verification_token',
+        'email_verified_at',
+        'is_email_verified'
     ];
 
     protected $hidden = [

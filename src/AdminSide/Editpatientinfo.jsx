@@ -37,7 +37,18 @@ function Editpatientinfo() {
   const [touched, setTouched] = useState({});
   const [submitError, setSubmitError] = useState("");
   const nameRegex = /^[A-Za-z ]+$/;
-  const phone11Digits = (v) => String(v || "").replace(/\D/g, "").length === 11;
+  const phone9Digits = (v) => String(v || "").replace(/\D/g, "").length === 9;
+
+  useEffect(() => {
+    const newErrors = {};
+    if (touched.spouseName && !nameRegex.test(form.spouseName)) {
+      newErrors.spouseName = "Spouse name must contain only letters and spaces.";
+    }
+    if (touched.spouseOccupation && !nameRegex.test(form.spouseOccupation)) {
+      newErrors.spouseOccupation = "Spouse occupation must contain only letters and spaces.";
+    }
+    setErrors(newErrors);
+  }, [form.spouseName, form.spouseOccupation, touched.spouseName, touched.spouseOccupation]);
 
   const calculatedAge = useMemo(() => {
     if (!form.dob) return "";
@@ -131,7 +142,7 @@ function Editpatientinfo() {
         next[field] = req(value) || (nameRegex.test(value) ? "" : "Letters and spaces only.");
         break;
       case "spouseName":
-        next[field] = value && !nameRegex.test(value) ? "Letters and spaces only." : "";
+        next[field] = (value ? "" : "This field is required.") || (nameRegex.test(value) ? "" : "Letters and spaces only.");
         break;
       case "address":
       case "nationality":
@@ -145,7 +156,7 @@ function Editpatientinfo() {
         }
         break;
       case "spouseOccupation":
-        next[field] = value && !nameRegex.test(value) ? "Letters and spaces only." : "";
+        next[field] = (value ? "" : "This field is required.") || (nameRegex.test(value) ? "" : "Letters and spaces only.");
         break;
       case "contact":
       case "emergencyContact":
@@ -189,13 +200,14 @@ function Editpatientinfo() {
     
     const requiredOk = [
       form.lastName,form.firstName,form.middleName,form.dob,form.address,form.province,form.nationality,form.contact,form.emergencyContact,
-      form.fatherName,form.fatherContact,form.fatherOccupation,form.fatherAddress,form.motherName,form.motherContact,form.motherOccupation,form.motherAddress
+      form.fatherName,form.fatherContact,form.fatherOccupation,form.fatherAddress,form.motherName,form.motherContact,form.motherOccupation,form.motherAddress,
+      form.spouseName,form.spouseOccupation
     ].every(v => String(v||"").trim());
     
     const phonesOk = [form.contact, form.emergencyContact, form.fatherContact, form.motherContact]
       .every(v => String(v||"").replace(/\D/g, "").length === 11);
     
-    const namesOk = [form.lastName,form.firstName,form.middleName,form.fatherName,form.motherName].every(v => nameRegex.test((v||"")));
+    const namesOk = [form.lastName,form.firstName,form.middleName,form.fatherName,form.motherName,form.spouseName].every(v => nameRegex.test((v||"")));
     
     if (!requiredOk || !phonesOk || !namesOk) {
       setSubmitError("Please complete all required fields and fix validation errors.");
@@ -288,7 +300,7 @@ function Editpatientinfo() {
             <label className="field">
               <span>Date of Birth:</span>
               <input type="date" name="dob" value={form.dob} onChange={(e)=>setField("dob", e.target.value)} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.dob && shouldShow('dob')? 'visible':'hidden'}}>{errors.dob || 'placeholder'}</div>
+              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.dob? 'visible':'hidden'}}>{errors.dob || 'placeholder'}</div>
             </label>
             <label className="field">
               <span>Age:</span>
@@ -303,7 +315,7 @@ function Editpatientinfo() {
                 <label><input type="radio" name="marital" checked={form.marital==='Widowed'} onChange={()=>setField('marital','Widowed')} /> Widowed</label>
                 <label><input type="radio" name="marital" checked={form.marital==='Divorced'} onChange={()=>setField('marital','Divorced')} /> Divorced</label>
               </div>
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.marital && shouldShow('marital')? 'visible':'hidden'}}>{errors.marital || 'placeholder'}</div>
+              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.marital? 'visible':'hidden'}}>{errors.marital || 'placeholder'}</div>
             </div>
           </div>
 
@@ -311,7 +323,7 @@ function Editpatientinfo() {
             <label className="field wide">
               <span>Address:</span>
               <input type="text" required name="address" value={form.address} onChange={(e)=>setField("address", e.target.value)} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.address && shouldShow('address')? 'visible':'hidden'}}>{errors.address || 'placeholder'}</div>
+              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.address? 'visible':'hidden'}}>{errors.address || 'placeholder'}</div>
             </label>
           </div>
 
@@ -326,7 +338,7 @@ function Editpatientinfo() {
             <label className="field">
               <span>Nationality:</span>
               <input type="text" required name="nationality" value={form.nationality} onChange={(e)=>setField("nationality", e.target.value)} pattern="[A-Za-z ]+" />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.nationality && shouldShow('nationality')? 'visible':'hidden'}}>{errors.nationality || 'placeholder'}</div>
+              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.nationality? 'visible':'hidden'}}>{errors.nationality || 'placeholder'}</div>
             </label>
           </div>
 
@@ -334,12 +346,12 @@ function Editpatientinfo() {
             <label className="field">
               <span>Contact:</span>
               <PhoneInput value={form.contact} onChange={(v)=>setField('contact', v)} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.contact && shouldShow('contact')? 'visible':'hidden'}}>{errors.contact || 'placeholder'}</div>
+              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.contact? 'visible':'hidden'}}>{errors.contact || 'placeholder'}</div>
             </label>
             <label className="field">
               <span>Emergency Contact:</span>
               <PhoneInput value={form.emergencyContact} onChange={(v)=>setField('emergencyContact', v)} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.emergencyContact && shouldShow('emergencyContact')? 'visible':'hidden'}}>{errors.emergencyContact || 'placeholder'}</div>
+              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.emergencyContact? 'visible':'hidden'}}>{errors.emergencyContact || 'placeholder'}</div>
             </label>
           </div>
         </div>
@@ -350,12 +362,12 @@ function Editpatientinfo() {
             <label className="field">
               <span>Father's Name:</span>
               <input type="text" required name="fatherName" value={form.fatherName} onChange={(e)=>setField("fatherName", e.target.value)} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.fatherName && shouldShow('fatherName')? 'visible':'hidden'}}>{errors.fatherName || 'placeholder'}</div>
+              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.fatherName? 'visible':'hidden'}}>{errors.fatherName || 'placeholder'}</div>
             </label>
             <label className="field">
               <span>Contact:</span>
               <PhoneInput value={form.fatherContact} onChange={(v)=>setField('fatherContact', v)} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.fatherContact && shouldShow('fatherContact')? 'visible':'hidden'}}>{errors.fatherContact || 'placeholder'}</div>
+              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.fatherContact? 'visible':'hidden'}}>{errors.fatherContact || 'placeholder'}</div>
             </label>
           </div>
           <div className="row">
@@ -378,24 +390,24 @@ function Editpatientinfo() {
             <label className="field">
               <span>Mother's Name:</span>
               <input type="text" required name="motherName" value={form.motherName} onChange={(e)=>setField("motherName", e.target.value)} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.motherName && shouldShow('motherName')? 'visible':'hidden'}}>{errors.motherName || 'placeholder'}</div>
+              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.motherName? 'visible':'hidden'}}>{errors.motherName || 'placeholder'}</div>
             </label>
             <label className="field">
               <span>Contact:</span>
               <PhoneInput value={form.motherContact} onChange={(v)=>setField('motherContact', v)} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.motherContact && shouldShow('motherContact')? 'visible':'hidden'}}>{errors.motherContact || 'placeholder'}</div>
+              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.motherContact? 'visible':'hidden'}}>{errors.motherContact || 'placeholder'}</div>
             </label>
           </div>
           <div className="row">
             <label className="field">
               <span>Occupation:</span>
               <input type="text" required name="motherOccupation" value={form.motherOccupation} onChange={(e)=>setField("motherOccupation", e.target.value)} pattern="[A-Za-z ]+" />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.motherOccupation && shouldShow('motherOccupation')? 'visible':'hidden'}}>{errors.motherOccupation || 'placeholder'}</div>
+              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.motherOccupation? 'visible':'hidden'}}>{errors.motherOccupation || 'placeholder'}</div>
             </label>
             <label className="field">
               <span>Mother's Address:</span>
               <input type="text" required name="motherAddress" value={form.motherAddress} onChange={(e)=>setField("motherAddress", e.target.value)} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.motherAddress && shouldShow('motherAddress')? 'visible':'hidden'}}>{errors.motherAddress || 'placeholder'}</div>
+              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.motherAddress? 'visible':'hidden'}}>{errors.motherAddress || 'placeholder'}</div>
             </label>
           </div>
         </div>
@@ -405,19 +417,19 @@ function Editpatientinfo() {
           <div className="row">
             <label className="field">
               <span>Spouse:</span>
-              <input type="text" name="spouseName" value={form.spouseName} onChange={(e)=>setField("spouseName", e.target.value)} />
+              <input type="text" required pattern="[A-Za-z ]+" name="spouseName" value={form.spouseName} onChange={(e)=>setField("spouseName", e.target.value)} onBlur={() => setTouched({...touched, spouseName: true})} />
               <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.spouseName? 'visible':'hidden'}}>{errors.spouseName || 'placeholder'}</div>
             </label>
             <label className="field">
               <span>Contact:</span>
               <PhoneInput value={form.spouseContact} onChange={(v)=>setField('spouseContact', v)} />
-              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.spouseContact && shouldShow('spouseContact')? 'visible':'hidden'}}>{errors.spouseContact || 'placeholder'}</div>
+              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.spouseContact? 'visible':'hidden'}}>{errors.spouseContact || 'placeholder'}</div>
             </label>
           </div>
           <div className="row">
             <label className="field">
               <span>Occupation:</span>
-              <input type="text" name="spouseOccupation" value={form.spouseOccupation} onChange={(e)=>setField("spouseOccupation", e.target.value)} pattern="[A-Za-z ]+" />
+              <input type="text" required pattern="[A-Za-z ]+" name="spouseOccupation" value={form.spouseOccupation} onChange={(e)=>setField("spouseOccupation", e.target.value)} onBlur={() => setTouched({...touched, spouseOccupation: true})} />
               <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.spouseOccupation? 'visible':'hidden'}}>{errors.spouseOccupation || 'placeholder'}</div>
             </label>
           </div>
