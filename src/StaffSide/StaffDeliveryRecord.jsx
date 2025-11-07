@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import StaffLayout from '../components/StaffLayout';
+import '../AdminSide/Staffregister.css';
+import '../AdminSide/Patientrecords.css';
+import '../AdminSide/Admindashboard.css';
 
 const StaffDeliveryRecord = () => {
   const [records, setRecords] = useState([]);
@@ -132,14 +135,17 @@ const StaffDeliveryRecord = () => {
   };
 
   return (
-    <StaffLayout>
-      <div style={{ padding: '16px' }}>
-        <h1>Delivery Records (Staff)</h1>
-        {error && <div style={{ color: 'red', marginBottom: '8px' }}>{error}</div>}
+    <StaffLayout title="Delivery Records">
+      {error && (
+        <div style={{ background:'#fff2f2', border:'1px solid #fca5a5', color:'#991b1b', padding:12, borderRadius:6, marginBottom:12 }}>
+          {error}
+        </div>
+      )}
 
-        <form onSubmit={addRecord} style={{ display: 'grid', gap: '8px', maxWidth: '520px' }}>
-          <label>
-            Patient
+      <form className="form" onSubmit={addRecord}>
+        <div className="row">
+          <label className="field wide">
+            <span>Patient</span>
             <select
               name="patient_id"
               value={form.patient_id}
@@ -155,8 +161,11 @@ const StaffDeliveryRecord = () => {
             </select>
             {searching && <div style={{ fontSize:12 }}>Loading patients...</div>}
           </label>
-          <label>
-            Delivery Date & Time
+        </div>
+
+        <div className="row">
+          <label className="field">
+            <span>Delivery Date & Time</span>
             <input
               type="datetime-local"
               name="delivery_date_time"
@@ -165,8 +174,8 @@ const StaffDeliveryRecord = () => {
               required
             />
           </label>
-          <label>
-            Delivery Type
+          <label className="field">
+            <span>Delivery Type</span>
             <input
               type="text"
               name="delivery_type"
@@ -176,33 +185,44 @@ const StaffDeliveryRecord = () => {
               required
             />
           </label>
-          <label>
-            Complications
+          <label className="field wide">
+            <span>Complications</span>
             <textarea
               name="complications"
               value={form.complications}
               onChange={onChange}
               placeholder="Optional details"
+              rows={3}
             />
           </label>
-          <button type="submit" disabled={loading}>
+        </div>
+
+        <div className="actions">
+          <button type="submit" className="next" disabled={loading}>
             {loading ? 'Saving...' : 'Add Delivery Record'}
           </button>
-        </form>
-
-        <hr style={{ margin: '16px 0' }} />
-
-        <h2>Existing Records</h2>
-        <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:12 }}>
-          <input
-            type="text"
-            placeholder="Search records by patient name or ID"
-            value={recordsSearchText}
-            onChange={(e) => setRecordsSearchText(e.target.value)}
-          />
-          <button type="button" onClick={() => setRecordsQuery(recordsSearchText.trim())}>Search</button>
-          <button type="button" onClick={() => { setRecordsSearchText(''); setRecordsQuery(''); }}>Clear</button>
+          <button
+            type="button"
+            className="clear-btn"
+            onClick={() => setForm({ patient_id: '', delivery_date_time: '', delivery_type: '', complications: '' })}
+          >
+            Clear
+          </button>
         </div>
+      </form>
+
+      <h2 style={{ marginTop:16 }}>Existing Records</h2>
+      <div className="toolbar">
+        <input
+          className="search"
+          type="text"
+          placeholder="Search: Patient ID or Patient Name"
+          value={recordsSearchText}
+          onChange={(e) => setRecordsSearchText(e.target.value)}
+        />
+        <button className="action-btn" type="button" onClick={() => setRecordsQuery(recordsSearchText.trim())}>Search</button>
+        <button className="action-btn" type="button" onClick={() => { setRecordsSearchText(''); setRecordsQuery(''); }}>Clear</button>
+      </div>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
@@ -238,7 +258,6 @@ const StaffDeliveryRecord = () => {
             </tbody>
           </table>
         </div>
-      </div>
     </StaffLayout>
   );
 };

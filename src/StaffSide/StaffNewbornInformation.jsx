@@ -1,5 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import StaffLayout from "../components/StaffLayout";
+import '../AdminSide/Staffregister.css';
+import '../AdminSide/Patientrecords.css';
+import '../AdminSide/Admindashboard.css';
 
 function StaffNewbornInformation() {
   const [items, setItems] = useState([]);
@@ -131,11 +134,10 @@ function StaffNewbornInformation() {
         </div>
       )}
 
-      <section className="card" style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 6, padding: 16, marginBottom: 16 }}>
-        <h2 style={{ marginTop: 0 }}>Add Newborn Information</h2>
-        <form onSubmit={handleSubmit} style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
-          <label>
-            <div>Patient</div>
+      <form className="form" onSubmit={handleSubmit}>
+        <div className="row">
+          <label className="field">
+            <span>Patient</span>
             <select name="patient_id" value={form.patient_id} onChange={handleChange} required>
               <option value="">Select a patient...</option>
               {patients.map((p) => (
@@ -144,50 +146,61 @@ function StaffNewbornInformation() {
                 </option>
               ))}
             </select>
-            {searching && <span style={{ fontSize:12 }}>Loading patients...</span>}
+            {searching && <div style={{ fontSize:12 }}>Loading patients...</div>}
           </label>
-          <label>
-            <div>Delivery Record ID</div>
+          <label className="field">
+            <span>Delivery Record ID</span>
             <input type="number" name="delivery_record_id" value={form.delivery_record_id} onChange={handleChange} required />
           </label>
-          <label>
-            <div>Gender</div>
+          <label className="field">
+            <span>Gender</span>
             <select name="gender" value={form.gender} onChange={handleChange} required>
               <option value="">Select gender</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
           </label>
-          <label>
-            <div>Weight (kg)</div>
+        </div>
+
+        <div className="row">
+          <label className="field">
+            <span>Weight (kg)</span>
             <input type="number" step="0.01" name="weight" value={form.weight} onChange={handleChange} required />
           </label>
-          <label>
-            <div>Length (cm)</div>
+          <label className="field">
+            <span>Length (cm)</span>
             <input type="number" step="0.01" name="length" value={form.length} onChange={handleChange} required />
           </label>
-          <label style={{ gridColumn:"1 / -1" }}>
-            <div>Complications</div>
+          <label className="field wide">
+            <span>Complications</span>
             <textarea name="complications" value={form.complications} onChange={handleChange} rows={3} />
           </label>
-          <div style={{ gridColumn: "1 / -1", display: "flex", gap: 8 }}>
-            <button type="submit" className="btn-primary">Save</button>
-            <button type="button" onClick={() => setForm({ patient_id:"", delivery_record_id:"", gender:"", weight:"", length:"", complications:"" })}>Clear</button>
-          </div>
-        </form>
-      </section>
+        </div>
+
+        <div className="actions">
+          <button type="submit" className="next">Save</button>
+          <button
+            type="button"
+            className="clear-btn"
+            onClick={() => setForm({ patient_id:"", delivery_record_id:"", gender:"", weight:"", length:"", complications:"" })}
+          >
+            Clear
+          </button>
+        </div>
+      </form>
 
       <section className="card" style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 6, padding: 16 }}>
         <h2 style={{ marginTop: 0 }}>Existing Records</h2>
-        <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:12 }}>
+        <div className="toolbar">
           <input
+            className="search"
             type="text"
-            placeholder="Search records by patient name or ID"
+            placeholder="Search: Patient ID or Patient Name"
             value={recordsSearchText}
             onChange={(e) => setRecordsSearchText(e.target.value)}
           />
-          <button type="button" onClick={() => setRecordsQuery(recordsSearchText.trim())}>Search</button>
-          <button type="button" onClick={() => { setRecordsSearchText(''); setRecordsQuery(''); }}>Clear</button>
+          <button className="action-btn" type="button" onClick={() => setRecordsQuery(recordsSearchText.trim())}>Search</button>
+          <button className="action-btn" type="button" onClick={() => { setRecordsSearchText(''); setRecordsQuery(''); }}>Clear</button>
         </div>
         {loading ? (
           <div>Loading...</div>
