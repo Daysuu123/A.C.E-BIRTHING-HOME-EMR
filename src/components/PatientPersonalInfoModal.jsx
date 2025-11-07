@@ -54,7 +54,7 @@ function PatientPersonalInfoModal({ isOpen, onClose, onSaved }) {
       let v = String(value || "");
       v = v.replace(/[^+\d]/g, "");
       v = v.replace(/\+/g, (m, idx) => (idx === 0 ? "+" : ""));
-      const digits = v.replace(/\D/g, "").slice(0, 9);
+      const digits = v.replace(/\D/g, "").slice(0, 11);
       value = v.startsWith("+") ? (digits ? "+" + digits : "") : digits;
     }
     const next = { ...form, [name]: value };
@@ -102,7 +102,7 @@ function PatientPersonalInfoModal({ isOpen, onClose, onSaved }) {
       case "spouseContact": {
         if (!value) { next[field] = "This field is required."; break; }
         const digits = String(value || "").replace(/\D/g, "");
-        next[field] = digits.length === 9 ? "" : "Must be 9 Digits.";
+        next[field] = digits.length === 11 ? "" : "Must be 11 Digits.";
         break;
       }
       case "dob":
@@ -134,7 +134,7 @@ function PatientPersonalInfoModal({ isOpen, onClose, onSaved }) {
     ].every(v => String(v||"").trim());
 
     const phonesOk = [form.contact, form.emergencyContact, form.fatherContact, form.motherContact]
-      .every(v => String(v||"").replace(/\D/g, "").length === 9);
+      .every(v => String(v||"").replace(/\D/g, "").length === 11);
 
     const namesOk = [form.lastName,form.firstName,form.middleName,form.fatherName,form.motherName,form.spouseName]
       .every(v => nameRegex.test((v||"")));

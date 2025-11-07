@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\StaffEmailVerification;
+use App\Models\StaffAccount;
 use Carbon\Carbon; // added
 
 class StaffController extends Controller
@@ -49,29 +53,39 @@ class StaffController extends Controller
             'lastName' => 'required|string|max:255',
             'middleInitial' => 'required|string|max:1',
             'position' => 'required|string|max:255',
-            'password' => 'required|string|min:4'
+            'password' => 'required|string|min:4',
+            'email' => 'required|email|unique:staffs_account,email'
         ]);
 
         try {
             $nextId = (int) (DB::table('staffs_account')->max('staff_id') ?? 0) + 1;
-            DB::table('staffs_account')->insert([
+            $verificationToken = Str::random(64);
+            
+            $staff = StaffAccount::create([
                 'staff_id' => $nextId,
                 'staffs_firs' => $request->firstName,
                 'staffs_sur' => $request->lastName,
                 'staffs_mi' => $request->middleInitial,
                 'position' => $request->position,
+                'email' => $request->email,
                 'password' => Hash::make($request->password),
+                'email_verification_token' => $verificationToken,
+                'is_email_verified' => false,
                 'date_created' => now(),
             ]);
 
+            // Send verification email
+            Mail::to($request->email)->send(new StaffEmailVerification($staff, $verificationToken));
+
             return response()->json([
                 'success' => true,
-                'message' => 'Staff account created successfully',
+                'message' => 'Staff account created successfully. Please check your email to verify your account.',
                 'staff' => [
                     'staff_id' => $nextId,
                     'staffs_firs' => $request->firstName,
                     'staffs_sur' => $request->lastName,
                     'position' => $request->position,
+                    'email' => $request->email,
                 ]
             ]);
         } catch (\Exception $e) {
@@ -113,6 +127,43 @@ class StaffController extends Controller
             return response()->json(['success' => true, 'message' => 'Staff deleted']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Failed to delete staff: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function verifyEmail($token)
+    {
+        try {
+            $staff = StaffAccount::where('email_verification_token', $token)->first();
+
+            if (!$staff) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid verification token.'
+                ], 404);
+            }
+
+            if ($staff->is_email_verified) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Email already verified.'
+                ], 400);
+            }
+
+            $staff->update([
+                'is_email_verified' => true,
+                'email_verified_at' => now(),
+                'email_verification_token' => null
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email verified successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to verify email: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

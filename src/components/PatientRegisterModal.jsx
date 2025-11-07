@@ -5,13 +5,12 @@ import { useNavigate } from "react-router-dom";
 function PatientRegisterModal({ isOpen, onClose, onComplete }) {
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
-  const [form, setForm] = useState({ lastName: "", firstName: "", middleInitial: "", email: "", password: "", confirmPassword: "" });
+  const [form, setForm] = useState({ lastName: "", firstName: "", middleInitial: "", email: "" });
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const pwRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
   const nameRegex = /^[A-Za-z]+$/;
   const miRegex = /^[A-Za-z]$/;
 
@@ -27,12 +26,6 @@ function PatientRegisterModal({ isOpen, onClose, onComplete }) {
     if (field === "email") {
       newErrors.email = v ? (emailRegex.test(v) ? "" : "Enter a valid email.") : "Email is required.";
     }
-    if (field === "password") {
-      newErrors.password = v ? (pwRegex.test(v) ? "" : "Password must contain at least 8 characters, 1 uppercase letter, 1 number, and 1 special character.") : "Password is required.";
-    }
-    if (field === "confirmPassword") {
-      newErrors.confirmPassword = v ? (v === currentForm.password ? "" : "Passwords do not match.") : "Please confirm your password.";
-    }
     setErrors(newErrors);
     return !newErrors[field];
   }
@@ -44,16 +37,14 @@ function PatientRegisterModal({ isOpen, onClose, onComplete }) {
   }
 
   async function handleNext() {
-    const allFields = ["lastName", "firstName", "middleInitial", "email", "password", "confirmPassword"];
+    const allFields = ["lastName", "firstName", "middleInitial", "email"];
     allFields.forEach(field => validate(field, form[field]));
     
     const anyEmpty = allFields.some(field => !String(form[field] || "").trim());
     const emailOk = emailRegex.test(form.email || "");
-    const pwOk = pwRegex.test(form.password || "");
-    const matchOk = form.password === form.confirmPassword;
     const namesOk = nameRegex.test(form.lastName || "") && nameRegex.test(form.firstName || "") && miRegex.test(form.middleInitial || "");
     
-    const ok = !anyEmpty && emailOk && pwOk && matchOk && namesOk;
+    const ok = !anyEmpty && emailOk && namesOk;
     if (!ok) {
       setSubmitError("Please complete all required fields and fix validation errors.");
       return;
@@ -72,8 +63,7 @@ function PatientRegisterModal({ isOpen, onClose, onComplete }) {
           lastName: form.lastName,
           firstName: form.firstName,
           middleInitial: form.middleInitial,
-          email: form.email,
-          password: form.password
+          email: form.email
         })
       });
 
@@ -137,23 +127,6 @@ function PatientRegisterModal({ isOpen, onClose, onComplete }) {
                 <span>Email:</span>
                 <input name="email" type="email" required value={form.email} onChange={onChange} />
                 <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.email? 'visible':'hidden'}}>{errors.email || 'placeholder'}</div>
-              </label>
-            </div>
-
-            <div className="row">
-              <label className="field">
-                <span>Password:</span>
-                <input name="password" type={show ? "text" : "password"} required value={form.password} onChange={onChange} pattern="(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}" />
-                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.password? 'visible':'hidden'}}>{errors.password || 'placeholder'}</div>
-              </label>
-              <label className="field">
-                <span>Confirm Password:</span>
-                <input name="confirmPassword" type={show ? "text" : "password"} required minLength={8} value={form.confirmPassword} onChange={onChange} />
-                <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.confirmPassword? 'visible':'hidden'}}>{errors.confirmPassword || 'placeholder'}</div>
-              </label>
-              <label className="show">
-                <input type="checkbox" onChange={(e) => setShow(e.target.checked)} />
-                Show Password
               </label>
             </div>
 

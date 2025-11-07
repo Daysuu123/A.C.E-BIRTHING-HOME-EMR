@@ -22,7 +22,11 @@ class StaffAccount extends Authenticatable
         'staffs_firs',
         'staffs_sur',
         'staffs_mi',
-        'position'
+        'position',
+        'email',
+        'email_verification_token',
+        'email_verified_at',
+        'is_email_verified'
     ];
 
     protected $hidden = [

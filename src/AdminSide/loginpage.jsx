@@ -51,7 +51,7 @@ function LoginPage() {
         result = await response.json();
       } catch (_) {
         // Fallback: allow dev login without backend
-        devBypass(username, password, "Server returned a non-JSON response.");
+        devBypass(username, password, "Wrong Password or Username.");
         return;
       }
 

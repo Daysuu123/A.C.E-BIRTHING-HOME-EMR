@@ -13,7 +13,6 @@ function Staffregister() {
   const miRegex = /^[A-Za-z]$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.com$/i;
   const pwRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-  const phone9Digits = (v) => String(v || "").replace(/\D/g, "").length === 9;
 
   function validate(field, value, current = { ...form, [field]: value }) {
     const v = String(value || "").trim();
@@ -28,9 +27,6 @@ function Staffregister() {
         break;
       case "email":
         next.email = v ? (emailRegex.test(v) ? "" : "Enter a valid .com email.") : "This field is required.";
-        break;
-      case "phone":
-        next.phone = v ? (phone9Digits(v) ? "" : "Must be 9 digits.") : "This field is required.";
         break;
       case "password":
         next.password = pwRegex.test(v) ? "" : "At least 8 chars, 1 uppercase, 1 number, 1 special.";
@@ -57,7 +53,7 @@ function Staffregister() {
     validate(name, value, next);
     setShowSubmitError(false);
     // clear only when all fields complete/valid
-    const fields = ["lastName","firstName","middleInitial","email","password","confirmPassword"];
+    const fields = ["lastName","firstName","middleInitial","email","password","confirmPassword","position"];
     const allFilled = fields.every(f => String(next[f]||"").trim());
     const allValid =
       nameRegex.test(next.lastName||"") &&
@@ -65,7 +61,8 @@ function Staffregister() {
       miRegex.test(next.middleInitial||"") && (String(next.middleInitial||"").length === 1) &&
       emailRegex.test(next.email||"") &&
       pwRegex.test(next.password||"") &&
-      next.password === next.confirmPassword;
+      next.password === next.confirmPassword &&
+      next.position !== "";
     if (allFilled && allValid) {/* nothing extra */}
   }
 
@@ -102,20 +99,13 @@ function Staffregister() {
               <option value="">Select Position</option>
               <option value="Midwife">Midwife</option>
               <option value="Doctor">Doctor</option>
-              <option value="Admin">Admin</option>
               <option value="Nurse">Nurse</option>
             </select>
             <div style={{marginTop:4,minHeight:16}} />
           </label>
-          <label class="field">
-            <span>Phone:</span>
-            <PhoneInput value={form.phone} onChange={(v) => {
-              const next = { ...form, phone: v };
-              setForm(next);
-              validate("phone", v, next);
-              setShowSubmitError(false);
-            }} />
-            <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.phone? 'visible':'hidden'}}>{errors.phone || 'placeholder'}</div>
+          <label className="field">
+            <PhoneInput value={form.phone} onChange={(v) => setForm((prev) => ({ ...prev, phone: v }))} />
+            <div style={{marginTop:4,minHeight:16}} />
           </label>
         </div>
 
@@ -144,10 +134,10 @@ function Staffregister() {
             type="button"
             className="next"
             onClick={async () => {
-              ["lastName","firstName","middleInitial","email","phone","password","confirmPassword"].forEach((f)=>validate(f, form[f]));
-              const required = ["lastName","firstName","middleInitial","phone","password","confirmPassword","position"];
+              ["lastName","firstName","middleInitial","email","password","confirmPassword","position"].forEach((f)=>validate(f, form[f]));
+              const required = ["lastName","firstName","middleInitial","email","password","confirmPassword","position"];
               const anyEmpty = required.some(f => !String(form[f]||"").trim());
-              if (anyEmpty || form.password !== form.confirmPassword || !phone9Digits(form.phone)) {
+              if (anyEmpty || form.password !== form.confirmPassword) {
                 setShowSubmitError(true);
                 return;
               }
@@ -159,7 +149,6 @@ function Staffregister() {
                     lastName: form.lastName,
                     firstName: form.firstName,
                     middleInitial: form.middleInitial,
-                    phone: form.phone,
                     position: form.position,
                     password: form.password
                   })

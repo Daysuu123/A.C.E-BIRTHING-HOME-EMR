@@ -8,16 +8,23 @@ const PhoneInput = ({ value, onChange, placeholder, className, ...props }) => {
   // Normalize incoming value to digits only
   const digits = String(value || '').replace(/\D/g, '');
 
-  // Determine the national (local) part to show in the input
+  // Determine the national (local) part to show in the input (without leading 0)
   const nationalPart = useMemo(() => {
     if (!digits) return '';
-    if (digits.startsWith('63')) return digits.slice(2);
-    return digits;
+    // If value was stored as 09xxxxxxxxx (11 digits starting with 0)
+    if (digits.length === 11 && digits.startsWith('0')) return digits.slice(1);
+    // If value looks like it has country code 63 + 9xxxxxxxxx (12 digits)
+    if (digits.length >= 12 && digits.startsWith('63')) return digits.slice(digits.startsWith('63') ? 2 : 0).slice(0, 10);
+    // If user stored only the national 10-digit part (starting with 9)
+    if (digits.length === 10) return digits;
+    // Fallback: if shorter, return as-is
+    return digits.slice(0, 10);
   }, [digits]);
 
   const handleInnerChange = (e) => {
-    let v = String(e.target.value || '').replace(/\D/g, '').slice(0, 9);
-    const stored = v ? ('63' + v) : '';
+    let v = String(e.target.value || '').replace(/\D/g, '').slice(0, 10);
+    // Convert to stored local format: leading 0 + nationalPart (total 11 digits)
+    const stored = v ? ('0' + v) : '';
     if (onChange) onChange(stored);
   };
 
@@ -30,7 +37,7 @@ const PhoneInput = ({ value, onChange, placeholder, className, ...props }) => {
         onChange={handleInnerChange}
         placeholder={placeholder || "9XXXXXXXXX"}
         className="phone-field"
-        maxLength={9}
+        maxLength={10}
         {...props}
       />
     </div>

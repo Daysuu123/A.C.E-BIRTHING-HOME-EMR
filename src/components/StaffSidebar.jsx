@@ -5,9 +5,9 @@ function StaffSidebar() {
   const location = useLocation();
   
   const navItems = [
-    { path: "/staff/landing", label: "Dashboard", icon: "🏠" },
-    { path: "/staff/manage-patient", label: "Patients", icon: "📋" },
-    { path: "/staff/manage-records", label: "Records", icon: "📊" },
+    { path: "/staff/landing", label: "Dashboard", icon: "" },
+    { path: "/staff/manage-patient", label: "Patients", icon: "" },
+    { path: "/staff/manage-records", label: "Records", icon: "" },
   ];
 
   const isActive = (path) => {
