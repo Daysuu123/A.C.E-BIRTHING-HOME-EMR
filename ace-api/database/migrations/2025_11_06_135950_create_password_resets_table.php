@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('password_resets', function (Blueprint $table) {
             $table->id();
+            $table->string('email')->index();
+            $table->string('code', 10);
+            $table->string('token', 128)->unique();
+            $table->string('account_type')->nullable();
+            $table->timestamp('expires_at');
             $table->timestamps();
         });
     }

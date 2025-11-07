@@ -16,9 +16,8 @@ class ResetPasswordMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(public string $code, public \Carbon\Carbon $expiresAt)
     {
-        //
     }
 
     /**
@@ -27,7 +26,7 @@ class ResetPasswordMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reset Password Mail',
+            subject: 'Reset your password',
         );
     }
 
@@ -37,7 +36,11 @@ class ResetPasswordMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.reset-password',
+            with: [
+                'code' => $this->code,
+                'expiresAt' => $this->expiresAt,
+            ],
         );
     }
 

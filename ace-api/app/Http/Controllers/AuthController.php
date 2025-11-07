@@ -54,8 +54,22 @@ class AuthController extends Controller
             ]);
         }
 
-        // Check staff accounts (no email field, using staff_id as identifier)
-        $staff = StaffAccount::where('staff_id', $email)->first();
+        // Check staff accounts by Name (supports "First Last" or "Last, First"),
+        // with fallback to staff_id for backward compatibility.
+        $normalized = trim($email);
+        $normalizedLower = mb_strtolower(preg_replace('/\s+/', ' ', $normalized));
+
+        $staff = StaffAccount::whereRaw("LOWER(CONCAT(staffs_firs, ' ', staffs_sur)) = ?", [$normalizedLower])->first();
+
+        if (!$staff) {
+            // Try "Last, First" format
+            $staff = StaffAccount::whereRaw("LOWER(CONCAT(staffs_sur, ', ', staffs_firs)) = ?", [$normalizedLower])->first();
+        }
+
+        if (!$staff) {
+            // Fallback: allow legacy login using staff_id entered in the username field
+            $staff = StaffAccount::where('staff_id', $normalized)->first();
+        }
 
         if ($staff && Hash::check($password, $staff->password)) {
             return response()->json([
@@ -63,7 +77,7 @@ class AuthController extends Controller
                 'message' => 'Login successful',
                 'user' => [
                     'id' => $staff->staff_id,
-                    'email' => $staff->staff_id,
+                    'email' => $staff->email ?? $staff->staff_id,
                     'name' => $staff->staffs_firs . ' ' . $staff->staffs_sur,
                     'role' => 'staff',
                     'type' => 'staff',

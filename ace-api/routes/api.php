@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PregnancyHistoryController;
 use App\Http\Controllers\DeliveryRecordController;
 use App\Http\Controllers\NewbornInformationController;
+use App\Http\Controllers\ResetPasswordController;
 
 // Resource routes
 Route::apiResource('pregnancy-histories', PregnancyHistoryController::class);
@@ -16,6 +17,11 @@ Route::apiResource('delivery-records', DeliveryRecordController::class);
 Route::apiResource('newborn-information', NewbornInformationController::class);
 
 Route::post('/login', [AuthController::class, 'login']);
+
+// Auth password reset routes
+Route::post('/auth/send-reset-code', [ResetPasswordController::class, 'sendResetCode']);
+Route::post('/auth/confirm-reset-code', [ResetPasswordController::class, 'confirmResetCode']);
+Route::post('/auth/change-password', [ResetPasswordController::class, 'changePassword']);
 
 // Test route
 Route::get('/test', function() {
@@ -47,7 +53,6 @@ Route::delete('/records/{id}', [RecordsController::class, 'destroy']);
 Route::get('/dashboard/monthly-patients', [DashboardController::class, 'getMonthlyPatients']);
 Route::get('/dashboard/monthly-checkups', [DashboardController::class, 'getMonthlyCheckups']);
 Route::get('/dashboard/checkup-types', [DashboardController::class, 'getCheckupTypes']);
-
 
 
 
