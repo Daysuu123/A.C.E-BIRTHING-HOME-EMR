@@ -54,22 +54,11 @@ class AuthController extends Controller
             ]);
         }
 
-        // Check staff accounts by Name (supports "First Last" or "Last, First"),
-        // with fallback to staff_id for backward compatibility.
+        // Staff login: use only first name (staffs_firs) as username
         $normalized = trim($email);
-        $normalizedLower = mb_strtolower(preg_replace('/\s+/', ' ', $normalized));
+        $normalizedLower = mb_strtolower($normalized);
 
-        $staff = StaffAccount::whereRaw("LOWER(CONCAT(staffs_firs, ' ', staffs_sur)) = ?", [$normalizedLower])->first();
-
-        if (!$staff) {
-            // Try "Last, First" format
-            $staff = StaffAccount::whereRaw("LOWER(CONCAT(staffs_sur, ', ', staffs_firs)) = ?", [$normalizedLower])->first();
-        }
-
-        if (!$staff) {
-            // Fallback: allow legacy login using staff_id entered in the username field
-            $staff = StaffAccount::where('staff_id', $normalized)->first();
-        }
+        $staff = StaffAccount::whereRaw('LOWER(staffs_firs) = ?', [$normalizedLower])->first();
 
         if ($staff && Hash::check($password, $staff->password)) {
             return response()->json([

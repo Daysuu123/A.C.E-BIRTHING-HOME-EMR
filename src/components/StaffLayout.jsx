@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StaffSidebar from "./StaffSidebar";
 import logoImg from "../assets/ACElogo.png";
@@ -17,6 +17,20 @@ function StaffLayout({ children, title = "Dashboard" }) {
   };
   const cancelLogout = () => setShowLogoutConfirm(false);
 
+  const auth = useMemo(() => {
+    try {
+      const raw = localStorage.getItem("auth");
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }, []);
+  const welcomeText = useMemo(() => {
+    const name = auth?.name?.trim();
+    if (name && name.length > 0) return `Welcome, ${name}`;
+    return "Welcome, Staff";
+  }, [auth]);
+
   return (
     <div className="admin-shell">
       <header className="topbar">
@@ -32,7 +46,7 @@ function StaffLayout({ children, title = "Dashboard" }) {
           <span className="brand-name">A.C.E Birthing Home</span>
         </div>
         <div className="topbar-right">
-          <span className="welcome">Welcome, Staff</span>
+          <span className="welcome">{welcomeText}</span>
           <button className="logout" onClick={handleLogoutClick}>Logout</button>
         </div>
       </header>
