@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Models\PatientAccount;
 use App\Mail\PatientEmailVerification;
+use Illuminate\Support\Facades\Log;
 
 class PatientController extends Controller
 {
@@ -43,10 +44,16 @@ class PatientController extends Controller
                 'date_created' => now()
             ]);
             
-            // Send verification email
-            Mail::to($patient->email)->send(new PatientEmailVerification($patient, $verificationToken));
+            // Try to send verification email, but don't fail the whole request in dev
+            $emailSendError = null;
+            try {
+                Mail::to($patient->email)->send(new PatientEmailVerification($patient, $verificationToken));
+            } catch (\Throwable $mailEx) {
+                $emailSendError = $mailEx->getMessage();
+                Log::error('Failed to send patient verification email: ' . $emailSendError);
+            }
 
-            return response()->json([
+            $response = [
                 'success' => true,
                 'message' => 'Patient account created successfully',
                 'patient_id' => $patientId,
@@ -56,7 +63,13 @@ class PatientController extends Controller
                     'email' => $patient->email
                 ],
                 'temp_password' => $tempPassword // Include temp password in response for admin to share with patient
-            ]);
+            ];
+            if ($emailSendError) {
+                // Include a hint so the UI can show a non-blocking warning
+                $response['email_send_error'] = $emailSendError;
+                $response['message'] .= ' (verification email not sent)';
+            }
+            return response()->json($response);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

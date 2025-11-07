@@ -3,7 +3,7 @@ import "../AdminSide/Patientregister.css";
 import { useNavigate } from "react-router-dom";
 import { postJson } from "../lib/api";
 
-function StaffPatientRegisterModal({ isOpen, onClose }) {
+function StaffPatientRegisterModal({ isOpen, onClose, onComplete }) {
   const navigate = useNavigate();
   const [form, setForm] = useState({ lastName: "", firstName: "", middleInitial: "", email: "" });
   const [errors, setErrors] = useState({});
@@ -71,12 +71,33 @@ function StaffPatientRegisterModal({ isOpen, onClose }) {
         // Store patient data for the next step
         localStorage.setItem('tempPatientId', data.patient_id);
         localStorage.setItem('tempPatientData', JSON.stringify(data.patient));
-        
-        // Close modal and navigate to patient info page
-        onClose();
-        navigate('/staff/add-patient-info');
+
+        // Prefer parent-driven flow like PatientRegisterModal to open info modal
+        const registrationData = {
+          lastName: (form.lastName || '').trim(),
+          firstName: (form.firstName || '').trim(),
+          middleName: (form.middleInitial || '').trim(),
+          patientId: data.patient_id
+        };
+
+        if (typeof onComplete === 'function') {
+          try {
+            onComplete(registrationData);
+          } catch (_) {
+            // Fallback: just close modal on error
+            onClose();
+          }
+        } else {
+          // Fallback: close the modal and stay on the same page
+          // (do NOT navigate to a non-existent route which could look like logout)
+          onClose();
+        }
       } else {
-        setSubmitError((data && data.message) || 'Failed to create patient account');
+        const message =
+          (data && data.message) ||
+          (data?.errors ? Object.values(data.errors)[0] : null) ||
+          'Failed to create patient account';
+        setSubmitError(message);
       }
     } catch (error) {
       setSubmitError('Network error. Please ensure the backend is running.');

@@ -11,18 +11,13 @@ class PatientAccount extends Authenticatable
     use Notifiable, HasFactory;
 
     protected $table = 'patient_acc';
-    // Use default incrementing integer primary key 'id' with timestamps
-    // so tests and controllers referencing 'id' work correctly.
-    protected $fillable = [
-        'email',
-        'password',
-        'role',
-        'first_name',
-        'last_name',
-        'phone',
-        'birth_date',
-        'address',
-    ];
+    protected $primaryKey = 'patient_id';
+    public $incrementing = false;
+    protected $keyType = 'integer';
+    public $timestamps = false;
+
+    // Allow mass assignment for existing legacy columns
+    protected $guarded = [];
 
     protected $hidden = [
         'password',

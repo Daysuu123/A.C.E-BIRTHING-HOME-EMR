@@ -3,6 +3,7 @@ import "../AdminSide/Patientregister.css";
 import "../AdminSide/Addpatientinfo.css";
 import PhoneInput from "./PhoneInput";
 import phLocations from "../AdminSide/phLocations";
+import { API_BASE } from "../lib/api";
 
 /**
  * EditPatientInfoModal - Enhanced with comprehensive data synchronization
@@ -150,7 +151,7 @@ function EditPatientInfoModal({ isOpen, onClose, patientId, onSaved }) {
   useEffect(() => {
     if (!isOpen) return;
     if (!patientId) {
-      setIsLoading(false);
+      setLoading(false);
       return;
     }
     
@@ -159,7 +160,7 @@ function EditPatientInfoModal({ isOpen, onClose, patientId, onSaved }) {
       setSyncError("");
       
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/patients/get-patient-info/${patientId}`);
+        const response = await fetch(`${API_BASE}/patients/${patientId}/info`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch patient info: ${response.status} ${response.statusText}`);
@@ -220,7 +221,7 @@ function EditPatientInfoModal({ isOpen, onClose, patientId, onSaved }) {
           errorMessage = err.message;
         }
         
-        setSubmitError(errorMessage);
+        setSyncError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -360,7 +361,7 @@ function EditPatientInfoModal({ isOpen, onClose, patientId, onSaved }) {
       return;
     }
     
-    setIsSubmitting(true);
+    setSubmitting(true);
     setErrors({});
     setSyncError("");
     
@@ -418,13 +419,34 @@ function EditPatientInfoModal({ isOpen, onClose, patientId, onSaved }) {
         timestamp: new Date().toISOString()
       });
       
-      const res = await fetch("http://127.0.0.1:8000/api/patients/update-patient-info", {
-        method: "POST",
+      const res = await fetch(`${API_BASE}/patients/${patientId}/info`, {
+        method: "PUT",
         headers: { 
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          lastName: form.lastName?.trim() || "",
+          firstName: form.firstName?.trim() || "",
+          middleName: form.middleName?.trim() || "",
+          dob: form.dob,
+          address: form.address?.trim() || "",
+          province: form.province?.trim() || "",
+          nationality: form.nationality?.trim() || "",
+          contact: form.contact?.trim() || "",
+          emergencyContact: form.emergencyContact?.trim() || "",
+          fatherName: form.fatherName?.trim() || "",
+          fatherContact: form.fatherContact?.trim() || "",
+          fatherOccupation: form.fatherOccupation?.trim() || "",
+          fatherAddress: form.fatherAddress?.trim() || "",
+          motherName: form.motherName?.trim() || "",
+          motherContact: form.motherContact?.trim() || "",
+          motherOccupation: form.motherOccupation?.trim() || "",
+          motherAddress: form.motherAddress?.trim() || "",
+          spouseName: form.spouseName?.trim() || "",
+          spouseContact: form.spouseContact?.trim() || "",
+          spouseOccupation: form.spouseOccupation?.trim() || ""
+        })
       });
       
       if (!res.ok) {

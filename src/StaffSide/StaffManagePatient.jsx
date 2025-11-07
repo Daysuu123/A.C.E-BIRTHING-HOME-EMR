@@ -3,10 +3,16 @@ import "../AdminSide/Patientrecords.css";
 import { useNavigate } from "react-router-dom";
 import StaffLayout from "../components/StaffLayout";
 import StaffPatientRegisterModal from "../components/StaffPatientRegisterModal";
+import PatientPersonalInfoModal from "../components/PatientPersonalInfoModal";
+import EditPatientInfoModal from "../components/EditPatientInfoModal";
 
 function StaffManagePatient() {
   const navigate = useNavigate();
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [syncData, setSyncData] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [patients, setPatients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -86,7 +92,12 @@ function StaffManagePatient() {
           filteredPatients.map((p) => (
             <article key={p.id} className="card">
               <div className="card-actions">
-                <button title="Edit" onClick={() => navigate(`/staff/patient-records/edit/${p.id}`)}>✎</button>
+                <button
+                  title="Edit"
+                  onClick={() => { setEditingId(p.id); setShowEditModal(true); }}
+                >
+                  ✎
+                </button>
                 <button title="Open">⤢</button>
               </div>
               <img className="avatar" src={p.photo} alt={p.name} />
@@ -106,6 +117,45 @@ function StaffManagePatient() {
       <StaffPatientRegisterModal 
         isOpen={showRegisterModal} 
         onClose={() => setShowRegisterModal(false)} 
+        onComplete={(registrationData) => {
+          try {
+            setShowRegisterModal(false);
+
+            // Basic validation and mapping as in Admin flow
+            if (!registrationData || typeof registrationData !== 'object') {
+              console.error('Invalid registration data received:', registrationData);
+              alert('Registration completed but data synchronization failed. Please fill in the information manually.');
+              setShowInfoModal(true);
+              return;
+            }
+
+            if (!registrationData.lastName || !registrationData.firstName || !registrationData.middleName) {
+              console.warn('Incomplete registration data:', registrationData);
+              alert('Registration completed but some information is missing. Please fill in the remaining fields.');
+            }
+
+            setSyncData(registrationData);
+            setShowInfoModal(true);
+          } catch (error) {
+            console.error('Error handling registration completion:', error);
+            alert('An error occurred during registration completion. Please fill in the information manually.');
+            setShowInfoModal(true);
+          }
+        }}
+      />
+
+      <PatientPersonalInfoModal
+        isOpen={showInfoModal}
+        onClose={() => { setShowInfoModal(false); setSyncData(null); }}
+        onSaved={() => { setShowInfoModal(false); setSyncData(null); fetchPatients(); }}
+        syncData={syncData}
+      />
+
+      <EditPatientInfoModal
+        isOpen={showEditModal}
+        patientId={editingId}
+        onClose={() => { setShowEditModal(false); setEditingId(null); }}
+        onSaved={() => { setShowEditModal(false); setEditingId(null); fetchPatients(); }}
       />
     </StaffLayout>
   );

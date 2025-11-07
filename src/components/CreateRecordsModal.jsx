@@ -11,33 +11,34 @@ function CreateRecordsModal({ isOpen, onClose }) {
   const notesRef = useRef();
   const outcomeRef = useRef();
   const [staffs, setStaffs] = useState([]);
+  const [patients, setPatients] = useState([]);
 
   useEffect(() => {
     if (!isOpen) return;
     (async () => {
       try {
-        const res = await fetch('/api/staffs');
-        const data = await res.json();
-        if (data && data.success) {
-          setStaffs((data.staff || []).map(s => ({ id: s.staff_id, name: `${s.staffs_sur}, ${s.staffs_firs}` })));
+        // Load staffs
+        const resStaffs = await fetch('/api/staffs');
+        const dataStaffs = await resStaffs.json();
+        if (dataStaffs && dataStaffs.success) {
+          setStaffs((dataStaffs.staff || []).map(s => ({ id: s.staff_id, name: `${s.staffs_sur}, ${s.staffs_firs}` })));
+        }
+
+        // Load patients
+        const resPatients = await fetch('/api/patients');
+        const dataPatients = await resPatients.json();
+        if (dataPatients && dataPatients.success) {
+          const list = dataPatients.patients || [];
+          setPatients(list.map(p => ({
+            id: p.patient_id,
+            name: `${p.last_name}, ${p.first_name}${p.middle_ini ? ' ' + p.middle_ini + '.' : ''}`
+          })));
         }
       } catch (_) {}
     })();
   }, [isOpen]);
   
-  // Mock female patient names for dropdown
-  const femalePatients = [
-    "Eppie, Amie P.",
-    "Santos, Maria L.",
-    "Reyes, Sofia G.",
-    "Cruz, Isabella M.",
-    "Garcia, Gabriela T.",
-    "Lim, Jasmine R.",
-    "Tan, Angela D.",
-    "Mendoza, Camille P.",
-    "Fernandez, Diana L.",
-    "Ramos, Victoria S."
-  ];
+  // Real patients are loaded from the backend when the modal opens
 
   if (!isOpen) return null;
 
@@ -51,14 +52,15 @@ function CreateRecordsModal({ isOpen, onClose }) {
         
         <div className="modal-body">
           <form className="cr-form">
-            <label className="field wide">
-              <span>Patient Name:</span>
-              <select defaultValue="Eppie, Amie P." ref={nameRef}>
-                {femalePatients.map((name, index) => (
-                  <option key={index} value={name}>{name}</option>
+              <label className="field wide">
+                <span>Patient Name:</span>
+              <select defaultValue="" ref={nameRef}>
+                <option value="" disabled>Select Patient</option>
+                {patients.map((p) => (
+                  <option key={p.id} value={p.name}>{p.name}</option>
                 ))}
               </select>
-            </label>
+              </label>
 
             <div className="row">
               <label className="field">
