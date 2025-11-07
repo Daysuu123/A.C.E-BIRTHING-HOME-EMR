@@ -151,3 +151,23 @@
 .MuiChartsContainer-root {
     width: 100% !important;
 }
+
+/* Loading and Error States */
+.loading-container, .error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin: 20px 0;
+    font-size: 16px;
+    color: #666;
+}
+
+.error-container {
+    color: #dc2626;
+    background-color: #fef2f2;
+    border-color: #fca5a5;
+}

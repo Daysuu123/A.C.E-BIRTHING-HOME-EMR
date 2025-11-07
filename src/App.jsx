@@ -10,6 +10,7 @@ import Manageaccs from "./AdminSide/Manageaccs";
 import Patientrecords from "./AdminSide/Patientrecords";  
 import Patientregister from "./AdminSide/Patientregister";
 import Addpatientinfo from "./AdminSide/Addpatientinfo";
+import AddpatientinfoModal from "./AdminSide/AddpatientinfoModal";
 import Staffregister from "./AdminSide/Staffregister";
 import Editpatientinfo from "./AdminSide/Editpatientinfo";
 import Editpatientaccount from "./AdminSide/Editpatientaccount";
@@ -21,6 +22,12 @@ import StaffManageRecords from "./StaffSide/StaffManageRecords";
 import StaffAddPatient from "./StaffSide/StaffAddPatient";
 import StaffManageAccounts from "./StaffSide/StaffManageAccounts";
 import UserLanding from "./PatientSide/UserLanding";
+import PregnancyHistory from "./AdminSide/PregnancyHistory";
+import DeliveryRecord from "./AdminSide/DeliveryRecord";
+import NewbornInformation from "./AdminSide/NewbornInformation";
+import StaffPregnancyHistory from "./StaffSide/StaffPregnancyHistory";
+import StaffNewbornInformation from "./StaffSide/StaffNewbornInformation";
+import StaffDeliveryRecord from "./StaffSide/StaffDeliveryRecord";
 
 function isAdminAuthenticated() {
   try {
@@ -101,7 +108,7 @@ function App() {
           }
         />
         <Route
-          path="/staff/create-records"
+          path="/staff/staff-create-records"
           element={
             <StaffProtectedRoute>
               <StaffCreateRecords />
@@ -113,6 +120,30 @@ function App() {
           element={
             <StaffProtectedRoute>
               <StaffManageRecords />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/pregnancy-history"
+          element={
+            <StaffProtectedRoute>
+              <StaffPregnancyHistory />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/newborn-information"
+          element={
+            <StaffProtectedRoute>
+              <StaffNewbornInformation />
+            </StaffProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/delivery-record"
+          element={
+            <StaffProtectedRoute>
+              <StaffDeliveryRecord />
             </StaffProtectedRoute>
           }
         />
@@ -229,7 +260,7 @@ function App() {
           path="/admin/patient-register/info"
           element={
             <ProtectedRoute>
-              <Addpatientinfo />
+              <AddpatientinfoModal />
             </ProtectedRoute>
           }
         />
@@ -249,6 +280,36 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/admin/pregnancy-history"
+          element={
+            <ProtectedRoute>
+              <PregnancyHistory />
+            </ProtectedRoute>
+          }
+        />
+
+
+        <Route
+          path="/admin/delivery-record"
+          element={
+            <ProtectedRoute>
+              <DeliveryRecord />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/newborn-information"
+          element={
+            <ProtectedRoute>
+              <NewbornInformation />
+            </ProtectedRoute>
+          }
+        />
+
+        {/** Reports removed */}
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

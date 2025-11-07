@@ -1,0 +1,4 @@
+.phone-input{display:inline-flex;align-items:center;border:1px solid #cfcfcf;border-radius:4px;padding:4px 6px;background:#fff}
+.phone-prefix{margin-right:8px;color:#333;font-weight:600}
+.phone-field{border:0;outline:none;font-size:14px}
+.phone-field::placeholder{color:#888}

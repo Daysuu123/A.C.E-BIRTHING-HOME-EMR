@@ -14,6 +14,7 @@ function Editstaffaccount() {
   const nameRegex = /^[A-Za-z ]+$/;
   const miRegex = /^[A-Za-z]$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.com$/i;
+  const phoneRegex = /^[0-9]{9}$/;
   const pwRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
   function validate(field, value, current = { ...form, [field]: value }) {
@@ -29,6 +30,9 @@ function Editstaffaccount() {
         break;
       case "email":
         next.email = v ? (emailRegex.test(v) ? "" : "Enter a valid .com email.") : "This field is required.";
+        break;
+      case "phone":
+        next.phone = v ? (phoneRegex.test(v) ? "" : "Must be 9 digits.") : "This field is required.";
         break;
       case "password":
         next.password = pwRegex.test(v) ? "" : "At least 8 chars, 1 uppercase, 1 number, 1 special.";
@@ -55,20 +59,21 @@ function Editstaffaccount() {
     validate(name, value, next);
     setShowSubmitError(false);
     // clear only when all fields complete/valid
-    const fields = ["lastName","firstName","middleInitial","email","password","confirmPassword"];
+    const fields = ["lastName","firstName","middleInitial","email","phone","password","confirmPassword"];
     const allFilled = fields.every(f => String(next[f]||"").trim());
     const allValid =
       nameRegex.test(next.lastName||"") &&
       nameRegex.test(next.firstName||"") &&
       miRegex.test(next.middleInitial||"") && (String(next.middleInitial||"").length === 1) &&
       emailRegex.test(next.email||"") &&
+      phoneRegex.test(next.phone||"") &&
       pwRegex.test(next.password||"") &&
       next.password === next.confirmPassword;
     if (allFilled && allValid) {/* nothing extra */}
   }
 
   function validateAll() {
-    const fields = ["lastName","firstName","middleInitial","email","password","confirmPassword"];
+    const fields = ["lastName","firstName","middleInitial","email","phone","password","confirmPassword"];
     fields.forEach((f) => validate(f, form[f]));
     const allEmpty = fields.every(f => !String(form[f]||"").trim());
     setShowSubmitError(allEmpty);
@@ -79,6 +84,7 @@ function Editstaffaccount() {
       nameRegex.test(form.firstName||"") &&
       miRegex.test(form.middleInitial||"") && (String(form.middleInitial||"").length === 1) &&
       emailRegex.test(form.email||"") &&
+      phoneRegex.test(form.phone||"") &&
       pwRegex.test(form.password||"") &&
       form.password === form.confirmPassword;
       
@@ -132,8 +138,8 @@ function Editstaffaccount() {
             </label>
             <label className="field">
               <span>Phone:</span>
-              <PhoneInput value={form.phone} onChange={(v)=>setForm((prev)=>({ ...prev, phone: v }))} />
-              <div style={{marginTop:4,minHeight:16}} />
+              <PhoneInput value={form.phone} onChange={(v) => onChange({ target: { name: 'phone', value: v }})} />
+              <div style={{color:'#dc2626',fontSize:12,marginTop:4,minHeight:16,visibility:errors.phone? 'visible':'hidden'}}>{errors.phone || 'placeholder'}</div>
             </label>
           </div>
 

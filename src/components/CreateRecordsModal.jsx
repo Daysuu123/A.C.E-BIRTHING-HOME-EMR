@@ -63,7 +63,7 @@ function CreateRecordsModal({ isOpen, onClose }) {
             <div className="row">
               <label className="field">
                 <span>Record Type:</span>
-                <select defaultValue="Prenatal" ref={typeRef}>
+                <select defaultValue="" ref={typeRef}>
                   <option>Prenatal</option>
                   <option>Postnatal</option>
                   <option>Delivery</option>
@@ -72,7 +72,7 @@ function CreateRecordsModal({ isOpen, onClose }) {
 
               <label className="field">
                 <span>Date:</span>
-                <input type="date" defaultValue="2025-09-18" ref={dateRef} />
+                <input type="date" defaultValue="" ref={dateRef} />
               </label>
 
               <label className="field">
@@ -88,13 +88,13 @@ function CreateRecordsModal({ isOpen, onClose }) {
 
             <label className="field wide">
               <span>Notes</span>
-              <input type="text" defaultValue="High Bp detected" ref={notesRef} />
+              <input type="text" defaultValue="" ref={notesRef} />
             </label>
 
             <div className="row">
               <label className="field wide">
                 <span>Outcome</span>
-                <textarea rows={3} defaultValue="Continue Monitoring" ref={outcomeRef} />
+                <textarea rows={3} defaultValue="" ref={outcomeRef} />
               </label>
 
               <div className="actions">

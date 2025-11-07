@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./Admindashboard.css";
 import AdminLayout from "../components/AdminLayout";
 
@@ -59,26 +59,81 @@ const chartSetting = {
 
 
 function AdminDashboard() {
+  const [monthlyPatients, setMonthlyPatients] = useState([]);
+  const [monthlyCheckups, setMonthlyCheckups] = useState([]);
+  const [checkupTypes, setCheckupTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const data = [5, 17, 11, 20, 10, 25, 3];
-  const xLabels = [
-    'June 2025', 
-    'July 2025', 
-    'Aug. 2025', 
-    'Sept. 2025', 
-    'October 2025', 
-    'Nov. 2025', 
-    'Dec. 2025'
-  ];
+  // Fetch dashboard data
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch monthly patients
+        const patientsResponse = await fetch('http://localhost:8000/api/dashboard/monthly-patients');
+        const patientsData = await patientsResponse.json();
+        if (patientsData.success) {
+          setMonthlyPatients(patientsData.data);
+        }
 
+        // Fetch monthly checkups
+        const checkupsResponse = await fetch('http://localhost:8000/api/dashboard/monthly-checkups');
+        const checkupsData = await checkupsResponse.json();
+        if (checkupsData.success) {
+          setMonthlyCheckups(checkupsData.data);
+        }
 
-  const pieChartData = [
-    { id: 0, value: 10, label: 'Prenatal Checkup' },
-    { id: 1, value: 15, label: 'General Checkup' },
-    { id: 2, value: 20, label: 'Postnatal Checkup' },
-  ];
-  
+        // Fetch checkup types
+        const typesResponse = await fetch('http://localhost:8000/api/dashboard/checkup-types');
+        const typesData = await typesResponse.json();
+        if (typesData.success) {
+          setCheckupTypes(typesData.data);
+        }
 
+      } catch (err) {
+        setError('Failed to fetch dashboard data');
+        console.error('Error fetching dashboard data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  // Prepare data for the monthly patients bar chart
+  const patientsData = monthlyPatients.map(item => item.patients);
+  const patientsLabels = monthlyPatients.map(item => item.month);
+
+  // Prepare data for the monthly checkups horizontal bar chart
+  const checkupsData = monthlyCheckups.map(item => item.checkups);
+  const checkupsLabels = monthlyCheckups.map(item => item.month);
+
+  if (loading) {
+    return (
+      <AdminLayout title="Dashboard">
+        <div className="dashboard-grid-container">
+          <div className="loading-container">
+            <p>Loading dashboard data...</p>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminLayout title="Dashboard">
+        <div className="dashboard-grid-container">
+          <div className="error-container">
+            <p>Error: {error}</p>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout title="Dashboard">
@@ -87,27 +142,26 @@ function AdminDashboard() {
       <div className="dashboard-grid-container">
 
         {/* --- TOP ROW (2 COLUMNS) --- */}
-        {/* 💡 This is the NEW BAR GRAPH 2 - Seoul Rainfall */}
+        {/* Monthly Checkups Horizontal Bar Chart */}
         <div className="chart-card top-chart-small">
-          <div className="subtitle">Appoint for the Past Couple of Months (Horizontal)</div>
+          <div className="subtitle">Monthly Checkups</div>
           
-          {/* 💡 REPLACED BAR CHART 2 CODE */}
           <BarChart
-            dataset={dataset}
+            dataset={monthlyCheckups}
             yAxis={[{ scaleType: 'band', dataKey: 'month' }]}
-            series={[{ dataKey: 'seoul', label: 'Checkups', valueFormatter }]}
+            series={[{ dataKey: 'checkups', label: 'Checkups', valueFormatter: (value) => `${value}` }]}
             layout="horizontal"
             {...chartSetting}
           />
         </div>
 
-        {/* This is the PIE GRAPH - Appointment Types */}
+        {/* Checkup Types Pie Chart */}
         <div className="chart-card top-chart-small">
-          <div className="subtitle">Pie Graph: Appointment Types</div>
+          <div className="subtitle">Checkup Types Distribution</div>
           <PieChart
             series={[
               {
-                data: pieChartData,
+                data: checkupTypes,
                 paddingAngle: 5, 
                 innerRadius: 30, 
                 outerRadius: 80, 
@@ -125,12 +179,12 @@ function AdminDashboard() {
         </div>
 
         {/* --- BOTTOM ROW (1 FULL-WIDTH COLUMN) --- */}
-        {/* This is BAR GRAPH 1 - Monthly Patient Summary */}
+        {/* Monthly Patient Registrations Bar Chart */}
         <div className="chart-card bottom-chart-full">
-          <div className="subtitle">Bar Graph 1: Monthly Patient Summary</div>
+          <div className="subtitle">Monthly Patient Registrations</div>
           <ChartContainer
-            xAxis={[{ scaleType: 'band', data: xLabels }]}
-            series={[{ type: 'bar', id: 'base', data: data }]}
+            xAxis={[{ scaleType: 'band', data: patientsLabels }]}
+            series={[{ type: 'bar', id: 'base', data: patientsData }]}
             height={400}
             yAxis={[{ width: 30 }]}
             margin={{ left: 10, right: 10 }}

@@ -53,7 +53,7 @@ function Staffregister() {
     validate(name, value, next);
     setShowSubmitError(false);
     // clear only when all fields complete/valid
-    const fields = ["lastName","firstName","middleInitial","email","password","confirmPassword"];
+    const fields = ["lastName","firstName","middleInitial","email","password","confirmPassword","position"];
     const allFilled = fields.every(f => String(next[f]||"").trim());
     const allValid =
       nameRegex.test(next.lastName||"") &&
@@ -61,7 +61,8 @@ function Staffregister() {
       miRegex.test(next.middleInitial||"") && (String(next.middleInitial||"").length === 1) &&
       emailRegex.test(next.email||"") &&
       pwRegex.test(next.password||"") &&
-      next.password === next.confirmPassword;
+      next.password === next.confirmPassword &&
+      next.position !== "";
     if (allFilled && allValid) {/* nothing extra */}
   }
 
@@ -98,14 +99,12 @@ function Staffregister() {
               <option value="">Select Position</option>
               <option value="Midwife">Midwife</option>
               <option value="Doctor">Doctor</option>
-              <option value="Admin">Admin</option>
               <option value="Nurse">Nurse</option>
             </select>
             <div style={{marginTop:4,minHeight:16}} />
           </label>
           <label className="field">
-            <span>Phone:</span>
-            <PhoneInput value={form.phone} onChange={(v)=>setForm((prev)=>({ ...prev, phone: v }))} />
+            <PhoneInput value={form.phone} onChange={(v) => setForm((prev) => ({ ...prev, phone: v }))} />
             <div style={{marginTop:4,minHeight:16}} />
           </label>
         </div>
@@ -135,8 +134,8 @@ function Staffregister() {
             type="button"
             className="next"
             onClick={async () => {
-              ["lastName","firstName","middleInitial","email","password","confirmPassword"].forEach((f)=>validate(f, form[f]));
-              const required = ["lastName","firstName","middleInitial","password","confirmPassword","position"];
+              ["lastName","firstName","middleInitial","email","password","confirmPassword","position"].forEach((f)=>validate(f, form[f]));
+              const required = ["lastName","firstName","middleInitial","email","password","confirmPassword","position"];
               const anyEmpty = required.some(f => !String(form[f]||"").trim());
               if (anyEmpty || form.password !== form.confirmPassword) {
                 setShowSubmitError(true);
@@ -145,12 +144,16 @@ function Staffregister() {
               try {
                 const res = await fetch('/api/staffs/register', {
                   method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                  },
                   body: JSON.stringify({
                     lastName: form.lastName,
                     firstName: form.firstName,
                     middleInitial: form.middleInitial,
                     position: form.position,
+                    email: form.email,
                     password: form.password
                   })
                 });
