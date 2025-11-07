@@ -10,6 +10,9 @@ function AdminSidebar() {
     { path: "/admin/manage-accounts", label: "Accounts", icon: "" },
     { path: "/admin/checkup-records", label: "Records", icon: "" },
     { path: "/admin/staff-register", label: "Staff Register", icon: "" },
+    { path: "/admin/pregnancy-history", label: "Pregnancy History", icon: "" },
+    { path: "/admin/delivery-record", label: "Delivery Record", icon: "" },
+    { path: "/admin/newborn-information", label: "Newborn Information", icon: "" },
   ];
 
   const isActive = (path) => {

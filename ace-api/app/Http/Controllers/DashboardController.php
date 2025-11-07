@@ -9,28 +9,21 @@ class DashboardController extends Controller
 {
     public function getMonthlyPatients()
     {
-        try {
-            $monthlyPatients = DB::table('patient_acc')
-                ->select(
-                    DB::raw("TO_CHAR(date_created, 'Mon') as month"),
-                    DB::raw('COUNT(*) as patients'),
-                    DB::raw('EXTRACT(MONTH FROM date_created) as month_num')
-                )
-                ->groupBy(DB::raw("TO_CHAR(date_created, 'Mon')"))
-                ->groupBy(DB::raw('EXTRACT(MONTH FROM date_created)'))
-                ->orderBy(DB::raw('EXTRACT(MONTH FROM date_created)'))
-                ->get();
+        $monthlyPatients = DB::table('patient_acc')
+            ->select(
+                DB::raw("TO_CHAR(date_created, 'Mon') as month"),
+                DB::raw('COUNT(*) as patients'),
+                DB::raw('EXTRACT(MONTH FROM date_created) as month_num')
+            )
+            ->groupBy(DB::raw("TO_CHAR(date_created, 'Mon')"))
+            ->groupBy(DB::raw('EXTRACT(MONTH FROM date_created)'))
+            ->orderBy(DB::raw('EXTRACT(MONTH FROM date_created)'))
+            ->get();
 
-            return response()->json([
-                'success' => true,
-                'data' => $monthlyPatients
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to fetch monthly patients: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'data' => $monthlyPatients
+        ]);
     }
 
     public function getMonthlyCheckups()

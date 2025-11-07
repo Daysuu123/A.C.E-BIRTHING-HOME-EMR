@@ -110,8 +110,6 @@ function AdminDashboard() {
   // Prepare data for the monthly checkups horizontal bar chart
   const checkupsData = monthlyCheckups.map(item => item.checkups);
   const checkupsLabels = monthlyCheckups.map(item => item.month);
-  
-
 
   if (loading) {
     return (

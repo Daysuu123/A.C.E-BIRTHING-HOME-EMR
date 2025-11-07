@@ -2,31 +2,26 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class PatientAccount extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, HasFactory;
 
     protected $table = 'patient_acc';
-    protected $primaryKey = 'patient_id';
-    public $incrementing = false;
-    protected $keyType = 'string';
-    public $timestamps = false;
-
+    // Use default incrementing integer primary key 'id' with timestamps
+    // so tests and controllers referencing 'id' work correctly.
     protected $fillable = [
-        'patient_id',
         'email',
         'password',
+        'role',
         'first_name',
         'last_name',
-        'middle_ini',
-        'date_created',
-        'email_verification_token',
-        'email_verified_at',
-        'is_email_verified'
+        'phone',
+        'birth_date',
+        'address',
     ];
 
     protected $hidden = [
@@ -37,7 +32,6 @@ class PatientAccount extends Authenticatable
     {
         return [
             'password' => 'hashed',
-            'date_created' => 'datetime',
         ];
     }
 }

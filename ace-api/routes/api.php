@@ -1,12 +1,19 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\RecordsController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PregnancyHistoryController;
+use App\Http\Controllers\DeliveryRecordController;
+use App\Http\Controllers\NewbornInformationController;
+
+// Resource routes
+Route::apiResource('pregnancy-histories', PregnancyHistoryController::class);
+Route::apiResource('delivery-records', DeliveryRecordController::class);
+Route::apiResource('newborn-information', NewbornInformationController::class);
 
 Route::post('/login', [AuthController::class, 'login']);
 
