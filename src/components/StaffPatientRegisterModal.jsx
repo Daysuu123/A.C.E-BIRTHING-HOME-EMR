@@ -59,13 +59,15 @@ function StaffPatientRegisterModal({ isOpen, onClose, onComplete }) {
 
     setIsSubmitting(true);
 
-    try {
-      const { data, ok } = await postJson('/patients/register-account', {
-        lastName: form.lastName.trim(),
-        firstName: form.firstName.trim(),
-        middleInitial: form.middleInitial.trim(),
-        email: form.email.trim()
-      });
+  try {
+      const payload = {
+        lastName: (form.lastName || ''),
+        firstName: (form.firstName || ''),
+        middleInitial: (form.middleInitial || ''),
+        email: (form.email || '')
+      };
+
+      const { data, ok } = await postJson('/patients/register-account', payload);
 
       if (data && (data.success || ok)) {
         // Store patient data for the next step

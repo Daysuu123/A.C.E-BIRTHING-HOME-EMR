@@ -1,12 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./UserLanding.css";
+import ConfirmLogoutModal from "../components/ConfirmLogoutModal";
 
 function UserLanding() {
+  const navigate = useNavigate();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const handleLogoutClick = () => setShowLogoutConfirm(true);
+  const confirmLogout = () => {
+    setShowLogoutConfirm(false);
+    localStorage.removeItem("auth");
+    navigate("/", { replace: true });
+  };
+  const cancelLogout = () => setShowLogoutConfirm(false);
+
   return (
     <div className="user-shell">
       <header className="user-header">
         <div className="brand">A.C.E Birthing Home</div>
-        <button className="logout">Log Out</button>
+        <button className="logout" onClick={handleLogoutClick}>Log Out</button>
       </header>
 
       <div className="user-body">
@@ -88,6 +101,12 @@ function UserLanding() {
           </div>
         </main>
       </div>
+
+      <ConfirmLogoutModal
+        isOpen={showLogoutConfirm}
+        onConfirm={confirmLogout}
+        onCancel={cancelLogout}
+      />
 
       <footer className="user-footer">
         <div className="footer-logo">👂</div>

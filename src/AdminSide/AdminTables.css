@@ -1,0 +1,32 @@
+/* Shared admin table styles aligned with Checkuprecords */
+.table-wrap {
+  border: 1px solid #e5e7eb; /* gray-200 */
+  border-radius: 4px;
+  margin-top: 10px;
+  overflow: hidden; /* ensures rounded corners with table inside */
+  background: #fff;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate; /* allow border radius via wrapper */
+  border-spacing: 0;
+  font-size: 12px;
+}
+
+.data-table thead th {
+  background: #f9fafb; /* gray-50 */
+  font-weight: 700;
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb; /* gray-200 */
+}
+
+.data-table tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f3f4f6; /* gray-100 */
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: 0;
+}

@@ -2,15 +2,20 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar";
 import logoImg from "../assets/ACElogo.png";
+import ConfirmLogoutModal from "./ConfirmLogoutModal";
 
 function AdminLayout({ children, title = "Dashboard" }) {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
-  const handleLogout = () => {
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const handleLogoutClick = () => setShowLogoutConfirm(true);
+  const confirmLogout = () => {
+    setShowLogoutConfirm(false);
     localStorage.removeItem("auth");
     navigate("/", { replace: true });
   };
+  const cancelLogout = () => setShowLogoutConfirm(false);
 
   return (
     <div className="admin-shell">
@@ -28,7 +33,7 @@ function AdminLayout({ children, title = "Dashboard" }) {
         </div>
         <div className="topbar-right">
           <span className="welcome">Welcome, Dace</span>
-          <button className="logout" onClick={handleLogout}>Logout</button>
+          <button className="logout" onClick={handleLogoutClick}>Logout</button>
         </div>
       </header>
 
@@ -57,6 +62,12 @@ function AdminLayout({ children, title = "Dashboard" }) {
           EVERY WOMAN
         </div>
       </footer>
+
+      <ConfirmLogoutModal
+        isOpen={showLogoutConfirm}
+        onConfirm={confirmLogout}
+        onCancel={cancelLogout}
+      />
     </div>
   );
 }

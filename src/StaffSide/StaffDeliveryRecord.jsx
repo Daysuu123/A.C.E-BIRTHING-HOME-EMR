@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import StaffLayout from '../components/StaffLayout';
-import '../AdminSide/Staffregister.css';
-import '../AdminSide/Patientrecords.css';
-import '../AdminSide/Admindashboard.css';
+import '../AdminSide/AdminTables.css';
 
 const StaffDeliveryRecord = () => {
   const [records, setRecords] = useState([]);
@@ -135,17 +133,14 @@ const StaffDeliveryRecord = () => {
   };
 
   return (
-    <StaffLayout title="Delivery Records">
-      {error && (
-        <div style={{ background:'#fff2f2', border:'1px solid #fca5a5', color:'#991b1b', padding:12, borderRadius:6, marginBottom:12 }}>
-          {error}
-        </div>
-      )}
+    <StaffLayout>
+      <div style={{ padding: '16px' }}>
+        <h1>Delivery Records (Staff)</h1>
+        {error && <div style={{ color: 'red', marginBottom: '8px' }}>{error}</div>}
 
-      <form className="form" onSubmit={addRecord}>
-        <div className="row">
-          <label className="field wide">
-            <span>Patient</span>
+        <form onSubmit={addRecord} style={{ display: 'grid', gap: '8px', maxWidth: '520px' }}>
+          <label>
+            Patient
             <select
               name="patient_id"
               value={form.patient_id}
@@ -161,11 +156,8 @@ const StaffDeliveryRecord = () => {
             </select>
             {searching && <div style={{ fontSize:12 }}>Loading patients...</div>}
           </label>
-        </div>
-
-        <div className="row">
-          <label className="field">
-            <span>Delivery Date & Time</span>
+          <label>
+            Delivery Date & Time
             <input
               type="datetime-local"
               name="delivery_date_time"
@@ -174,8 +166,8 @@ const StaffDeliveryRecord = () => {
               required
             />
           </label>
-          <label className="field">
-            <span>Delivery Type</span>
+          <label>
+            Delivery Type
             <input
               type="text"
               name="delivery_type"
@@ -185,79 +177,69 @@ const StaffDeliveryRecord = () => {
               required
             />
           </label>
-          <label className="field wide">
-            <span>Complications</span>
+          <label>
+            Complications
             <textarea
               name="complications"
               value={form.complications}
               onChange={onChange}
               placeholder="Optional details"
-              rows={3}
             />
           </label>
-        </div>
-
-        <div className="actions">
-          <button type="submit" className="next" disabled={loading}>
+          <button type="submit" disabled={loading}>
             {loading ? 'Saving...' : 'Add Delivery Record'}
           </button>
-          <button
-            type="button"
-            className="clear-btn"
-            onClick={() => setForm({ patient_id: '', delivery_date_time: '', delivery_type: '', complications: '' })}
-          >
-            Clear
-          </button>
-        </div>
-      </form>
+        </form>
 
-      <h2 style={{ marginTop:16 }}>Existing Records</h2>
-      <div className="toolbar">
-        <input
-          className="search"
-          type="text"
-          placeholder="Search: Patient ID or Patient Name"
-          value={recordsSearchText}
-          onChange={(e) => setRecordsSearchText(e.target.value)}
-        />
-        <button className="action-btn" type="button" onClick={() => setRecordsQuery(recordsSearchText.trim())}>Search</button>
-        <button className="action-btn" type="button" onClick={() => { setRecordsSearchText(''); setRecordsQuery(''); }}>Clear</button>
-      </div>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <hr style={{ margin: '16px 0' }} />
+
+        <h2>Existing Records</h2>
+        <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:12 }}>
+          <input
+            type="text"
+            placeholder="Search records by patient name or ID"
+            value={recordsSearchText}
+            onChange={(e) => setRecordsSearchText(e.target.value)}
+          />
+          <button type="button" onClick={() => setRecordsQuery(recordsSearchText.trim())}>Search</button>
+          <button type="button" onClick={() => { setRecordsSearchText(''); setRecordsQuery(''); }}>Clear</button>
+        </div>
+        <div className="table-wrap" style={{ overflowX: 'auto' }}>
+          <table className="data-table">
             <thead>
               <tr>
-                <th style={{ borderBottom: '1px solid #ddd', textAlign: 'left' }}>ID</th>
-                <th style={{ borderBottom: '1px solid #ddd', textAlign: 'left' }}>Patient</th>
-                <th style={{ borderBottom: '1px solid #ddd', textAlign: 'left' }}>Patient ID</th>
-                <th style={{ borderBottom: '1px solid #ddd', textAlign: 'left' }}>Date Time</th>
-                <th style={{ borderBottom: '1px solid #ddd', textAlign: 'left' }}>Type</th>
-                <th style={{ borderBottom: '1px solid #ddd', textAlign: 'left' }}>Complications</th>
-                <th style={{ borderBottom: '1px solid #ddd', textAlign: 'left' }}>Actions</th>
+                <th>ID</th>
+                <th>Patient</th>
+                <th>Patient ID</th>
+                <th>Date Time</th>
+                <th>Type</th>
+                <th>Complications</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredRecords.length === 0 && (
                 <tr>
-                  <td colSpan="6" style={{ padding: '8px' }}>No records found.</td>
+                  <td colSpan="6">No records found.</td>
                 </tr>
               )}
               {filteredRecords.map((r) => (
                 <tr key={r.id}>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{r.id}</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{(() => { const p = patientMap.get(r.patient_id); return p ? getPatientDisplayName(p) : '-'; })()}</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid ' + '#eee' }}>{r.patient_id}</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{r.delivery_date_time}</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{r.delivery_type}</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>{r.complications || '-'}</td>
-                  <td style={{ padding: '8px', borderBottom: '1px solid #eee' }}>
-                    <button onClick={() => deleteRecord(r.id)} style={{ color: 'red' }}>Delete</button>
+                  <td>{r.id}</td>
+                  <td>{(() => { const p = patientMap.get(r.patient_id); return p ? getPatientDisplayName(p) : '-'; })()}</td>
+                  <td>{r.patient_id}</td>
+                  <td>{r.delivery_date_time}</td>
+                  <td>{r.delivery_type}</td>
+                  <td>{r.complications || '-'}</td>
+                  <td>
+                    <button onClick={() => deleteRecord(r.id)} className="btn-danger">Delete</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      </div>
     </StaffLayout>
   );
 };

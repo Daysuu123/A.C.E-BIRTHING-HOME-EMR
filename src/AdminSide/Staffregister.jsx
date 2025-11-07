@@ -104,6 +104,7 @@ function Staffregister() {
             <div style={{marginTop:4,minHeight:16}} />
           </label>
           <label className="field">
+            <span>Phone:</span>
             <PhoneInput value={form.phone} onChange={(v) => setForm((prev) => ({ ...prev, phone: v }))} />
             <div style={{marginTop:4,minHeight:16}} />
           </label>

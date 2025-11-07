@@ -1,4 +1,9 @@
-.phone-input{display:inline-flex;align-items:center;border:1px solid #cfcfcf;border-radius:4px;padding:4px 6px;background:#fff}
-.phone-prefix{margin-right:8px;color:#333;font-weight:600}
-.phone-field{border:0;outline:none;font-size:14px}
-.phone-field::placeholder{color:#888}
+.phone-input { --phone-height: 33px; --phone-offset-y: -4px; --phone-prefix-gap: 8px; display: flex; align-items: center; width: 100%; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 10px; background: #fff; height: var(--phone-height); transform: translateY(var(--phone-offset-y)); }
+.phone-prefix { margin-right: var(--phone-prefix-gap); color: #374151; font-weight: 600; background: transparent; border: 0; font-size: 12px; line-height: 1; }
+/* Ensure the inner input does not render its own box/border */
+.phone-input .phone-field { flex: 1; border: none !important; box-shadow: none !important; outline: none; font-size: 12px; line-height: 20px; color: #111827; background: transparent !important; padding: 0 !important; }
+
+/* Optional utility classes for common height adjustments */
+.phone-input.tall { --phone-height: 36px; }
+.phone-input.compact { --phone-height: 30px; }
+.phone-input .phone-field::placeholder { color: #9ca3af; }

@@ -56,11 +56,12 @@ function PatientRegisterModal({ isOpen, onClose, onComplete }) {
 
   try {
       const registrationData = {
-        lastName: form.lastName.trim(),
-        firstName: form.firstName.trim(),
-        middleInitial: form.middleInitial.trim(),
-        email: form.email.trim()
+        lastName: (form.lastName || '').trim(),
+        firstName: (form.firstName || '').trim(),
+        middleInitial: (form.middleInitial || '').trim(),
+        email: (form.email || '').trim()
       };
+
       const { data, ok } = await postJson('/patients/register-account', registrationData);
 
       if (data && (data.success || ok)) {
@@ -82,7 +83,11 @@ function PatientRegisterModal({ isOpen, onClose, onComplete }) {
           navigate('/admin/patient-register/info');
         }
       } else {
-        setSubmitError((data && data.message) || 'Failed to create patient account');
+        const message =
+          (data && data.message) ||
+          (data?.errors ? Object.values(data.errors)[0] : null) ||
+          'Failed to create patient account';
+        setSubmitError(message);
       }
     } catch (error) {
       setSubmitError('Network error. Please ensure the backend is running.');

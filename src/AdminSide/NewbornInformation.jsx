@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import AdminLayout from '../components/AdminLayout';
-import './Staffregister.css';
-import './Patientrecords.css';
-import './Admindashboard.css';
+import './AdminTables.css';
 
 function NewbornInformation() {
   const [items, setItems] = useState([]);
@@ -132,10 +130,11 @@ function NewbornInformation() {
         </div>
       )}
 
-      <form className="form" onSubmit={handleSubmit}>
-        <div className="row">
-          <label className="field">
-            <span>Patient</span>
+      <section className="card" style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:6, padding:16, marginBottom:16 }}>
+        <h2 style={{ marginTop:0 }}>Add Newborn Information</h2>
+        <form onSubmit={handleSubmit} style={{ display:'grid', gridTemplateColumns:'repeat(2, 1fr)', gap:12 }}>
+          <label>
+            <div>Patient</div>
             <select name="patient_id" value={form.patient_id} onChange={handleChange} required>
               <option value="">Select a patient...</option>
               {patients.map((p) => (
@@ -146,64 +145,54 @@ function NewbornInformation() {
             </select>
             {searching && <div style={{ fontSize:12 }}>Loading patients...</div>}
           </label>
-          <label className="field">
-            <span>Delivery Record ID</span>
+          <label>
+            <div>Delivery Record ID</div>
             <input type="number" name="delivery_record_id" value={form.delivery_record_id} onChange={handleChange} required />
           </label>
-          <label className="field">
-            <span>Gender</span>
+          <label>
+            <div>Gender</div>
             <select name="gender" value={form.gender} onChange={handleChange} required>
               <option value="">Select gender</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
           </label>
-        </div>
-
-        <div className="row">
-          <label className="field">
-            <span>Weight (kg)</span>
+          <label>
+            <div>Weight (kg)</div>
             <input type="number" step="0.01" name="weight" value={form.weight} onChange={handleChange} required />
           </label>
-          <label className="field">
-            <span>Length (cm)</span>
+          <label>
+            <div>Length (cm)</div>
             <input type="number" step="0.01" name="length" value={form.length} onChange={handleChange} required />
           </label>
-          <label className="field wide">
-            <span>Complications</span>
+          <label style={{ gridColumn:'1 / -1' }}>
+            <div>Complications</div>
             <textarea name="complications" value={form.complications} onChange={handleChange} rows={3} />
           </label>
-        </div>
+          <div style={{ gridColumn:'1 / -1', display:'flex', gap:8 }}>
+            <button type="submit" className="btn-primary">Save</button>
+            <button type="button" onClick={() => setForm({ patient_id:'', delivery_record_id:'', gender:'', weight:'', length:'', complications:'' })}>Clear</button>
+          </div>
+        </form>
+      </section>
 
-        <div className="actions">
-          <button type="submit" className="next">Save</button>
-          <button
-            type="button"
-            className="clear-btn"
-            onClick={() => setForm({ patient_id:'', delivery_record_id:'', gender:'', weight:'', length:'', complications:'' })}
-          >
-            Clear
-          </button>
-        </div>
-      </form>
-
-      <section className="card" style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:6, padding:16, marginTop:16 }}>
+      <section className="card" style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:6, padding:16 }}>
         <h2 style={{ marginTop:0 }}>Existing Records</h2>
-        <div className="toolbar">
+        <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:12 }}>
           <input
-            className="search"
             type="text"
-            placeholder="Search: Patient ID or Patient Name"
+            placeholder="Search records by patient name or ID"
             value={recordsSearchText}
             onChange={(e) => setRecordsSearchText(e.target.value)}
           />
-          <button className="action-btn" type="button" onClick={() => setRecordsQuery(recordsSearchText.trim())}>Search</button>
-          <button className="action-btn" type="button" onClick={() => { setRecordsSearchText(''); setRecordsQuery(''); }}>Clear</button>
+          <button type="button" onClick={() => setRecordsQuery(recordsSearchText.trim())}>Search</button>
+          <button type="button" onClick={() => { setRecordsSearchText(''); setRecordsQuery(''); }}>Clear</button>
         </div>
         {loading ? (
           <div>Loading...</div>
         ) : (
-          <table className="data-table" style={{ width:'100%', borderCollapse:'collapse' }}>
+          <div className="table-wrap">
+          <table className="data-table">
             <thead>
               <tr>
                 <th>ID</th>
@@ -240,6 +229,7 @@ function NewbornInformation() {
               )}
             </tbody>
           </table>
+          </div>
         )}
       </section>
     </AdminLayout>
