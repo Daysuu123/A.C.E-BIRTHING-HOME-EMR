@@ -12,7 +12,6 @@ function ForgotPassword() {
   const [verifying, setVerifying] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("info");
-  const [devCode, setDevCode] = useState("");
 
   const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || "").trim());
 
@@ -28,19 +27,14 @@ function ForgotPassword() {
       const { data, ok } = await postJson("/auth/send-reset-code", { email: email.trim() });
       if (ok) {
         setMessageType("success");
-        setMessage(data?.message || "Verification code sent to your email.");
+        setMessage(data?.message || "Reset code sent to your email.");
       } else {
-        // Dev fallback: emulate sending code
-        const generated = "123456";
-        setDevCode(generated);
-        setMessageType("success");
-        setMessage("Verification code sent (demo). Use 123456.");
+        setMessageType("error");
+        setMessage(data?.message || "Failed to send reset code.");
       }
     } catch (_) {
-      const generated = "123456";
-      setDevCode(generated);
-      setMessageType("success");
-      setMessage("Verification code sent (demo). Use 123456.");
+      setMessageType("error");
+      setMessage("Network error while sending reset code. Please try again.");
     } finally {
       setSending(false);
     }
@@ -56,10 +50,10 @@ function ForgotPassword() {
     setMessage("");
     try {
       const { data, ok } = await postJson("/auth/confirm-reset-code", { email: email.trim(), code: code.trim() });
-      if (ok || code.trim() === devCode) {
+      if (ok) {
         setMessageType("success");
         setMessage(data?.message || "Code verified. Proceed to change password.");
-        const token = data?.token || "demo-token";
+        const token = data?.token;
         setTimeout(() => {
           navigate("/change-password", {
             replace: true,
@@ -71,19 +65,8 @@ function ForgotPassword() {
         setMessage(data?.message || "Invalid code. Please try again.");
       }
     } catch (_) {
-      if (code.trim() === devCode && devCode) {
-        setMessageType("success");
-        setMessage("Code verified (demo). Proceed to change password.");
-        setTimeout(() => {
-          navigate("/change-password", {
-            replace: true,
-            state: { email: email.trim(), resetToken: "demo-token" },
-          });
-        }, 600);
-      } else {
-        setMessageType("error");
-        setMessage("Network error. Please try again.");
-      }
+      setMessageType("error");
+      setMessage("Network error. Please try again.");
     } finally {
       setVerifying(false);
     }

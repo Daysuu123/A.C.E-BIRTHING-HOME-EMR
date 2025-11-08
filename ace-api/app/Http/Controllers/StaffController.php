@@ -166,6 +166,72 @@ class StaffController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Resend email verification link to a staff user.
+     * Accepts either first name (preferred) or email.
+     */
+    public function resendVerification(Request $request)
+    {
+        $request->validate([
+            'firstName' => 'nullable|string',
+            'email' => 'nullable|email'
+        ]);
+
+        $firstName = $request->input('firstName');
+        $email = $request->input('email');
+
+        if (!$firstName && !$email) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please provide firstName or email.'
+            ], 422);
+        }
+
+        // Find staff by first name (case-insensitive) or by email
+        $staff = null;
+        if ($firstName) {
+            $staff = StaffAccount::whereRaw('LOWER(staffs_firs) = ?', [mb_strtolower(trim($firstName))])->first();
+        }
+        if (!$staff && $email) {
+            $staff = StaffAccount::whereRaw('LOWER(email) = ?', [mb_strtolower(trim($email))])->first();
+        }
+
+        if (!$staff) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Staff account not found.'
+            ], 404);
+        }
+
+        if (!$staff->email) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Staff account has no email on record.'
+            ], 422);
+        }
+
+        // Generate new verification token and send email
+        $token = Str::random(60);
+        $staff->email_verification_token = $token;
+        $staff->is_email_verified = 0;
+        $staff->email_verified_at = null;
+        $staff->save();
+
+        try {
+            Mail::to($staff->email)->send(new StaffEmailVerification($staff, $token));
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send verification email: ' . $e->getMessage()
+            ], 500);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Verification email sent. Please check your inbox.'
+        ]);
+    }
 }
 
 

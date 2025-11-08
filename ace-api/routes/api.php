@@ -40,6 +40,7 @@ Route::put('/patients/{id}/info', [PatientController::class, 'updatePatientInfo'
 Route::get('/staffs', [StaffController::class, 'getAllStaff']);
 Route::post('/staffs/register', [StaffController::class, 'register']);
 Route::get('/staffs/verify-email/{token}', [StaffController::class, 'verifyEmail']);
+Route::post('/staffs/resend-verification', [StaffController::class, 'resendVerification']);
 Route::put('/staffs/{id}', [StaffController::class, 'update']);
 Route::delete('/staffs/{id}', [StaffController::class, 'destroy']);
 
@@ -53,7 +54,6 @@ Route::delete('/records/{id}', [RecordsController::class, 'destroy']);
 Route::get('/dashboard/monthly-patients', [DashboardController::class, 'getMonthlyPatients']);
 Route::get('/dashboard/monthly-checkups', [DashboardController::class, 'getMonthlyCheckups']);
 Route::get('/dashboard/checkup-types', [DashboardController::class, 'getCheckupTypes']);
-
 
 
 

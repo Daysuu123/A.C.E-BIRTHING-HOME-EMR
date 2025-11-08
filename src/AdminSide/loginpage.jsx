@@ -134,6 +134,7 @@ function LoginPage() {
               </label>
               <a href="/forgot-password" className="forgot">Forgot Password?</a>
             </div>
+            {/* Removed verification resend UI; use Forgot Password link for reset code */}
             <button type="submit" className="submit" disabled={submitting}>{submitting ? "Logging in..." : "Login"}</button>
           </form>
         </div>

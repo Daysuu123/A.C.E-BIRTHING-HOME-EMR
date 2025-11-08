@@ -14,7 +14,7 @@
 <body>
     <div class="container">
         <h2>Password Reset</h2>
-        <p>Use the verification code below to reset your password:</p>
+        <p>Use the reset code below to reset your password:</p>
         <p class="code">{{ $code }}</p>
         <p class="muted">This code will expire at {{ \Carbon\Carbon::parse($expiresAt)->format('Y-m-d H:i') }}.</p>
         <p>If you did not request a password reset, you can safely ignore this email.</p>
