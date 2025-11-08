@@ -58,7 +58,24 @@ function StaffPregnancyHistory() {
       const p = patientMap.get(it.patient_id);
       const name = p ? getPatientDisplayName(p).toLowerCase() : '';
       const idStr = String(it.patient_id).toLowerCase();
-      return name.includes(q) || idStr.includes(q);
+      const gravida = String(it.gravida ?? '').toLowerCase();
+      const para = String(it.para ?? '').toLowerCase();
+      const fullTerm = String(it.full_term_pregnancies ?? '').toLowerCase();
+      const preterm = String(it.preterm_deliveries ?? '').toLowerCase();
+      const abortions = String(it.abortions ?? '').toLowerCase();
+      const living = String(it.living_children ?? '').toLowerCase();
+      const lmp = String(it.last_menstrual_period ?? '').toLowerCase();
+      return (
+        name.includes(q) ||
+        idStr.includes(q) ||
+        gravida.includes(q) ||
+        para.includes(q) ||
+        fullTerm.includes(q) ||
+        preterm.includes(q) ||
+        abortions.includes(q) ||
+        living.includes(q) ||
+        lmp.includes(q)
+      );
     });
   }, [recordsQuery, items, patientMap]);
 
@@ -175,7 +192,7 @@ function StaffPregnancyHistory() {
                 <option value="">Select a patient...</option>
                 {patients.map((p) => (
                   <option key={(p.id ?? p.patient_id)} value={(p.id ?? p.patient_id)}>
-                    {getPatientDisplayName(p)} (ID: {p.id ?? p.patient_id})
+                    {getPatientDisplayName(p)}
                   </option>
                 ))}
               </select>
@@ -222,7 +239,7 @@ function StaffPregnancyHistory() {
         <div style={{ display:"flex", gap:8, alignItems:"center", marginBottom:12 }}>
           <input
             type="text"
-            placeholder="Search records by patient name or ID"
+            placeholder="Search by name, gravida, para, LMP"
             value={recordsSearchText}
             onChange={(e) => setRecordsSearchText(e.target.value)}
           />
@@ -236,7 +253,6 @@ function StaffPregnancyHistory() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Patient</th>
                 <th>Gravida</th>
                 <th>Para</th>
@@ -251,7 +267,6 @@ function StaffPregnancyHistory() {
             <tbody>
               {filteredItems.map((it) => (
                 <tr key={it.id}>
-                  <td>{it.id}</td>
                   <td>{(() => {
                     const p = patients.find((pp) => (pp.id === it.patient_id) || (pp.patient_id === it.patient_id));
                     return p ? getPatientDisplayName(p) : it.patient_id;
@@ -270,7 +285,7 @@ function StaffPregnancyHistory() {
               ))}
               {items.length === 0 && (
                 <tr>
-                  <td colSpan="10" style={{ textAlign: "center", padding: 12 }}>No records found</td>
+                  <td colSpan="9" style={{ textAlign: "center", padding: 12 }}>No records found</td>
                 </tr>
               )}
             </tbody>

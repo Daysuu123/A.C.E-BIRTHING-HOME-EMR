@@ -78,7 +78,16 @@ const DeliveryRecord = () => {
       const p = patientMap.get(r.patient_id);
       const name = p ? getPatientDisplayName(p).toLowerCase() : '';
       const idStr = String(r.patient_id).toLowerCase();
-      return name.includes(q) || idStr.includes(q);
+      const type = String(r.delivery_type || '').toLowerCase();
+      const dt = String(r.delivery_date_time || '').toLowerCase();
+      const comps = String(r.complications || '').toLowerCase();
+      return (
+        name.includes(q) ||
+        idStr.includes(q) ||
+        type.includes(q) ||
+        dt.includes(q) ||
+        comps.includes(q)
+      );
     });
   }, [recordsQuery, records, patientMap]);
 
@@ -153,7 +162,7 @@ const DeliveryRecord = () => {
               <option value="">Select a patient...</option>
               {patients.map((p) => (
                 <option key={(p.id ?? p.patient_id)} value={(p.id ?? p.patient_id)}>
-                  {getPatientDisplayName(p)} (ID: {p.id ?? p.patient_id})
+                  {getPatientDisplayName(p)}
                 </option>
               ))}
             </select>
@@ -200,7 +209,7 @@ const DeliveryRecord = () => {
         <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:12 }}>
           <input
             type="text"
-            placeholder="Search records by patient name or ID"
+            placeholder="Search by name, type, date, complications"
             value={recordsSearchText}
             onChange={(e) => setRecordsSearchText(e.target.value)}
           />
@@ -211,9 +220,7 @@ const DeliveryRecord = () => {
           <table className="data-table">
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Patient</th>
-                <th>Patient ID</th>
                 <th>Date Time</th>
                 <th>Type</th>
                 <th>Complications</th>
@@ -223,14 +230,12 @@ const DeliveryRecord = () => {
             <tbody>
               {filteredRecords.length === 0 && (
                 <tr>
-                  <td colSpan="6">No records found.</td>
+                  <td colSpan="5">No records found.</td>
                 </tr>
               )}
               {filteredRecords.map((r) => (
                 <tr key={r.id}>
-                  <td>{r.id}</td>
                   <td>{(() => { const p = patientMap.get(r.patient_id); return p ? getPatientDisplayName(p) : '-'; })()}</td>
-                  <td>{r.patient_id}</td>
                   <td>{r.delivery_date_time}</td>
                   <td>{r.delivery_type}</td>
                   <td>{r.complications || '-'}</td>

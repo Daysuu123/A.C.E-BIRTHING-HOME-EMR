@@ -75,7 +75,20 @@ function NewbornInformation() {
       const p = patientMap.get(it.patient_id);
       const name = p ? getPatientDisplayName(p).toLowerCase() : '';
       const idStr = String(it.patient_id).toLowerCase();
-      return name.includes(q) || idStr.includes(q);
+      const deliveryId = String(it.delivery_record_id || '').toLowerCase();
+      const gender = String(it.gender || '').toLowerCase();
+      const weight = String(it.weight || '').toLowerCase();
+      const length = String(it.length || '').toLowerCase();
+      const comps = String(it.complications || '').toLowerCase();
+      return (
+        name.includes(q) ||
+        idStr.includes(q) ||
+        deliveryId.includes(q) ||
+        gender.includes(q) ||
+        weight.includes(q) ||
+        length.includes(q) ||
+        comps.includes(q)
+      );
     });
   }, [recordsQuery, items, patientMap]);
 
@@ -139,7 +152,7 @@ function NewbornInformation() {
               <option value="">Select a patient...</option>
               {patients.map((p) => (
                 <option key={(p.id ?? p.patient_id)} value={(p.id ?? p.patient_id)}>
-                  {getPatientDisplayName(p)} (ID: {p.id ?? p.patient_id})
+                  {getPatientDisplayName(p)}
                 </option>
               ))}
             </select>
@@ -181,7 +194,7 @@ function NewbornInformation() {
         <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:12 }}>
           <input
             type="text"
-            placeholder="Search records by patient name or ID"
+            placeholder="Search by name, gender, weight, length, complications"
             value={recordsSearchText}
             onChange={(e) => setRecordsSearchText(e.target.value)}
           />
@@ -195,9 +208,7 @@ function NewbornInformation() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Patient</th>
-                <th>Patient ID</th>
                 <th>Delivery</th>
                 <th>Gender</th>
                 <th>Weight</th>
@@ -209,9 +220,7 @@ function NewbornInformation() {
             <tbody>
               {filteredItems.map((it) => (
                 <tr key={it.id}>
-                  <td>{it.id}</td>
                   <td>{(() => { const p = patientMap.get(it.patient_id); return p ? getPatientDisplayName(p) : '-'; })()}</td>
-                  <td>{it.patient_id}</td>
                   <td>{it.delivery_record_id}</td>
                   <td>{it.gender}</td>
                   <td>{it.weight}</td>
@@ -224,7 +233,7 @@ function NewbornInformation() {
               ))}
               {filteredItems.length === 0 && (
                 <tr>
-                  <td colSpan="8" style={{ textAlign:'center', padding:12 }}>No records found</td>
+                  <td colSpan="7" style={{ textAlign:'center', padding:12 }}>No records found</td>
                 </tr>
               )}
             </tbody>
