@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import './AdminTables.css';
+import './Records.css';
+import './Staffregister.css';
 
 function PregnancyHistory() {
   const [items, setItems] = useState([]);
@@ -172,17 +174,15 @@ function PregnancyHistory() {
       <div className="subtitle">Manage pregnancy history records</div>
 
       {error && (
-        <div style={{ background:'#fff2f2', border:'1px solid #fca5a5', color:'#991b1b', padding:12, borderRadius:6, marginBottom:12 }}>
-          {error}
-        </div>
+        <div className="alert-error">{error}</div>
       )}
 
-      <section className="card" style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:6, padding:16, marginBottom:16 }}>
-        <h2 style={{ marginTop:0 }}>Add Pregnancy History</h2>
-        <form onSubmit={handleSubmit} style={{ display:'grid', gridTemplateColumns:'repeat(2, 1fr)', gap:12 }}>
-          <div style={{ gridColumn:'1 / -1', display:'grid', gap:8 }}>
-            <div style={{ fontWeight:600 }}>Patient</div>
-            <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+      <section>
+        <h2 className="title">Add Pregnancy History</h2>
+        <form onSubmit={handleSubmit} className="form">
+          <div className="row">
+            <label className="field" style={{ gridColumn: '1 / -1' }}>
+              <span>Patient</span>
               <select
                 value={form.patient_id}
                 onChange={(e) => {
@@ -199,55 +199,63 @@ function PregnancyHistory() {
                   </option>
                 ))}
               </select>
-              {searching && <span>Loading patients...</span>}
-            </div>
+              {searching && <div style={{ fontSize:12 }}>Loading patients...</div>}
+            </label>
           </div>
-          <label>
-            <div>Gravida</div>
-            <input type="number" name="gravida" value={form.gravida} onChange={handleChange} required />
-          </label>
-          <label>
-            <div>Para</div>
-            <input type="number" name="para" value={form.para} onChange={handleChange} required />
-          </label>
-          <label>
-            <div>Full Term Pregnancies</div>
-            <input type="number" name="full_term_pregnancies" value={form.full_term_pregnancies} onChange={handleChange} required />
-          </label>
-          <label>
-            <div>Preterm Deliveries</div>
-            <input type="number" name="preterm_deliveries" value={form.preterm_deliveries} onChange={handleChange} required />
-          </label>
-          <label>
-            <div>Abortions</div>
-            <input type="number" name="abortions" value={form.abortions} onChange={handleChange} required />
-          </label>
-          <label>
-            <div>Living Children</div>
-            <input type="number" name="living_children" value={form.living_children} onChange={handleChange} required />
-          </label>
-          <label>
-            <div>Last Menstrual Period</div>
-            <input type="date" name="last_menstrual_period" value={form.last_menstrual_period} onChange={handleChange} required />
-          </label>
-          <div style={{ gridColumn:'1 / -1', display:'flex', gap:8 }}>
-            <button type="submit" className="btn-primary">Save</button>
-            <button type="button" onClick={() => setForm({ patient_id:'', gravida:'', para:'', full_term_pregnancies:'', preterm_deliveries:'', abortions:'', living_children:'', last_menstrual_period:'' })}>Clear</button>
+          <div className="row">
+            <label className="field">
+              <span>Gravida</span>
+              <input type="number" name="gravida" value={form.gravida} onChange={handleChange} required />
+            </label>
+            <label className="field">
+              <span>Para</span>
+              <input type="number" name="para" value={form.para} onChange={handleChange} required />
+            </label>
+            <label className="field">
+              <span>Full Term Pregnancies</span>
+              <input type="number" name="full_term_pregnancies" value={form.full_term_pregnancies} onChange={handleChange} required />
+            </label>
+          </div>
+          <div className="row">
+            <label className="field">
+              <span>Preterm Deliveries</span>
+              <input type="number" name="preterm_deliveries" value={form.preterm_deliveries} onChange={handleChange} required />
+            </label>
+            <label className="field">
+              <span>Abortions</span>
+              <input type="number" name="abortions" value={form.abortions} onChange={handleChange} required />
+            </label>
+            <label className="field">
+              <span>Living Children</span>
+              <input type="number" name="living_children" value={form.living_children} onChange={handleChange} required />
+            </label>
+          </div>
+          <div className="row">
+            <label className="field">
+              <span>Last Menstrual Period</span>
+              <input type="date" name="last_menstrual_period" value={form.last_menstrual_period} onChange={handleChange} required />
+            </label>
+            <div />
+            <div />
+          </div>
+          <div className="actions">
+            <button type="submit" className="next">Save</button>
+            <button type="button" className="secondary" onClick={() => setForm({ patient_id:'', gravida:'', para:'', full_term_pregnancies:'', preterm_deliveries:'', abortions:'', living_children:'', last_menstrual_period:'' })}>Clear</button>
           </div>
         </form>
       </section>
 
-      <section className="card" style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:6, padding:16 }}>
+      <section className="card">
         <h2 style={{ marginTop:0 }}>Existing Records</h2>
-        <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:12 }}>
+        <div className="filters">
           <input
             type="text"
             placeholder="Search by name, gravida, para, LMP"
             value={recordsSearchText}
             onChange={(e) => setRecordsSearchText(e.target.value)}
           />
-          <button type="button" onClick={() => setRecordsQuery(recordsSearchText.trim())}>Search</button>
-          <button type="button" onClick={() => { setRecordsSearchText(''); setRecordsQuery(''); }}>Clear</button>
+          <button type="button" className="btn" onClick={() => setRecordsQuery(recordsSearchText.trim())}>Search</button>
+          <button type="button" className="btn" onClick={() => { setRecordsSearchText(''); setRecordsQuery(''); }}>Clear</button>
         </div>
         {loading ? (
           <div>Loading...</div>

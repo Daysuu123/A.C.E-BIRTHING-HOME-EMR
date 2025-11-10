@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import './AdminTables.css';
+import './Records.css';
+import './Staffregister.css';
 
 const DeliveryRecord = () => {
   const [records, setRecords] = useState([]);
@@ -144,77 +146,84 @@ const DeliveryRecord = () => {
 
   return (
     <AdminLayout>
-      <div style={{ padding: '16px' }}>
+      <div className="page-inner">
         <h1>Delivery Records</h1>
         {error && (
-          <div style={{ color: 'red', marginBottom: '8px' }}>{error}</div>
+          <div className="alert-error">{error}</div>
         )}
 
-        <form onSubmit={addRecord} style={{ display: 'grid', gap: '8px', maxWidth: '520px' }}>
-          <label>
-            Patient
-            <select
-              name="patient_id"
-              value={form.patient_id}
-              onChange={onChange}
-              required
-            >
-              <option value="">Select a patient...</option>
-              {patients.map((p) => (
-                <option key={(p.id ?? p.patient_id)} value={(p.id ?? p.patient_id)}>
-                  {getPatientDisplayName(p)}
-                </option>
-              ))}
-            </select>
-            {searching && <div style={{ fontSize:12 }}>Loading patients...</div>}
-          </label>
-          <label>
-            Delivery Date & Time
-            <input
-              type="datetime-local"
-              name="delivery_date_time"
-              value={form.delivery_date_time}
-              onChange={onChange}
-              required
-            />
-          </label>
-          <label>
-            Delivery Type
-            <input
-              type="text"
-              name="delivery_type"
-              placeholder="e.g. Normal, C-section"
-              value={form.delivery_type}
-              onChange={onChange}
-              required
-            />
-          </label>
-          <label>
-            Complications
-            <textarea
-              name="complications"
-              value={form.complications}
-              onChange={onChange}
-              placeholder="Optional details"
-            />
-          </label>
-          <button type="submit" disabled={loading}>
-            {loading ? 'Saving...' : 'Add Delivery Record'}
-          </button>
+        <form onSubmit={addRecord} className="form">
+          <div className="row">
+            <label className="field">
+              <span>Patient</span>
+              <select
+                name="patient_id"
+                value={form.patient_id}
+                onChange={onChange}
+                required
+              >
+                <option value="">Select a patient...</option>
+                {patients.map((p) => (
+                  <option key={(p.id ?? p.patient_id)} value={(p.id ?? p.patient_id)}>
+                    {getPatientDisplayName(p)}
+                  </option>
+                ))}
+              </select>
+              {searching && <div style={{ fontSize:12 }}>Loading patients...</div>}
+            </label>
+            <label className="field">
+              <span>Delivery Date & Time</span>
+              <input
+                type="datetime-local"
+                name="delivery_date_time"
+                value={form.delivery_date_time}
+                onChange={onChange}
+                required
+              />
+            </label>
+            <label className="field">
+              <span>Delivery Type</span>
+              <input
+                type="text"
+                name="delivery_type"
+                placeholder="e.g. Normal, C-section"
+                value={form.delivery_type}
+                onChange={onChange}
+                required
+              />
+            </label>
+          </div>
+          <div className="row">
+            <label className="field" style={{ gridColumn: '1 / -1' }}>
+              <span>Complications</span>
+              <textarea
+                name="complications"
+                value={form.complications}
+                onChange={onChange}
+                placeholder="Optional details"
+              />
+            </label>
+          </div>
+          <div className="actions">
+            <button type="submit" className="next" disabled={loading}>
+              {loading ? 'Saving...' : 'Add Delivery Record'}
+            </button>
+            <button type="button" className="secondary" onClick={() => { setForm({ patient_id: '', delivery_date_time: '', delivery_type: '', complications: '' }); }}>Clear</button>
+          </div>
         </form>
 
         <hr style={{ margin: '16px 0' }} />
 
         <h2>Existing Records</h2>
-        <div style={{ display:'flex', gap:8, alignItems:'center', marginBottom:12 }}>
+        <div className="filters">
           <input
             type="text"
             placeholder="Search by name, type, date, complications"
             value={recordsSearchText}
             onChange={(e) => setRecordsSearchText(e.target.value)}
           />
-          <button type="button" onClick={() => setRecordsQuery(recordsSearchText.trim())}>Search</button>
-          <button type="button" onClick={() => { setRecordsSearchText(''); setRecordsQuery(''); }}>Clear</button>
+          <button type="button" className="btn" onClick={() => setRecordsQuery(recordsSearchText.trim())}>Search</button>
+          <button type="button" className="btn" onClick={() => { setRecordsSearchText(''); setRecordsQuery(''); }}>Clear</button>
         </div>
         <div className="table-wrap" style={{ overflowX: 'auto' }}>
           <table className="data-table">

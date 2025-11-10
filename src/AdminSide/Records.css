@@ -1,0 +1,91 @@
+/* Shared record page styles for Admin and Staff sides */
+
+.page-inner {
+  padding: 16px;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.form-grid.narrow {
+  max-width: 520px;
+}
+
+/* Label + controls */
+.form-grid label { display: grid; gap: 6px; }
+.form-grid .wide { grid-column: 1 / -1; }
+.form-grid .row { display: flex; gap: 8px; align-items: center; }
+
+/* Inputs */
+.card input,
+.card select,
+.card textarea,
+.page-inner input,
+.page-inner select,
+.page-inner textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* Buttons */
+.btn { 
+  background: #f3f4f6;
+  color: #111827;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn:hover { filter: brightness(0.97); }
+
+.btn-primary {
+  background: #111827;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-weight: 600;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.btn-danger:hover { filter: brightness(0.95); }
+
+/* Alerts */
+.alert-error {
+  background: #fff2f2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+

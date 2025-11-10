@@ -23,7 +23,6 @@ import StaffCreateRecords from "./StaffSide/StaffCreateRecords";
 import StaffManageRecords from "./StaffSide/StaffManageRecords";
 import StaffAddPatient from "./StaffSide/StaffAddPatient";
 import StaffManageAccounts from "./StaffSide/StaffManageAccounts";
-import UserLanding from "./PatientSide/UserLanding";
 import PregnancyHistory from "./AdminSide/PregnancyHistory";
 import DeliveryRecord from "./AdminSide/DeliveryRecord";
 import NewbornInformation from "./AdminSide/NewbornInformation";
@@ -168,15 +167,8 @@ function App() {
           }
         />
 
-        {/* Patient routes */}
-        <Route
-          path="/user/landing"
-          element={
-            <PatientProtectedRoute>
-              <UserLanding />
-            </PatientProtectedRoute>
-          }
-        />
+    
+      
 
 
         <Route
